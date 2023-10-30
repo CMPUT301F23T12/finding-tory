@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.finding_tory"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.finding_tory"
