@@ -1,6 +1,8 @@
 package com.example.finding_tory;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -100,5 +102,16 @@ public class Item implements Serializable {
 
     public void setItemTags(ArrayList<String> itemTags) {
         this.itemTags = itemTags;
+    }
+
+    public static String errorHandleItemInput(String purchaseDate, String description, String estimatedValue) throws ParseException {
+        if (description.trim().equals("")) return "Item Description cannot be empty";
+        Date current = new Date();
+        if(current.before(new SimpleDateFormat("yyyy-MM-dd").parse(purchaseDate))) return "Date cannot be in the future";
+
+        if (estimatedValue.trim().equals("")) return "Expense amount cannot be empty";
+        if (Float.parseFloat(estimatedValue) <= 0) return "Cannot have a negative expense cost";
+
+        return "";
     }
 }

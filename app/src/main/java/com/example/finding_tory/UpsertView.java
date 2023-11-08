@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-public class UpsertView extends AppCompatActivity {
+public class UpsertView extends AppCompatActivity{
+    private final int ADD_ITEM = 0;
+    private final int EDIT_ITEM = 1;
+    private final int CANCEL_EDIT = 2;
     Button add_tags_button;
     Button submit_button;
     Button cancel_button;
@@ -27,15 +30,13 @@ public class UpsertView extends AppCompatActivity {
     EditText make_text;
     EditText model_text;
     EditText date_purchased_text;
-    EditText cost_text;
+    EditText estimated_cost_text;
     EditText serial_number_text;
     EditText comment_text;
     EditText tags_entered;
     ArrayList<String> tags;
+    boolean isAdd = false;
 
-    boolean isAdd = true;
-    @SuppressLint("MissingInflatedId")
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upsert_view);
@@ -48,35 +49,35 @@ public class UpsertView extends AppCompatActivity {
         make_text = findViewById(R.id.make_edittext);
         model_text = findViewById(R.id.model_edittext);
         date_purchased_text = findViewById(R.id.date_edittext);
-        cost_text = findViewById(R.id.amount_edittext);
-        cost_text.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10,2)});
+        estimated_cost_text = findViewById(R.id.amount_edittext);
+        estimated_cost_text.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10,2)});
         serial_number_text = findViewById(R.id.serial_number_edittext);
         comment_text = findViewById(R.id.comment_edittext);
         tags_entered = findViewById(R.id.add_tags_edittext);
 
+        Bundle extras = getIntent().getExtras();
+        Item item = null;
+        // if no data is sent through intent, then user wants to add an item
+        if (extras == null)
+            isAdd = true;
+        else {
+            item = (Item) (extras.getSerializable("ItemToEdit"));
+        }
 
-        Item item;
-        Date purchaseDate = new Date();
-        String description = "Test Item";
-        String make = "Test Make";
-        String model = "Test Model";
-        int serialNumber = 12345;
-        Float estimatedValue = 100.0f;
-        String comment = "Test Comment";
-        ArrayList<String> tags_test =new ArrayList<String>();
-        tags_test.add("tag1");
-        tags_test.add("tag2");
-        item = new Item(purchaseDate, description, make, model, estimatedValue, serialNumber, comment, tags_test);
-
-        if (!isAdd) {
+        // sets UI for whether user wants to add/edit
+        if (isAdd) {
+            view_title.setText("Add Item Information");
+            submit_button.setText("Add");
+        } else {
             view_title.setText("Edit Item Information");
             description_text.setText(item.getDescription());
             make_text.setText(item.getMake());
             model_text.setText(item.getModel());
             date_purchased_text.setText((CharSequence) item.getPurchaseDate());
-            cost_text.setText(Float.toString(item.getEstimatedValue()));
+            estimated_cost_text.setText(Float.toString(item.getEstimatedValue()));
             serial_number_text.setText(Integer.toString(item.getSerialNumber()));
             comment_text.setText(item.getComment());
+            submit_button.setText("Update");
         }
 
         add_tags_button.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +88,7 @@ public class UpsertView extends AppCompatActivity {
                 tags = new ArrayList<>(Arrays.asList(tag_list));
                 for (String tag: tags) {
                     String previous = tags_view.getText().toString();
-                    tags_view.setText(previous + " (" + tag + ")");
+                    tags_view.setText(String.format("%s (%s)", previous, tag));
                 }
             }
         });
@@ -95,28 +96,60 @@ public class UpsertView extends AppCompatActivity {
         submit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Date dateFormatted = null;
+                String error = "";
                 try {
-                    dateFormatted = new SimpleDateFormat("yyyy-MM").parse(date_purchased_text.getText().toString());
+                    error = Item.errorHandleItemInput(
+                            date_purchased_text.getText().toString(),
+                            description_text.getText().toString(),
+                            estimated_cost_text.getText().toString());
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
-                String description = description_text.getText().toString();
-                String make = make_text.getText().toString();
-                String model = model_text.getText().toString();
-                Float cost = Float.parseFloat(cost_text.getText().toString());
-                int serial_number = Integer.parseInt(serial_number_text.getText().toString());
-                String comment = comment_text.getText().toString();
+
+                if (!error.equals("")){
+                    // TODO: display error message on screen
+                } else {
+                    Intent intent = new Intent();
+                    Date dateFormatted = null;
+                    try {
+                        dateFormatted = new SimpleDateFormat("yyyy-MM").parse(date_purchased_text.getText().toString());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    String description = description_text.getText().toString();
+                    String make = make_text.getText().toString();
+                    String model = model_text.getText().toString();
+                    Float estimated_cost = Float.parseFloat(estimated_cost_text.getText().toString());
+                    int serial_number = Integer.parseInt(serial_number_text.getText().toString());
+                    String comment = comment_text.getText().toString();
 //                Item item = new Item(dateFormatted, description, make, model, cost, serial_number, comment, tags)
-                //TODO: send item back to be displayed in list/update
-//                send as intents
-//                finish()
+                    //TODO: send item back to be displayed in list/update
+                    if (isAdd) {
+                        Item new_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
+                        intent.putExtra("item_to_do", new_item);
+                        setResult(ADD_ITEM, intent);
+                        finish();
+                    } else {
+                        intent.putExtra("date_edit", dateFormatted);
+                        intent.putExtra("description_edit", description);
+                        intent.putExtra("make_edit", make);
+                        intent.putExtra("model_edit", model);
+                        intent.putExtra("estimated_cost_edit", estimated_cost);
+                        intent.putExtra("serial_number_edit", serial_number);
+                        intent.putExtra("comment_edit", comment);
+                        intent.putExtra("tags_edit", tags);
+
+                        setResult(EDIT_ITEM, intent);
+                        finish();
+                    }
+                }
             }
         });
 
         cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setResult(CANCEL_EDIT);
                 finish();
             }
         });
