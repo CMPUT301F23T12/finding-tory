@@ -2,8 +2,12 @@ package com.example.finding_tory;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,6 +25,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
+    private Button addItemButton;
 
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
@@ -51,7 +56,24 @@ public class InventoryViewActivity extends AppCompatActivity {
         // initialize and cache the TextViews for the totals
         totalItemsTextView = findViewById(R.id.total_items_textview);
         totalValueTextView = findViewById(R.id.total_value_textview);
+        addItemButton = findViewById(R.id.add_item_button);
         updateTotals();
+
+        // allows new items to be added
+        addItemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: add start activity page for result for adding item
+            }
+        });
+
+        //allow the items in the list to be clickable
+        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //TODO: let the user view the item (start new activity)
+            }
+        });
     }
 
 
