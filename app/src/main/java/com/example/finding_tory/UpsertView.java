@@ -16,11 +16,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-
 public class UpsertView extends AppCompatActivity{
-    private final int ADD_ITEM = 0;
-    private final int EDIT_ITEM = 1;
-    private final int CANCEL_EDIT = 2;
+//    private final int ADD_ITEM = 0;
+//    private final int EDIT_ITEM = 1;
+//    private final int CANCEL_EDIT = 2;
+
     Button add_tags_button;
     Button submit_button;
     Button cancel_button;
@@ -127,7 +127,7 @@ public class UpsertView extends AppCompatActivity{
                     if (isAdd) {
                         Item new_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
                         intent.putExtra("item_to_do", new_item);
-                        setResult(ADD_ITEM, intent);
+                        setResult(ActivityCodes.ADD_ITEM.getRequestCode(), intent);
                         finish();
                     } else {
                         intent.putExtra("date_edit", dateFormatted);
@@ -138,8 +138,7 @@ public class UpsertView extends AppCompatActivity{
                         intent.putExtra("serial_number_edit", serial_number);
                         intent.putExtra("comment_edit", comment);
                         intent.putExtra("tags_edit", tags);
-
-                        setResult(EDIT_ITEM, intent);
+                        setResult(ActivityCodes.EDIT_ITEM.getRequestCode(), intent);
                         finish();
                     }
                 }
@@ -149,7 +148,8 @@ public class UpsertView extends AppCompatActivity{
         cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(CANCEL_EDIT);
+                Intent intent = new Intent();
+                setResult(ActivityCodes.CANCEL_ITEM.getRequestCode(), intent);
                 finish();
             }
         });
