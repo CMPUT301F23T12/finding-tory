@@ -1,9 +1,10 @@
 package com.example.finding_tory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Item {
+public class Item implements Serializable {
     Date purchaseDate;
     String description;
     String make;
@@ -11,12 +12,11 @@ public class Item {
     int serialNumber;
     Float estimatedValue;
     String comment;
-    int itemCount;
     ArrayList<String> itemTags;
     // TODO: Add ArrayList of Images
 
 
-    public Item(Date purchaseDate, String description, String make, String model, int serialNumber, Float estimatedValue, String comment) {
+    public Item(Date purchaseDate, String description, String make, String model, Float estimatedValue, int serialNumber, String comment, ArrayList<String> itemTags) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -24,9 +24,10 @@ public class Item {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.itemTags = itemTags;
     }
 
-    public Item(Date purchaseDate, String description, String make, String model, Float estimatedValue, String comment) {
+    public Item(Date purchaseDate, String description, String make, String model, Float estimatedValue, String comment, ArrayList<String> itemTags) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -34,6 +35,7 @@ public class Item {
         this.serialNumber = 0;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.itemTags = itemTags;
     }
 
     public Date getPurchaseDate() {
@@ -90,14 +92,6 @@ public class Item {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public int getItemCount() {
-        return itemCount;
-    }
-
-    public void setItemCount(int itemCount) {
-        this.itemCount = itemCount;
     }
 
     public ArrayList<String> getItemTags() {
