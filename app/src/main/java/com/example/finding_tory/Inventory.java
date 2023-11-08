@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Inventory {
 
     private String name;
-    private ArrayList<Item> items;
+    private ArrayList<MockItem> items;
     private double value;
 
     /**
@@ -36,7 +36,7 @@ public class Inventory {
      * Gets the list of Items stored by the inventory.
      * @return ArrayList holding the inventory's items
      */
-    public ArrayList<Item> getItems() {
+    public ArrayList<MockItem> getItems() {
         return items;
     }
 
@@ -74,10 +74,10 @@ public class Inventory {
      * @param items
      *          new ArrayList of Items to store
      */
-    public void setItems(ArrayList<Item> items) {
+    public void setItems(ArrayList<MockItem> items) {
         this.items = items;
         this.value = 0;
-        for (Item item : items) {
+        for (MockItem item : items) {
             this.value += item.getValue();
         }
     }
@@ -88,7 +88,7 @@ public class Inventory {
      * @param item
      *          new Item object to add to inventory
      */
-    public void addItem(Item item) {
+    public void addItem(MockItem item) {
         this.items.add(item);
         this.value += item.getValue();
     }

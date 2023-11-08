@@ -1,11 +1,11 @@
 package com.example.finding_tory;
 
-public class Item {
+public class MockItem {
     private String description;
     private double value;
     private String tags;
 
-    public Item(String description, double value, String tags) {
+    public MockItem(String description, double value, String tags) {
         this.description = description;
         this.value = value;
         this.tags = tags;

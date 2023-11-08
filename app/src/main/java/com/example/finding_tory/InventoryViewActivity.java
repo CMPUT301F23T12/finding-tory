@@ -17,7 +17,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
     private Inventory inventory;
     private ListView inventoryListView;
-    private ArrayAdapter<Item> inventoryAdapter;
+    private ArrayAdapter<MockItem> inventoryAdapter;
 
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
@@ -38,10 +38,10 @@ public class InventoryViewActivity extends AppCompatActivity {
         setTitle(inventory.getName());
 
         // create some mock items to populate the list
-        inventory.addItem(new Item("Item1", 1.1, "[test]"));
-        inventory.addItem(new Item("Item2", 2.2, "[test] [uniqueTag]"));
-        inventory.addItem(new Item("Item3", 3.3, "[test]"));
-        inventory.addItem(new Item("Item4", 4.4, "[test]"));
+        inventory.addItem(new MockItem("Item1", 1.1, "[test]"));
+        inventory.addItem(new MockItem("Item2", 2.2, "[test] [uniqueTag]"));
+        inventory.addItem(new MockItem("Item3", 3.3, "[test]"));
+        inventory.addItem(new MockItem("Item4", 4.4, "[test]"));
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);

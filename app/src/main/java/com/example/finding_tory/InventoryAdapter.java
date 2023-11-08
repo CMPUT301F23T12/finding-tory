@@ -17,9 +17,9 @@ import java.util.Locale;
  * Implements adapter functionality in order to link the InventoryViewActivity's ListView
  * element to the array of Items in an Inventory.
  */
-public class InventoryAdapter extends ArrayAdapter<Item> {
+public class InventoryAdapter extends ArrayAdapter<MockItem> {
 
-    private ArrayList<Item> items;
+    private ArrayList<MockItem> items;
     private Context context;
 
     /**
@@ -29,7 +29,7 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
      * @param items
      *          list of Item objects being wrapped into the ListView
      */
-    public InventoryAdapter(Context context, ArrayList<Item> items) {
+    public InventoryAdapter(Context context, ArrayList<MockItem> items) {
         super(context, 0, items);
         this.items = items;
         this.context = context;
@@ -57,7 +57,7 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
             view = LayoutInflater.from(context).inflate(R.layout.item_content, parent, false);
 
         // find TextView elements that we wish to update
-        Item item = items.get(position);
+        MockItem item = items.get(position);
         TextView descriptionTextView = view.findViewById(R.id.description_text);
         TextView valueTextView = view.findViewById(R.id.value_text);
         TextView tagsTextView = view.findViewById(R.id.tags_text);
