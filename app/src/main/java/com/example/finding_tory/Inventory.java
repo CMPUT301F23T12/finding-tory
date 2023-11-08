@@ -6,6 +6,7 @@ import java.util.ArrayList;
  * Container class to hold a list of Items.
  */
 public class Inventory {
+
     private String name;
     private ArrayList<Item> items;
     private double value;
@@ -21,6 +22,7 @@ public class Inventory {
         this.value = 0;
     }
 
+
     /**
      * Gets the name of the inventory.
      * @return inventory name
@@ -28,6 +30,7 @@ public class Inventory {
     public String getName() {
         return name;
     }
+
 
     /**
      * Gets the list of Items stored by the inventory.
@@ -37,6 +40,7 @@ public class Inventory {
         return items;
     }
 
+
     /**
      * Gets the number of Items being held by the inventory.
      * @return size of the inventory
@@ -44,6 +48,7 @@ public class Inventory {
     public int getCount() {
         return items.size();
     }
+
 
     /**
      * Gets the total value of all the Items in the inventory.
@@ -53,6 +58,7 @@ public class Inventory {
         return value;
     }
 
+
     /**
      * Sets the name of the inventory object.
      * @param name
@@ -61,6 +67,7 @@ public class Inventory {
     public void setName(String name) {
         this.name = name;
     }
+
 
     /**
      * Sets the list of Items being held in the inventory, overwriting any previous lists.
@@ -74,6 +81,7 @@ public class Inventory {
             this.value += item.getValue();
         }
     }
+
 
     /**
      * Adds an Item object to the list of stored items in the inventory.

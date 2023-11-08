@@ -52,7 +52,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/total_items"
+        android:id="@+id/total_items_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/searchSortFilterNavbar"
@@ -63,13 +63,13 @@
         />
 
     <TextView
-        android:id="@+id/total_value"
+        android:id="@+id/total_value_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/searchSortFilterNavbar"
         android:layout_marginVertical="15dp"
         android:layout_marginHorizontal="40dp"
-        android:layout_toEndOf="@+id/total_items"
+        android:layout_toEndOf="@+id/total_items_textview"
         android:text="Total Value: $xx.xx"
         />
 
@@ -77,7 +77,7 @@
         android:id="@+id/inventory_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/total_items"
+        android:layout_below="@+id/total_items_textview"
         android:layout_alignParentStart="true"
         android:layout_marginTop="10dp"
         />

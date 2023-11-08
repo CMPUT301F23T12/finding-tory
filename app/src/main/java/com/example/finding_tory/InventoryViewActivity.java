@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.Locale;
 
 
 /**
@@ -16,10 +19,14 @@ public class InventoryViewActivity extends AppCompatActivity {
     private ListView inventoryListView;
     private ArrayAdapter<Item> inventoryAdapter;
 
+    private TextView totalItemsTextView;
+    private TextView totalValueTextView;
+
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
      *
-     * @param savedInstanceState possible default layout
+     * @param savedInstanceState
+     *          possible default layout
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,5 +47,27 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventoryListView = findViewById(R.id.inventory_listview);
         inventoryAdapter = new InventoryAdapter(this, inventory.getItems());
         inventoryListView.setAdapter(inventoryAdapter);
+
+        // initialize and cache the TextViews for the totals
+        totalItemsTextView = findViewById(R.id.total_items_textview);
+        totalValueTextView = findViewById(R.id.total_value_textview);
+        updateTotals();
+    }
+
+
+    /**
+     * Rewrites the TextView elements displaying the inventory totals to reflect new values.
+     */
+    public void updateTotals() {
+        totalItemsTextView.setText(
+                String.format(Locale.CANADA,
+                        "Total items: %d",
+                        inventory.getCount())
+        );
+        totalValueTextView.setText(
+                String.format(Locale.CANADA,
+                        "Total Value: $%.2f",
+                        inventory.getValue())
+        );
     }
 }

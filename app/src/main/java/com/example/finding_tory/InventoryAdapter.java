@@ -18,6 +18,7 @@ import java.util.Locale;
  * element to the array of Items in an Inventory.
  */
 public class InventoryAdapter extends ArrayAdapter<Item> {
+
     private ArrayList<Item> items;
     private Context context;
 
@@ -34,13 +35,17 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         this.context = context;
     }
 
+
     /**
      * Updates the contents of the TextView elements in an inventory row (ie. an item) to reflect
      *  the state of a given Item object.
      *
-     * @param position index of the Item object whose info we wish to update
-     * @param convertView the view that will be returned at the end
-     * @param parent used to define return in case convertView is null
+     * @param position
+     *          index of the Item object whose info we wish to update
+     * @param convertView
+     *          view that will be returned at the end
+     * @param parent
+     *          used to define return in case convertView is null
      *
      * @return the element that is updated
      */
