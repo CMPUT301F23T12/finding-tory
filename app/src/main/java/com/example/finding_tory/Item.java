@@ -13,7 +13,7 @@ public class Item {
     String comment;
     int itemCount;
     ArrayList<String> itemTags;
-    // Add ArrayList of Images
+    // TODO: Add ArrayList of Images
 
 
     public Item(Date purchaseDate, String description, String make, String model, int serialNumber, Float estimatedValue, String comment) {
