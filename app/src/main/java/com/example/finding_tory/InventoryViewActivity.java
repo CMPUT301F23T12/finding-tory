@@ -6,14 +6,21 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 
+/**
+ * Displays the content of a given Inventory (ie. a list of Items).
+ */
 public class InventoryViewActivity extends AppCompatActivity {
 
     private Inventory inventory;
     private ListView inventoryListView;
     private ArrayAdapter<Item> inventoryAdapter;
 
+    /**
+     * Initializes the instance variables and bindings associated with this activity on creation.
+     *
+     * @param savedInstanceState possible default layout
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

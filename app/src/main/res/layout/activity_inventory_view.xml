@@ -22,7 +22,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:hint="Search for items..."
+            android:hint="@string/items_search_hint"
             android:inputType="text"
             android:autofillHints="" />
 
@@ -59,7 +59,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginVertical="15dp"
         android:layout_marginHorizontal="40dp"
-        android:text="Total Items:"
+        android:text="Total Items: xx"
         />
 
     <TextView
@@ -70,7 +70,7 @@
         android:layout_marginVertical="15dp"
         android:layout_marginHorizontal="40dp"
         android:layout_toEndOf="@+id/total_items"
-        android:text="Total Value:"
+        android:text="Total Value: $xx.xx"
         />
 
     <ListView
@@ -93,7 +93,7 @@
         android:clickable="true"
         app:srcCompat="@android:drawable/ic_input_add"
         android:focusable="true"
-        android:contentDescription="Add Item"
+        android:contentDescription="@string/add_item_btn_description"
         />
 
 </RelativeLayout>

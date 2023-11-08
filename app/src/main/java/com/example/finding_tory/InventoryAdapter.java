@@ -13,10 +13,21 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * Implements adapter functionality in order to link the InventoryViewActivity's ListView
+ * element to the array of Items in an Inventory.
+ */
 public class InventoryAdapter extends ArrayAdapter<Item> {
     private ArrayList<Item> items;
     private Context context;
 
+    /**
+     * Creates a new InventoryAdapter object.
+     * @param context
+     *          view/element this adapter is subordinate to
+     * @param items
+     *          list of Item objects being wrapped into the ListView
+     */
     public InventoryAdapter(Context context, ArrayList<Item> items) {
         super(context, 0, items);
         this.items = items;
