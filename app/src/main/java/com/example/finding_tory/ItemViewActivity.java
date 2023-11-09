@@ -46,6 +46,16 @@ public class ItemViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Show Delete Confirmation Fragment
                 DeleteItemFragment deleteDialog = new DeleteItemFragment();
+                final View greyBack = findViewById(R.id.fadeBackground);
+                greyBack.setVisibility(View.VISIBLE);
+                // Set the listener to know when the dialog is dismissed
+                deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
+                    @Override
+                    public void onDialogDismissed() {
+                        // Make grey background invisible when the dialog is dismissed
+                        greyBack.setVisibility(View.GONE);
+                    }
+                });
                 deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
             }
         });
