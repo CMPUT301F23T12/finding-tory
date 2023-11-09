@@ -10,6 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Locale;
@@ -22,7 +25,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
     private Inventory inventory;
     private ListView inventoryListView;
-    private ArrayAdapter<MockItem> inventoryAdapter;
+    private ArrayAdapter<Item> inventoryAdapter;
 
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
@@ -31,8 +34,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
      *
-     * @param savedInstanceState
-     *          possible default layout
+     * @param savedInstanceState possible default layout
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +46,16 @@ public class InventoryViewActivity extends AppCompatActivity {
         setTitle(inventory.getName());
 
         // create some mock items to populate the list
-        inventory.addItem(new MockItem("Item1", 1.1, "[test]"));
-        inventory.addItem(new MockItem("Item2", 2.2, "[test] [uniqueTag]"));
-        inventory.addItem(new MockItem("Item3", 3.3, "[test]"));
-        inventory.addItem(new MockItem("Item4", 4.4, "[test]"));
+        ArrayList<String> tags1 = new ArrayList<String>();
+        tags1.add("testtag1");
+        tags1.add("testtag1.1");
+        ArrayList<String> tags2 = new ArrayList<String>();
+        tags2.add("testtag2");
+        tags2.add("testtag2.2");
+        inventory.addItem(new Item(new Date(2023, 1, 24), "Item1", "make1", "model1", 10.01f, "1", "no comment", tags1));
+        inventory.addItem(new Item(new Date(2023, 1, 25), "Item2", "make2", "model2", 20.02f, "2", "No comment", tags2));
+        inventory.addItem(new Item(new Date(2023, 2, 27), "Item3", "make1", "model3", 30.03f, "3", "no Comment", tags2));
+        inventory.addItem(new Item(new Date(2022, 9, 13), "Item4", "make4", "model1", 400.40f, "4", "no commenT", tags1));
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -71,8 +79,13 @@ public class InventoryViewActivity extends AppCompatActivity {
         //allow the items in the list to be clickable
         inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO: let the user view the item (start new activity)
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Item selectedItem = inventoryAdapter.getItem(position);
+
+                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
+                intent.putExtra("item", selectedItem);
+
+                startActivity(intent);
             }
         });
     }

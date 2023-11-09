@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_close_item_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:srcCompat="@android:drawable/ic_delete" />
+
+    <!-- Image Slider Placeholder -->
+    <FrameLayout
+        android:id="@+id/image_slider_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/item_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <Button
+            android:id="@+id/button_left_picture_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:drawableEnd="@android:drawable/ic_media_previous"
+            android:minWidth="40dp"
+            android:minHeight="40dp" />
+
+        <Button
+            android:id="@+id/button_right_picture_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:drawableEnd="@android:drawable/ic_media_next"
+            android:minWidth="40dp"
+            android:minHeight="40dp" />
+
+    </FrameLayout>
+
+    <!-- Details Section -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/image_slider_placeholder">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/item_description_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:paddingStart="10sp"
+                android:paddingTop="5sp"
+                android:paddingEnd="10sp"
+                android:paddingBottom="5sp"
+                android:text="item_description"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/item_comment_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:paddingStart="10sp"
+                android:paddingTop="10sp"
+                android:paddingEnd="10sp"
+                android:paddingBottom="5sp"
+                android:text="item_comment"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/item_make_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:paddingStart="10sp"
+                android:paddingTop="10sp"
+                android:paddingEnd="10sp"
+                android:paddingBottom="5sp"
+                android:text="item_make"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/item_model_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:paddingStart="10sp"
+                android:paddingTop="5sp"
+                android:paddingEnd="10sp"
+                android:paddingBottom="5sp"
+                android:text="item_model"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/item_date_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:paddingStart="10sp"
+                android:paddingTop="10sp"
+                android:paddingEnd="10sp"
+                android:paddingBottom="5sp"
+                android:text="item_date"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/item_value_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:paddingStart="10sp"
+                android:paddingTop="5sp"
+                android:paddingEnd="10sp"
+                android:paddingBottom="5sp"
+                android:text="item_value"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/item_serial_number_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:paddingStart="10sp"
+                android:paddingTop="5sp"
+                android:paddingEnd="10sp"
+                android:paddingBottom="5sp"
+                android:text="item_SN"
+                android:textSize="18sp" />
+
+            <!-- Tags Container -->
+            <LinearLayout
+                android:id="@+id/item_tag_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!--Tags will be dynamically added, these are here as reference-->
+                <!--<TextView-->
+                <!--    android:layout_width="wrap_content"-->
+                <!--    android:layout_height="wrap_content"-->
+                <!--    android:padding="8dp"-->
+                <!--    android:text="item_tag1" />-->
+
+                <!--<TextView-->
+                <!--    android:layout_width="wrap_content"-->
+                <!--    android:layout_height="wrap_content"-->
+                <!--    android:padding="8dp"-->
+                <!--    android:text="item_tag2" />-->
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Delete and Edit Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/button_edit_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="edit" />
+
+        <Button
+            android:id="@+id/button_delete_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="delete" />
+    </LinearLayout>
+
+</RelativeLayout>
