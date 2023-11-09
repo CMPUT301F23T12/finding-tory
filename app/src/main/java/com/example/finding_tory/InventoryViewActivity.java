@@ -34,7 +34,8 @@ public class InventoryViewActivity extends AppCompatActivity {
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
      *
-     * @param savedInstanceState possible default layout
+     * @param savedInstanceState
+     *          possible default layout
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
