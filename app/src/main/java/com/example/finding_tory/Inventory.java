@@ -69,6 +69,12 @@ public class Inventory implements Serializable {
         this.name = name;
     }
 
+    public void calculateValue() {
+        this.value = 0;
+        for (Item item : items) {
+            this.value += item.getEstimatedValue();
+        }
+    }
 
     /**
      * Sets the list of Items being held in the inventory, overwriting any previous lists.
@@ -77,10 +83,16 @@ public class Inventory implements Serializable {
      */
     public void setItems(ArrayList<Item> items) {
         this.items = items;
-        this.value = 0;
-        for (Item item : items) {
-            this.value += item.getEstimatedValue();
-        }
+        calculateValue();
+    }
+
+    public Item get(int index) {
+        return items.get(index);
+    }
+
+    public void set(int index, Item item) {
+        items.set(index, item);
+        calculateValue();
     }
 
 

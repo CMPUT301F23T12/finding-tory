@@ -1,5 +1,6 @@
 package com.example.finding_tory;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,6 +17,7 @@ import java.util.Date;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Locale;
+import java.util.Objects;
 
 
 /**
@@ -63,7 +65,8 @@ public class InventoryViewActivity extends AppCompatActivity {
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: add start activity page for result for adding item
+                Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
+                startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
             }
         });
 
@@ -74,13 +77,41 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item selectedItem = inventoryAdapter.getItem(position);
 
                 Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
-                intent.putExtra("item", selectedItem);
+                intent.putExtra("selectedItem", selectedItem);
+                intent.putExtra("pos", position);
 
-                startActivity(intent);
+                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
             }
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // adding new item to list once user submits new item
+        if (requestCode == ActivityCodes.ADD_ITEM.getRequestCode()) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                Item selectedItem = (Item) data.getSerializableExtra("item_to_add");
+                assert selectedItem != null;
+                System.out.println(selectedItem.getDescription());
+                inventory.addItem(selectedItem);
+                inventoryAdapter.notifyDataSetChanged();
+                updateTotals();
+            }
+        }
+        // updates the item at position passed
+        if (requestCode == ActivityCodes.VIEW_ITEM.getRequestCode()){
+            int pos = data.getIntExtra("position", 0);
+            System.out.println(pos);
+            Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
+            inventory.set(pos, returnedItem);
+            inventoryAdapter.notifyDataSetChanged();
+            updateTotals();
+        }
+
+        // TODO: implement for deleting
+    }
 
     /**
      * Rewrites the TextView elements displaying the inventory totals to reflect new values.
