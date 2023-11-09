@@ -10,11 +10,14 @@ import android.widget.EditText;
 
 import com.google.android.material.snackbar.Snackbar;
 
+
+/**
+ * Displays an activity allowing the user to login, or begin new account creation.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameEditText;
     private EditText passwordEditText;
-
 
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.

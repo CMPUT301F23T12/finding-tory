@@ -17,11 +17,23 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
 
+
+/**
+ * Displays a navbar activity allowing the user to view their ledger (list of inventories),
+ *  as well as viewing info about their profile, or logging out. The navigation between
+ *  these views is done through a drawer that opens on the left on back press/hamburger menu press.
+ */
 public class LedgerViewActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityLedgerViewBinding binding;
 
+    /**
+     * Initializes the instance variables and bindings associated with this activity on creation.
+     *
+     * @param savedInstanceState
+     *          possible default layout
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
