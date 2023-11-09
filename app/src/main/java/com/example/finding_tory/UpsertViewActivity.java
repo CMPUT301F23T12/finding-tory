@@ -2,7 +2,6 @@ package com.example.finding_tory;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -16,11 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-public class UpsertView extends AppCompatActivity{
-//    private final int ADD_ITEM = 0;
-//    private final int EDIT_ITEM = 1;
-//    private final int CANCEL_EDIT = 2;
-
+public class UpsertViewActivity extends AppCompatActivity{
     Button add_tags_button;
     Button submit_button;
     Button cancel_button;
@@ -34,8 +29,9 @@ public class UpsertView extends AppCompatActivity{
     EditText serial_number_text;
     EditText comment_text;
     EditText tags_entered;
-    ArrayList<String> tags;
+    Item item;
     boolean isAdd = false;
+    ArrayList<String> tags = new ArrayList<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,15 +52,15 @@ public class UpsertView extends AppCompatActivity{
         tags_entered = findViewById(R.id.add_tags_edittext);
 
         Bundle extras = getIntent().getExtras();
-        Item item = null;
+        item = null;
         // if no data is sent through intent, then user wants to add an item
         if (extras == null)
             isAdd = true;
         else {
-            item = (Item) (extras.getSerializable("ItemToEdit"));
+            item = (Item) (extras.getSerializable("selectedItem"));
+            tags.addAll(item.getItemTags());
         }
 
-        // sets UI for whether user wants to add/edit
         if (isAdd) {
             view_title.setText("Add Item Information");
             submit_button.setText("Add");
@@ -73,10 +69,11 @@ public class UpsertView extends AppCompatActivity{
             description_text.setText(item.getDescription());
             make_text.setText(item.getMake());
             model_text.setText(item.getModel());
-            date_purchased_text.setText((CharSequence) item.getPurchaseDate());
+            date_purchased_text.setText(new SimpleDateFormat("yyyy-MM-dd").format(item.getPurchaseDate()));
             estimated_cost_text.setText(Float.toString(item.getEstimatedValue()));
-            serial_number_text.setText(Integer.toString(item.getSerialNumber()));
+            serial_number_text.setText(item.getSerialNumber());
             comment_text.setText(item.getComment());
+            tags_view.setText(tags.toString());
             submit_button.setText("Update");
         }
 
@@ -84,12 +81,13 @@ public class UpsertView extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 String tags_string = tags_entered.getText().toString();
-                String[] tag_list = tags_string.split(" ");
-                tags = new ArrayList<>(Arrays.asList(tag_list));
-                for (String tag: tags) {
-                    String previous = tags_view.getText().toString();
-                    tags_view.setText(String.format("%s (%s)", previous, tag));
+                if (tags_string.equals("")) {
+                    return;
                 }
+                String[] tag_list = tags_string.split(" ");
+                tags.addAll(Arrays.asList(tag_list));
+                tags_view.setText(tags.toString());
+                tags_entered.setText("");
             }
         });
 
@@ -103,6 +101,7 @@ public class UpsertView extends AppCompatActivity{
                             description_text.getText().toString(),
                             estimated_cost_text.getText().toString());
                 } catch (ParseException e) {
+                    System.out.println("check except");
                     throw new RuntimeException(e);
                 }
 
@@ -112,33 +111,27 @@ public class UpsertView extends AppCompatActivity{
                     Intent intent = new Intent();
                     Date dateFormatted = null;
                     try {
-                        dateFormatted = new SimpleDateFormat("yyyy-MM").parse(date_purchased_text.getText().toString());
+                        dateFormatted = new SimpleDateFormat("yyyy-MM-dd").parse(date_purchased_text.getText().toString());
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
                     String description = description_text.getText().toString();
                     String make = make_text.getText().toString();
                     String model = model_text.getText().toString();
-                    Float estimated_cost = Float.parseFloat(estimated_cost_text.getText().toString());
-                    int serial_number = Integer.parseInt(serial_number_text.getText().toString());
+                    float estimated_cost = Float.parseFloat(estimated_cost_text.getText().toString());
+                    String serial_number = serial_number_text.getText().toString();
                     String comment = comment_text.getText().toString();
-//                Item item = new Item(dateFormatted, description, make, model, cost, serial_number, comment, tags)
                     //TODO: send item back to be displayed in list/update
                     if (isAdd) {
+                        System.out.println("no error");
                         Item new_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
-                        intent.putExtra("item_to_do", new_item);
-                        setResult(ActivityCodes.ADD_ITEM.getRequestCode(), intent);
+                        intent.putExtra("item_to_add", new_item);
+                        setResult(RESULT_OK, intent);
                         finish();
                     } else {
-                        intent.putExtra("date_edit", dateFormatted);
-                        intent.putExtra("description_edit", description);
-                        intent.putExtra("make_edit", make);
-                        intent.putExtra("model_edit", model);
-                        intent.putExtra("estimated_cost_edit", estimated_cost);
-                        intent.putExtra("serial_number_edit", serial_number);
-                        intent.putExtra("comment_edit", comment);
-                        intent.putExtra("tags_edit", tags);
-                        setResult(ActivityCodes.EDIT_ITEM.getRequestCode(), intent);
+                        Item edited_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
+                        intent.putExtra("editedItem", edited_item);
+                        setResult(RESULT_OK, intent);
                         finish();
                     }
                 }
@@ -148,8 +141,8 @@ public class UpsertView extends AppCompatActivity{
         cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                setResult(ActivityCodes.CANCEL_ITEM.getRequestCode(), intent);
+//                Intent intent = new Intent();
+                setResult(RESULT_CANCELED);
                 finish();
             }
         });

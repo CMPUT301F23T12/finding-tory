@@ -13,8 +13,8 @@ public class ItemTest extends TestCase {
         String description = "Test Item";
         String make = "Test Make";
         String model = "Test Model";
-        int serialNumber = 12345;
-        Float estimatedValue = 100.0f;
+        String serialNumber = "12345";
+        float estimatedValue = 100.0f;
         String comment = "Test Comment";
         ArrayList<String> tags = new ArrayList<String>();
         tags.add("tag1");
@@ -60,11 +60,11 @@ public class ItemTest extends TestCase {
     }
 
     public void testGetSerialNumber() {
-        assertEquals(item.getSerialNumber(), 12345);
+        assertEquals(item.getSerialNumber(), "12345");
     }
 
     public void testSetSerialNumber() {
-        item.setSerialNumber(54321);
+        item.setSerialNumber("54321");
         assertEquals(item.getSerialNumber(), 54321);
     }
 

@@ -11,14 +11,14 @@ public class Item implements Serializable {
     String description;
     String make;
     String model;
-    int serialNumber;
-    Float estimatedValue;
+    String serialNumber;
+    float estimatedValue;
     String comment;
     ArrayList<String> itemTags;
     // TODO: Add ArrayList of Images
 
 
-    public Item(Date purchaseDate, String description, String make, String model, Float estimatedValue, int serialNumber, String comment, ArrayList<String> itemTags) {
+    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -29,15 +29,15 @@ public class Item implements Serializable {
         this.itemTags = itemTags;
     }
 
-    public Item(Date purchaseDate, String description, String make, String model, Float estimatedValue, String comment, ArrayList<String> itemTags) {
-        this.purchaseDate = purchaseDate;
-        this.description = description;
-        this.make = make;
-        this.model = model;
-        this.serialNumber = 0;
-        this.estimatedValue = estimatedValue;
-        this.comment = comment;
-        this.itemTags = itemTags;
+    public void updateItem(Item copy) {
+        this.purchaseDate = copy.getPurchaseDate();
+        this.description = copy.getDescription();
+        this.make = copy.getMake();
+        this.model = copy.getModel();
+        this.serialNumber = copy.getSerialNumber();
+        this.estimatedValue = copy.getEstimatedValue();
+        this.comment = copy.getComment();
+        this.itemTags = copy.getItemTags();
     }
 
     public Date getPurchaseDate() {
@@ -72,19 +72,19 @@ public class Item implements Serializable {
         this.model = model;
     }
 
-    public int getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(int serialNumber) {
+    public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
-    public Float getEstimatedValue() {
+    public float getEstimatedValue() {
         return estimatedValue;
     }
 
-    public void setEstimatedValue(Float estimatedValue) {
+    public void setEstimatedValue(float estimatedValue) {
         this.estimatedValue = estimatedValue;
     }
 
@@ -100,6 +100,15 @@ public class Item implements Serializable {
         return itemTags;
     }
 
+    public StringBuilder getTagsString() {
+        StringBuilder tags_string = new StringBuilder();
+        for (String tag: this.itemTags) {
+            tags_string.append(tag).append(" ");
+        }
+
+        return tags_string;
+    }
+
     public void setItemTags(ArrayList<String> itemTags) {
         this.itemTags = itemTags;
     }
@@ -107,10 +116,11 @@ public class Item implements Serializable {
     public static String errorHandleItemInput(String purchaseDate, String description, String estimatedValue) throws ParseException {
         if (description.trim().equals("")) return "Item Description cannot be empty";
         Date current = new Date();
-        if(current.before(new SimpleDateFormat("yyyy-MM-dd").parse(purchaseDate))) return "Date cannot be in the future";
+        if (current.before(new SimpleDateFormat("yyyy-MM-dd").parse(purchaseDate)))
+            return "Date cannot be in the future";
 
-        if (estimatedValue.trim().equals("")) return "Expense amount cannot be empty";
-        if (Float.parseFloat(estimatedValue) <= 0) return "Cannot have a negative expense cost";
+        if (estimatedValue.trim().equals("")) return "Estimated value cannot be empty";
+        if (Float.parseFloat(estimatedValue) <= 0) return "Cannot have a negative Estimated value";
 
         return "";
     }
