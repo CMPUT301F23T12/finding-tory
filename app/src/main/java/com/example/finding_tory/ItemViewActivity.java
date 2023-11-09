@@ -22,6 +22,7 @@ public class ItemViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_view);
+        setTitle("View Item");
 
         // Retrieve the selected item from the Intent
         Item selectedItem = (Item) getIntent().getSerializableExtra("item");

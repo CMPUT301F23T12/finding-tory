@@ -84,7 +84,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
                 intent.putExtra("item", selectedItem);
-                System.out.println("b4");
+
                 startActivity(intent);
             }
         });
