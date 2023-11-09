@@ -9,12 +9,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+
+/**
+ * This class is responsible for updating/inserting items in an inventory
+ */
 public class UpsertViewActivity extends AppCompatActivity{
     Button add_tags_button;
     Button submit_button;
@@ -61,6 +66,7 @@ public class UpsertViewActivity extends AppCompatActivity{
             tags.addAll(item.getItemTags());
         }
 
+        //initializes UI based on if user wants to add or edit item
         if (isAdd) {
             view_title.setText("Add Item Information");
             submit_button.setText("Add");
@@ -77,6 +83,10 @@ public class UpsertViewActivity extends AppCompatActivity{
             submit_button.setText("Update");
         }
 
+        /**
+         * Displays any tags user entered in the search bar (space-separated) adds it to all
+         * tags associated with the item
+         */
         add_tags_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,30 +95,37 @@ public class UpsertViewActivity extends AppCompatActivity{
                     return;
                 }
                 String[] tag_list = tags_string.split(" ");
-                tags.addAll(Arrays.asList(tag_list));
+                tags.addAll(Arrays.asList(tag_list)); // adds to all tags for item
                 tags_view.setText(tags.toString());
                 tags_entered.setText("");
             }
         });
 
+        /**
+         * Submits the form if data is valid and will either add item to inventory list or
+         * view item if user wants to edit item
+         */
         submit_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String error = "";
+                // checks for error and makes sure required input is filled
+                String error;
                 try {
                     error = Item.errorHandleItemInput(
                             date_purchased_text.getText().toString(),
                             description_text.getText().toString(),
                             estimated_cost_text.getText().toString());
                 } catch (ParseException e) {
-                    System.out.println("check except");
-                    throw new RuntimeException(e);
+                    error = "Invalid Date Format";
                 }
 
                 if (!error.equals("")){
                     // TODO: display error message on screen
+                    Toast toast = Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG);
+                    toast.show();
                 } else {
                     Intent intent = new Intent();
+                    // takes input from the form
                     Date dateFormatted = null;
                     try {
                         dateFormatted = new SimpleDateFormat("yyyy-MM-dd").parse(date_purchased_text.getText().toString());
@@ -121,19 +138,15 @@ public class UpsertViewActivity extends AppCompatActivity{
                     float estimated_cost = Float.parseFloat(estimated_cost_text.getText().toString());
                     String serial_number = serial_number_text.getText().toString();
                     String comment = comment_text.getText().toString();
-                    //TODO: send item back to be displayed in list/update
+                    Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
+
                     if (isAdd) {
-                        System.out.println("no error");
-                        Item new_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
-                        intent.putExtra("item_to_add", new_item);
-                        setResult(RESULT_OK, intent);
-                        finish();
+                        intent.putExtra("item_to_add", upsert_item);
                     } else {
-                        Item edited_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
-                        intent.putExtra("editedItem", edited_item);
-                        setResult(RESULT_OK, intent);
-                        finish();
+                        intent.putExtra("editedItem", upsert_item);
                     }
+                    setResult(RESULT_OK, intent); // sends item back to parent activity
+                    finish();
                 }
             }
         });
@@ -141,7 +154,6 @@ public class UpsertViewActivity extends AppCompatActivity{
         cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent();
                 setResult(RESULT_CANCELED);
                 finish();
             }
