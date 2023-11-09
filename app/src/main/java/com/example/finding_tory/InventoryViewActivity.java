@@ -10,8 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -84,7 +82,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Item selectedItem = inventoryAdapter.getItem(position);
 
-                Intent intent = new Intent(InventoryViewActivity.this, ItemView.class);
+                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
                 intent.putExtra("item", selectedItem);
                 System.out.println("b4");
                 startActivity(intent);

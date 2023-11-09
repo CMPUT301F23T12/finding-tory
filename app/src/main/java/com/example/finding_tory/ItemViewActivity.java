@@ -15,13 +15,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.Locale;
 import java.util.Objects;
 
-public class ItemView extends AppCompatActivity {
+public class ItemViewActivity extends AppCompatActivity {
     private static final int EDIT_ITEM_REQUEST = 1; // Can be any integer unique to this activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.item_click_view);
+        setContentView(R.layout.activity_item_view);
 
         // Retrieve the selected item from the Intent
         Item selectedItem = (Item) getIntent().getSerializableExtra("item");
@@ -92,7 +92,7 @@ public class ItemView extends AppCompatActivity {
     }
 
     private void setItemView(Item passedItem) {
-        TextView item_name = findViewById(R.id.item_name_text);
+        TextView item_name = findViewById(R.id.item_description_text);
         item_name.setText(passedItem.getDescription());
 
         TextView item_comment = findViewById(R.id.item_comment_text);
@@ -101,14 +101,14 @@ public class ItemView extends AppCompatActivity {
         TextView item_make = findViewById(R.id.item_make_text);
         item_make.setText(passedItem.getMake());
 
+        TextView item_quantity = findViewById(R.id.item_model_text);
+        item_quantity.setText(passedItem.getModel());
+
         TextView item_date = findViewById(R.id.item_date_text);
         item_date.setText(passedItem.getPurchaseDate().toString());
 
         TextView item_value = findViewById(R.id.item_value_text);
         item_value.setText(String.format(Locale.CANADA, "$%.2f", passedItem.getEstimatedValue()));
-
-        TextView item_quantity = findViewById(R.id.item_quantity_text);
-        item_quantity.setText(passedItem.getMake());
 
         TextView item_serial_number = findViewById(R.id.item_serial_number_text);
         item_serial_number.setText(passedItem.getSerialNumber());
