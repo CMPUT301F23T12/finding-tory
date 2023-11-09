@@ -212,4 +212,16 @@ public class Item implements Serializable {
 
         return "";
     }
+
+    public void addTags(ArrayList<String> newTags) {
+        for (String tag : newTags) {
+            if (!this.itemTags.contains(tag)) {
+                this.itemTags.add(tag);
+            }
+        }
+    }
+
+    public void removeTag(String tag) {
+        this.itemTags.remove(tag);
+    }
 }
