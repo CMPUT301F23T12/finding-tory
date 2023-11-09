@@ -31,9 +31,10 @@ public class ItemView extends AppCompatActivity {
             if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                 // Handle the returned result data
                 Intent data = result.getData();
-                selectedItem = (Item) data.getSerializableExtra("editedItem");
+                selectedItem.updateItem((Item) data.getSerializableExtra("editedItem"));
                 // Update your UI with the edited item here
-                setItemView(selectedItem);
+//                selectedItem.setDescription(editted_item.getDescription());
+            setItemView(selectedItem);
             }
         });
 
@@ -61,9 +62,9 @@ public class ItemView extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Start Edit Activity
-                Intent editItemIntent = new Intent(ItemView.this, EditItemActivity.class);
-                editItemIntent.putExtra("selectedItem", selectedItem);
-                editItemActivityResultLauncher.launch(editItemIntent);
+//                Intent editItemIntent = new Intent(ItemView.this, EditItemActivity.class);
+//                editItemIntent.putExtra("selectedItem", selectedItem);
+//                editItemActivityResultLauncher.launch(editItemIntent);
             }
         });
 
