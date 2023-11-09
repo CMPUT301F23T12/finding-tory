@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -15,6 +14,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.Locale;
 
 
@@ -29,7 +31,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
-    private Button addItemButton;
+    private FloatingActionButton addItemButton;
 
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
