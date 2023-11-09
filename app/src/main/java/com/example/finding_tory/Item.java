@@ -11,14 +11,14 @@ public class Item implements Serializable {
     String description;
     String make;
     String model;
-    int serialNumber;
+    String serialNumber;
     Float estimatedValue;
     String comment;
     ArrayList<String> itemTags;
     // TODO: Add ArrayList of Images
 
 
-    public Item(Date purchaseDate, String description, String make, String model, Float estimatedValue, int serialNumber, String comment, ArrayList<String> itemTags) {
+    public Item(Date purchaseDate, String description, String make, String model, Float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -34,7 +34,7 @@ public class Item implements Serializable {
         this.description = description;
         this.make = make;
         this.model = model;
-        this.serialNumber = 0;
+        this.serialNumber = "";
         this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.itemTags = itemTags;
@@ -83,11 +83,11 @@ public class Item implements Serializable {
         this.model = model;
     }
 
-    public int getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(int serialNumber) {
+    public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
@@ -118,7 +118,8 @@ public class Item implements Serializable {
     public static String errorHandleItemInput(String purchaseDate, String description, String estimatedValue) throws ParseException {
         if (description.trim().equals("")) return "Item Description cannot be empty";
         Date current = new Date();
-        if(current.before(new SimpleDateFormat("yyyy-MM-dd").parse(purchaseDate))) return "Date cannot be in the future";
+        if (current.before(new SimpleDateFormat("yyyy-MM-dd").parse(purchaseDate)))
+            return "Date cannot be in the future";
 
         if (estimatedValue.trim().equals("")) return "Expense amount cannot be empty";
         if (Float.parseFloat(estimatedValue) <= 0) return "Cannot have a negative expense cost";

@@ -1,18 +1,18 @@
 package com.example.finding_tory;
 
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Locale;
 import java.util.Objects;
 
 public class ItemView extends AppCompatActivity {
@@ -30,9 +30,8 @@ public class ItemView extends AppCompatActivity {
         assert selectedItem != null;
         setItemView(selectedItem);
 
-
         // Handles going back to Inventory view
-        final Button closeItemViewButton = findViewById(R.id.button_close_item_view);
+        final FloatingActionButton closeItemViewButton = findViewById(R.id.button_close_item_view);
         closeItemViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,9 +54,9 @@ public class ItemView extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Start Edit Activity
-                Intent editItemIntent = new Intent(ItemView.this, EditItemActivity.class);
-                editItemIntent.putExtra("selectedItem", selectedItem);
-                startActivityForResult(editItemIntent, EDIT_ITEM_REQUEST);
+//                Intent editItemIntent = new Intent(ItemView.this, EditItemActivity.class);
+//                editItemIntent.putExtra("selectedItem", selectedItem);
+//                startActivityForResult(editItemIntent, EDIT_ITEM_REQUEST);
             }
         });
 
@@ -95,16 +94,22 @@ public class ItemView extends AppCompatActivity {
     private void setItemView(Item passedItem) {
         TextView item_name = findViewById(R.id.item_name_text);
         item_name.setText(passedItem.getDescription());
+
         TextView item_comment = findViewById(R.id.item_comment_text);
         item_comment.setText(passedItem.getComment());
+
         TextView item_make = findViewById(R.id.item_make_text);
         item_make.setText(passedItem.getMake());
+
         TextView item_date = findViewById(R.id.item_date_text);
         item_date.setText(passedItem.getPurchaseDate().toString());
+
         TextView item_value = findViewById(R.id.item_value_text);
-        item_value.setText(passedItem.getEstimatedValue().toString());
+        item_value.setText(String.format(Locale.CANADA, "$%.2f", passedItem.getEstimatedValue()));
+
         TextView item_quantity = findViewById(R.id.item_quantity_text);
         item_quantity.setText(passedItem.getMake());
+
         TextView item_serial_number = findViewById(R.id.item_serial_number_text);
         item_serial_number.setText(passedItem.getSerialNumber());
     }
