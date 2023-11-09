@@ -97,6 +97,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // adding new item to list once user submits new item
         if (requestCode == ActivityCodes.ADD_ITEM.getRequestCode()) {
             if (resultCode == RESULT_OK) {
                 assert data != null;
@@ -107,7 +108,9 @@ public class InventoryViewActivity extends AppCompatActivity {
                 inventoryAdapter.notifyDataSetChanged();
                 updateTotals();
             }
-        } if (requestCode == ActivityCodes.VIEW_ITEM.getRequestCode()){
+        }
+        // updates the item at position passed
+        if (requestCode == ActivityCodes.VIEW_ITEM.getRequestCode()){
             int pos = data.getIntExtra("position", 0);
             System.out.println(pos);
             Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
@@ -115,6 +118,8 @@ public class InventoryViewActivity extends AppCompatActivity {
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();
         }
+
+        // TODO: implement for deleting
     }
 
     /**

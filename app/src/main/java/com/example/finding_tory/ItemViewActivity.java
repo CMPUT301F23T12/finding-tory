@@ -14,7 +14,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.Objects;
 
 public class ItemViewActivity extends AppCompatActivity {
     Item selectedItem;
@@ -92,8 +91,6 @@ public class ItemViewActivity extends AppCompatActivity {
                 assert data != null;
                 Item returnedItem = (Item) data.getSerializableExtra("editedItem");
                 assert returnedItem != null;
-//                selectedItem.updateItem((Item) Objects.requireNonNull(data.getSerializableExtra("editedItem")));
-//                setItemView(selectedItem);
                 selectedItem = returnedItem;
                 setItemView(selectedItem);
             }
