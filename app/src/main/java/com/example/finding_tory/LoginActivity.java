@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.username_edittext);
         passwordEditText = findViewById(R.id.password_edittext);
 
-        // initialize+cache buttons, set click listeners
+        // initialize registration button, set click listener
         Button registerButton = findViewById(R.id.register_button);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,15 +42,25 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // initialize login button, set click listener
         Button loginButton = findViewById(R.id.login_button);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // launch a new Ledger view activity for this user
-                // TODO actually get the user info at login. for now it doesn't matter
+                // TODO validate real user info at login. for now we use mock credentials
+                String username = String.valueOf(usernameEditText.getText());
+                String password = String.valueOf(passwordEditText.getText());
+                passwordEditText.setText("");  // when we return we need to re-enter password
+
+                if (!(username.equals("user") && password.equals("password"))) {
+                    Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    return;
+                }
 
                 Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
-                intent.putExtra("user", usernameEditText.getText());
+                intent.putExtra("user", username);
                 startActivity(intent);
             }
         });
