@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -15,6 +18,7 @@ import java.util.Date;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -25,7 +29,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
     private Inventory inventory;
     private ListView inventoryListView;
-    private ArrayAdapter<Item> inventoryAdapter;
+    private InventoryAdapter inventoryAdapter;
 
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
@@ -88,6 +92,66 @@ public class InventoryViewActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        inventoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                enterSelectionMode();
+                return true;
+            }
+        });
+
+        Button sort_cancel_button = findViewById(R.id.sort_inventory_button);
+        sort_cancel_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exitSelectionMode();
+            }
+        });
+
+        Button filter_delete_button = findViewById(R.id.filter_inventory_button);
+        filter_delete_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Item> selectedItems = inventoryAdapter.getSelectedItems();
+
+                // Remove selected items from the inventory
+                for (Item item : selectedItems) {
+                    inventory.removeItem(item);
+                }
+
+                // Clear the selection and exit selection mode
+                inventoryAdapter.clearSelection();
+                exitSelectionMode();
+
+                // Notify the adapter of the data change
+                inventoryAdapter.notifyDataSetChanged();
+
+                // Update totals
+                updateTotals();
+            }
+        });
+    }
+
+    private void enterSelectionMode() {
+        // Show checkboxes
+        for (int i = 0; i < inventoryAdapter.getCount(); i++) {
+            View view = inventoryListView.getChildAt(i);
+            CheckBox checkBox = view.findViewById(R.id.item_checkbox);
+            ImageView arrow = view.findViewById(R.id.arrow);
+            checkBox.setVisibility(View.VISIBLE);
+            arrow.setVisibility(View.GONE);
+        }
+    }
+
+    // Implement a method to exit the selection mode and hide checkboxes
+    private void exitSelectionMode() {
+        for (int i = 0; i < inventoryAdapter.getCount(); i++) {
+            View view = inventoryListView.getChildAt(i);
+            CheckBox checkBox = view.findViewById(R.id.item_checkbox);
+            ImageView arrow = view.findViewById(R.id.arrow);
+            checkBox.setVisibility(View.GONE);
+            arrow.setVisibility(View.VISIBLE);
+        }
     }
 
 
@@ -95,15 +159,7 @@ public class InventoryViewActivity extends AppCompatActivity {
      * Rewrites the TextView elements displaying the inventory totals to reflect new values.
      */
     public void updateTotals() {
-        totalItemsTextView.setText(
-                String.format(Locale.CANADA,
-                        "Total items: %d",
-                        inventory.getCount())
-        );
-        totalValueTextView.setText(
-                String.format(Locale.CANADA,
-                        "Total Value: $%.2f",
-                        inventory.getValue())
-        );
+        totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
+        totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getValue()));
     }
 }
