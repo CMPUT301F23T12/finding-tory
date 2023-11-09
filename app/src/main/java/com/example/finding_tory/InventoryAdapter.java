@@ -17,9 +17,9 @@ import java.util.Locale;
  * Implements adapter functionality in order to link the InventoryViewActivity's ListView
  * element to the array of Items in an Inventory.
  */
-public class InventoryAdapter extends ArrayAdapter<MockItem> {
+public class InventoryAdapter extends ArrayAdapter<Item> {
 
-    private ArrayList<MockItem> items;
+    private ArrayList<Item> items;
     private Context context;
 
     /**
@@ -29,7 +29,7 @@ public class InventoryAdapter extends ArrayAdapter<MockItem> {
      * @param items
      *          list of Item objects being wrapped into the ListView
      */
-    public InventoryAdapter(Context context, ArrayList<MockItem> items) {
+    public InventoryAdapter(Context context, ArrayList<Item> items) {
         super(context, 0, items);
         this.items = items;
         this.context = context;
@@ -57,15 +57,19 @@ public class InventoryAdapter extends ArrayAdapter<MockItem> {
             view = LayoutInflater.from(context).inflate(R.layout.item_content, parent, false);
 
         // find TextView elements that we wish to update
-        MockItem item = items.get(position);
+        Item item = items.get(position);
         TextView descriptionTextView = view.findViewById(R.id.description_text);
         TextView valueTextView = view.findViewById(R.id.value_text);
         TextView tagsTextView = view.findViewById(R.id.tags_text);
 
         // modify TextViews with current item information
         descriptionTextView.setText(item.getDescription());
-        valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getValue()));
-        tagsTextView.setText(item.getTags());
+        valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getEstimatedValue()));
+        StringBuilder tag_to_display = new StringBuilder();
+        for (String tag: item.getItemTags()) {
+            tag_to_display.append(tag).append(" ");
+        }
+        tagsTextView.setText(tag_to_display);
         return view;
     }
 }

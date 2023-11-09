@@ -11,6 +11,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 
@@ -43,10 +47,16 @@ public class InventoryViewActivity extends AppCompatActivity {
         setTitle(inventory.getName());
 
         // create some mock items to populate the list
-        inventory.addItem(new Item("2023-11-08", "Item1", 1.1, "[test]"));
-        inventory.addItem(new Item("Item2", 2.2, "[test] [uniqueTag]"));
-        inventory.addItem(new Item("Item3", 3.3, "[test]"));
-        inventory.addItem(new Item("Item4", 4.4, "[test]"));
+        ArrayList<String> tags1 = new ArrayList<String>();
+        tags1.add("testtag1");
+        tags1.add("testtag1.1");
+        ArrayList<String> tags2 = new ArrayList<String>();
+        tags2.add("testtag2");
+        tags2.add("testtag2.2");
+        inventory.addItem(new Item(new Date(2023, 1, 24), "Item1", "make1", "model1", 10.01f, 1, "no comment",tags1));
+        inventory.addItem(new Item(new Date(2023, 1, 25), "Item2", "make2", "model2", 20.02f, 2, "No comment",tags2));
+        inventory.addItem(new Item(new Date(2023, 2, 27), "Item3", "make1", "model3", 30.03f, 3, "no Comment",tags2));
+        inventory.addItem(new Item(new Date(2022, 9, 13), "Item4", "make4", "model1", 400.40f, 4, "no commenT",tags1));
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
