@@ -1,16 +1,16 @@
-package com.example.finding_tory.ui.gallery;
+package com.example.finding_tory.ui.ledger;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class GalleryViewModel extends ViewModel {
+public class LedgerViewModel extends ViewModel {
 
     private final MutableLiveData<String> mText;
 
-    public GalleryViewModel() {
+    public LedgerViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is gallery fragment");
+        mText.setValue("This is ledger fragment");
     }
 
     public LiveData<String> getText() {
