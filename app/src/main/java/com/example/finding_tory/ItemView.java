@@ -10,10 +10,13 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Objects;
+
 public class ItemView extends AppCompatActivity {
-    private ActivityResultLauncher<Intent> editItemActivityResultLauncher;
+    private static final int EDIT_ITEM_REQUEST = 1; // Can be any integer unique to this activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,19 +27,8 @@ public class ItemView extends AppCompatActivity {
         Item selectedItem = (Item) getIntent().getSerializableExtra("item");
 
         // Use the selectedItem to populate the views in the item_click_view layout
+        assert selectedItem != null;
         setItemView(selectedItem);
-
-        // Register the activity result launcher
-        editItemActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                // Handle the returned result data
-                Intent data = result.getData();
-                selectedItem.updateItem((Item) data.getSerializableExtra("editedItem"));
-                // Update your UI with the edited item here
-//                selectedItem.setDescription(editted_item.getDescription());
-            setItemView(selectedItem);
-            }
-        });
 
 
         // Handles going back to Inventory view
@@ -57,14 +49,15 @@ public class ItemView extends AppCompatActivity {
                 deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
             }
         });
+
         final Button editItemButton = findViewById(R.id.button_edit_item);
         editItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Start Edit Activity
-//                Intent editItemIntent = new Intent(ItemView.this, EditItemActivity.class);
-//                editItemIntent.putExtra("selectedItem", selectedItem);
-//                editItemActivityResultLauncher.launch(editItemIntent);
+                Intent editItemIntent = new Intent(ItemView.this, EditItemActivity.class);
+                editItemIntent.putExtra("selectedItem", selectedItem);
+                startActivityForResult(editItemIntent, EDIT_ITEM_REQUEST);
             }
         });
 
@@ -85,20 +78,34 @@ public class ItemView extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == EDIT_ITEM_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                Item selectedItem = (Item) data.getSerializableExtra("editedItem");
+                assert selectedItem != null;
+                selectedItem.updateItem((Item) Objects.requireNonNull(data.getSerializableExtra("editedItem")));
+                setItemView(selectedItem);
+            }
+        }
+    }
+
     private void setItemView(Item passedItem) {
         TextView item_name = findViewById(R.id.item_name_text);
-        // item_name.setText(passedItem.getName());
+        item_name.setText(passedItem.getDescription());
         TextView item_comment = findViewById(R.id.item_comment_text);
-        // item_comment.setText(passedItem.getComment());
+        item_comment.setText(passedItem.getComment());
         TextView item_make = findViewById(R.id.item_make_text);
-        // item_make.setText(passedItem.getMake());
+        item_make.setText(passedItem.getMake());
         TextView item_date = findViewById(R.id.item_date_text);
-        // item_date.setText(passedItem.getDate().toString());
+        item_date.setText(passedItem.getPurchaseDate().toString());
         TextView item_value = findViewById(R.id.item_value_text);
-        // item_value.setText(passedItem.getValue().toString());
+        item_value.setText(passedItem.getEstimatedValue().toString());
         TextView item_quantity = findViewById(R.id.item_quantity_text);
-        // item_quantity.setText(passedItem.getMake().toString());
+        item_quantity.setText(passedItem.getMake());
         TextView item_serial_number = findViewById(R.id.item_serial_number_text);
-        // item_serial_number.setText(passedItem.getSerialNumber());
+        item_serial_number.setText(passedItem.getSerialNumber());
     }
 }
