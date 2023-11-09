@@ -20,8 +20,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -181,13 +179,6 @@
             android:text="Upload Images"
             android:layout_marginTop="24dp"/>
 
-<!--        <Button-->
-<!--            android:id="@+id/scan_barcode_button"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Scan Barcode"-->
-<!--            android:layout_marginTop="16dp"/>-->
-
         <!-- Tag input can be complex depending on the UI/UX design,
              here is a simple button placeholder for it -->
         <TextView
@@ -240,100 +231,3 @@
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
-<!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--    xmlns:tools="http://schemas.android.com/tools"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"-->
-<!--    android:background="#E2E2E3"-->
-<!--    tools:context=".UpsertView">-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/upsert_text"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_alignParentTop="true"-->
-<!--        android:layout_marginStart="0dp"-->
-<!--        android:text="@string/upsert_title_text"-->
-<!--        android:textSize="34sp"-->
-<!--        android:layout_marginTop="0dp"-->
-<!--        tools:srcCompat="@tools:sample/avatars" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/item_name_title"-->
-<!--        android:layout_width="157dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@+id/upsert_text"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_marginTop="0dp"-->
-<!--        android:paddingStart="10sp"-->
-<!--        android:paddingTop="5sp"-->
-<!--        android:paddingEnd="5sp"-->
-<!--        android:text="Item Description"-->
-<!--        android:textSize="18sp" />-->
-
-<!--    <EditText-->
-<!--        android:id="@+id/item_name"-->
-<!--        android:layout_width="206dp"-->
-<!--        android:layout_height="36dp"-->
-<!--        android:layout_below="@+id/upsert_text"-->
-<!--        android:layout_alignStart="@+id/item_name_title"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_marginStart="167dp"-->
-<!--        android:layout_marginTop="0dp"-->
-<!--        android:layout_marginEnd="38dp"-->
-<!--        android:paddingStart="10sp"-->
-<!--        android:paddingTop="5sp"-->
-<!--        android:paddingEnd="5sp"-->
-<!--        android:text=""-->
-<!--        android:textSize="24sp"-->
-<!--        android:textStyle="bold" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/purchase_date_title"-->
-<!--        android:layout_width="157dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@+id/item_name_title"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_marginStart="3dp"-->
-<!--        android:layout_marginTop="17dp"-->
-<!--        android:paddingStart="10sp"-->
-<!--        android:paddingTop="5sp"-->
-<!--        android:paddingEnd="5sp"-->
-<!--        android:text="Item Description"-->
-<!--        android:textSize="18sp" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/comment_title"-->
-<!--        android:layout_width="157dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@+id/item_name_title"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_marginStart="5dp"-->
-<!--        android:layout_marginTop="65dp"-->
-<!--        android:paddingStart="10sp"-->
-<!--        android:paddingTop="5sp"-->
-<!--        android:paddingEnd="5sp"-->
-<!--        android:text="Item Description"-->
-<!--        android:textSize="18sp" />-->
-
-<!--    <EditText-->
-<!--        android:id="@+id/purchase_date"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="37dp"-->
-<!--        android:layout_below="@+id/item_name"-->
-<!--        android:layout_alignStart="@+id/item_name_title"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_marginStart="164dp"-->
-<!--        android:layout_marginTop="6dp"-->
-<!--        android:layout_marginEnd="33dp"-->
-<!--        android:paddingStart="10sp"-->
-<!--        android:paddingTop="5sp"-->
-<!--        android:paddingEnd="5sp"-->
-<!--        android:text=""-->
-<!--        android:textSize="24sp"-->
-<!--        android:textStyle="bold" />-->
-
-<!--</RelativeLayout>-->
