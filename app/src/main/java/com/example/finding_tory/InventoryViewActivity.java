@@ -42,20 +42,11 @@ public class InventoryViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_inventory_view);
 
         // TODO get an actual inventory from the db
-        inventory = new Inventory("Dummy Inventory");
+        // get the inventory that's been passed by the ledger view parent activity
+        Intent intent = getIntent();
+        inventory = (Inventory) intent.getSerializableExtra("inventory");
+        assert (inventory != null);
         setTitle(inventory.getName());
-
-        // create some mock items to populate the list
-        ArrayList<String> tags1 = new ArrayList<String>();
-        tags1.add("testtag1");
-        tags1.add("testtag1.1");
-        ArrayList<String> tags2 = new ArrayList<String>();
-        tags2.add("testtag2");
-        tags2.add("testtag2.2");
-        inventory.addItem(new Item(new Date(2023, 1, 24), "Item1", "make1", "model1", 10.01f, "1", "no comment", tags1));
-        inventory.addItem(new Item(new Date(2023, 1, 25), "Item2", "make2", "model2", 20.02f, "2", "No comment", tags2));
-        inventory.addItem(new Item(new Date(2023, 2, 27), "Item3", "make1", "model3", 30.03f, "3", "no Comment", tags2));
-        inventory.addItem(new Item(new Date(2022, 9, 13), "Item4", "make4", "model1", 400.40f, "4", "no commenT", tags1));
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
