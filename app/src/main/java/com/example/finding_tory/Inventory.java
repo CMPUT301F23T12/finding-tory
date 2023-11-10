@@ -2,6 +2,9 @@ package com.example.finding_tory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * Represents an inventory containing a collection of items. This class provides functionalities to manage
@@ -13,6 +16,9 @@ public class Inventory implements Serializable {
     private String name;
     private ArrayList<Item> items;
     private double value;
+
+    private String sortType = "Description";
+    private String sortOrder = "Ascending";
 
     /**
      * Constructs a new Inventory object with a specified name.
@@ -100,7 +106,7 @@ public class Inventory implements Serializable {
      * @return The item at the specified index.
      */
     public Item get(int index) {
-        return items.get(index);
+        return this.items.get(index);
     }
 
     /**
@@ -143,5 +149,39 @@ public class Inventory implements Serializable {
     public void removeItemByIndex(int i) {
         this.value -= this.items.get(i).getEstimatedValue();
         this.items.remove(i);
+    }
+
+    public void setSortData(String sortType, String sortOrder) {
+        if (!Objects.equals(sortType, "")) {
+            this.sortType = sortType;
+        }
+        if (!Objects.equals(sortOrder, "")) {
+            this.sortOrder = sortOrder;
+        }
+    }
+
+    public Boolean sortItems() {
+        Comparator<Item> comparator;
+        switch (this.sortType) {
+            case "Description":
+                comparator = Comparator.comparing(Item::getDescription);
+                break;
+            case "Date":
+                comparator = Comparator.comparing(Item::getPurchaseDate);
+                break;
+            case "Make":
+                comparator = Comparator.comparing(Item::getMake);
+                break;
+            case "Value":
+                comparator = Comparator.comparing(Item::getEstimatedValue);
+                break;
+            default:
+                return false;
+        }
+        if ("Descending".equals(this.sortOrder)) {
+            comparator = comparator.reversed();
+        }
+        Collections.sort(items, comparator);
+        return true;
     }
 }

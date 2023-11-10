@@ -24,6 +24,7 @@ public class DeleteItemFragment extends DialogFragment {
      */
     public interface DeleteDialogListener {
         void onDialogDismissed();
+
         void onDeleteConfirmed();
     }
 
