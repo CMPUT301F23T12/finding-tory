@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 
-public class ItemViewActivity extends AppCompatActivity implements Serializable {
+public class ItemViewActivity extends AppCompatActivity {
 
     Item selectedItem;
     int position;
