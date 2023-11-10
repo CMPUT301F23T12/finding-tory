@@ -37,7 +37,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
      *
-     * @param savedInstanceState possible default layout
+     * @param savedInstanceState Possible saved state information for the activity.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,6 +170,10 @@ public class InventoryViewActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Enters the selection mode for the inventory items. In selection mode, checkboxes are displayed
+     * next to each item in the list, allowing the user to select multiple items for actions like deletion.
+     */
     private void enterSelectionMode() {
         state_deletion = true;
         // Show checkboxes
@@ -182,7 +186,11 @@ public class InventoryViewActivity extends AppCompatActivity {
         }
     }
 
-    // Implement a method to exit the selection mode and hide checkboxes
+    /**
+     * Exits the selection mode for the inventory items. In selection mode, checkboxes are displayed
+     * next to each item in the list. This method hides the checkboxes and returns the inventory view
+     * to its normal state.
+     */
     private void exitSelectionMode() {
         state_deletion = false;
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
@@ -195,6 +203,13 @@ public class InventoryViewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Handles the result of activities that were started for a result.
+     *
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode  The result code returned by the activity.
+     * @param data        The data returned by the activity.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -239,6 +254,11 @@ public class InventoryViewActivity extends AppCompatActivity {
         totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getValue()));
     }
 
+    /**
+     * Removes an item from Firestore database and updates the inventory accordingly.
+     *
+     * @param item The Item object to be removed from Firestore.
+     */
     private void removeItemFromFirestore(Item item) {
         FirestoreDB.getItemsRef().document(item.getDescription()).delete().addOnSuccessListener(aVoid -> {
             // Remove item from inventory and update the adapter

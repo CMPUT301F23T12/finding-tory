@@ -5,9 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +31,7 @@ public class UpsertViewActivity extends AppCompatActivity{
     Button submit_button;
     Button cancel_button;
     TextView view_title;
-    TextView tags_view;
+    LinearLayout tags_container;
     EditText description_text;
     EditText make_text;
     EditText model_text;
@@ -41,6 +44,13 @@ public class UpsertViewActivity extends AppCompatActivity{
     boolean isAdd = false;
     ArrayList<String> tags = new ArrayList<>();
 
+    /**
+     * Initializes the activity, sets up the user interface, and prepares data models.
+     * It determines whether the operation is adding a new item or editing an existing one
+     * and sets up the UI accordingly.
+     *
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upsert_view);
@@ -48,7 +58,7 @@ public class UpsertViewActivity extends AppCompatActivity{
         submit_button = findViewById(R.id.add_button);
         cancel_button = findViewById(R.id.cancel_button);
         view_title = findViewById(R.id.upsert_title);
-        tags_view = findViewById(R.id.tag_display);
+        tags_container = findViewById(R.id.tags_container);
         description_text = findViewById(R.id.description_edittext);
         make_text = findViewById(R.id.make_edittext);
         model_text = findViewById(R.id.model_edittext);
@@ -82,26 +92,44 @@ public class UpsertViewActivity extends AppCompatActivity{
             estimated_cost_text.setText(Float.toString(item.getEstimatedValue()));
             serial_number_text.setText(item.getSerialNumber());
             comment_text.setText(item.getComment());
-            tags_view.setText(tags.toString());
             submit_button.setText("Update");
+            for (String tag : tags) {
+                View tagView = LayoutInflater.from(this).inflate(R.layout.tag_item_layout, tags_container, false);
+                TextView tagTextView = tagView.findViewById(R.id.tag_text);
+                tagTextView.setText(tag);
+                ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+                removeTagButton.setOnClickListener(v -> {
+                    tags_container.removeView(tagView);
+                    tags.remove(tag);
+                });
+                tags_container.addView(tagView);
+            }
         }
 
         /**
          * Displays any tags user entered in the search bar (space-separated) adds it to all
          * tags associated with the item
          */
-        add_tags_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String tags_string = tags_entered.getText().toString();
-                if (tags_string.equals("")) {
-                    return;
+        add_tags_button.setOnClickListener(view -> {
+            String tagText = tags_entered.getText().toString().trim();
+            String[] tagParts = tagText.split("\\s+");
+            for (String tag : tagParts) {
+                if (!tag.isEmpty() && !tags.contains(tag)) {
+                    tags.add(tag); // Add the tag to your tags list
+                    LayoutInflater inflater = LayoutInflater.from(this);
+
+                    View tagView = inflater.inflate(R.layout.tag_item_layout, tags_container, false);
+                    TextView tagTextView = tagView.findViewById(R.id.tag_text);
+                    tagTextView.setText(tag);
+                    ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+                    removeTagButton.setOnClickListener(v -> {
+                        tags_container.removeView(tagView);
+                        tags.remove(tag);
+                    });
+                    tags_container.addView(tagView);
                 }
-                String[] tag_list = tags_string.split(" ");
-                tags.addAll(Arrays.asList(tag_list)); // adds to all tags for item
-                tags_view.setText(tags.toString());
-                tags_entered.setText("");
             }
+            tags_entered.setText("");
         });
 
         /**
@@ -165,6 +193,11 @@ public class UpsertViewActivity extends AppCompatActivity{
         });
     }
 
+    /**
+     * Adds an item to Firestore items collection.
+     *
+     * @param item The item to be added to Firestore.
+     */
     private void addItemToFirestore(Item item) {
         FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
                 .addOnSuccessListener(aVoid -> {
@@ -173,6 +206,12 @@ public class UpsertViewActivity extends AppCompatActivity{
                 });
     }
 
+    /**
+     * Edits an item in Firestore by deleting and re-adding the item from the DB.
+     *
+     * @param existingItem The existing item to be edited.
+     * @param updatedItem  The updated item.
+     */
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
         FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
         FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);

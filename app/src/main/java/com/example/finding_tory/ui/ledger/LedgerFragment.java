@@ -61,7 +61,7 @@ public class LedgerFragment extends Fragment {
         View root = binding.getRoot();
 
         // create a mock inventory with mock items to populate the list
-        Inventory mockInventory = new Inventory("Mock Inventory");
+        Inventory mockInventory = new Inventory("Home Inventory");
         inventories = new ArrayList<>();
         inventories.add(mockInventory);
 
@@ -73,6 +73,9 @@ public class LedgerFragment extends Fragment {
                     mockInventory.addItem(item);
                 }
             }
+            // need to notify because this block may or may not finish before the next block.
+            // since it's a "success listener", we have no idea when this code gets executed.
+            ledgerAdapter.notifyDataSetChanged();
         });
 
         // map the listview to the ledger's list of items via custom ledger adapter

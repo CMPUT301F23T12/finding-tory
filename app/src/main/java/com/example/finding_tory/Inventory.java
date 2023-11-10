@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * Container class to hold a list of Items.
+ * Represents an inventory containing a collection of items. This class provides functionalities to manage
+ * an inventory, such as adding, removing, and accessing items. It also calculates the total estimated value of all
+ * items in the inventory.
  */
 public class Inventory implements Serializable {
 
@@ -15,16 +17,16 @@ public class Inventory implements Serializable {
     private double value;
 
     /**
-     * Creates a new Inventory object.
+     * Constructs a new Inventory object with a specified name.
+     * Initializes an empty list of items and sets the total value to zero.
      *
-     * @param name name for the inventory
+     * @param name The name of the inventory.
      */
     public Inventory(String name) {
         this.name = name;
         this.items = new ArrayList<>();
         this.value = 0;
     }
-
 
     /**
      * Gets the name of the inventory.
@@ -35,7 +37,6 @@ public class Inventory implements Serializable {
         return name;
     }
 
-
     /**
      * Gets the list of Items stored by the inventory.
      *
@@ -44,7 +45,6 @@ public class Inventory implements Serializable {
     public ArrayList<Item> getItems() {
         return items;
     }
-
 
     /**
      * Gets the number of Items being held by the inventory.
@@ -55,7 +55,6 @@ public class Inventory implements Serializable {
         return items.size();
     }
 
-
     /**
      * Gets the total value of all the Items in the inventory.
      *
@@ -64,7 +63,6 @@ public class Inventory implements Serializable {
     public double getValue() {
         return value;
     }
-
 
     /**
      * Sets the name of the inventory object.
@@ -75,6 +73,10 @@ public class Inventory implements Serializable {
         this.name = name;
     }
 
+    /**
+     * Recalculates the total value of all items in the inventory.
+     * This method should be called whenever the list of items is modified.
+     */
     public void calculateValue() {
         this.value = 0;
         for (Item item : items) {
@@ -84,6 +86,7 @@ public class Inventory implements Serializable {
 
     /**
      * Sets the list of Items being held in the inventory, overwriting any previous lists.
+     * Also recalculates the total inventory value based on the new items.
      *
      * @param items new ArrayList of Items to store
      */
@@ -92,31 +95,53 @@ public class Inventory implements Serializable {
         calculateValue();
     }
 
+    /**
+     * Retrieves an item at a specific index in the inventory.
+     *
+     * @param index The index of the item to retrieve.
+     * @return The item at the specified index.
+     */
     public Item get(int index) {
         return this.items.get(index);
     }
 
+    /**
+     * Replaces an item at a specific index in the inventory with a new item.
+     * Also recalculates the total inventory value after the replacement.
+     *
+     * @param index The index of the item to replace.
+     * @param item The new item to set in the inventory.
+     */
     public void set(int index, Item item) {
         items.set(index, item);
         calculateValue();
     }
 
-
     /**
-     * Adds an Item object to the list of stored items in the inventory.
+     * Adds a new item to the inventory and updates the total value.
      *
-     * @param item new Item object to add to inventory
+     * @param item The item to add to the inventory.
      */
     public void addItem(Item item) {
         this.items.add(item);
         this.value += item.getEstimatedValue();
     }
 
+    /**
+     * Removes an item from the inventory and updates the total value.
+     *
+     * @param item The item to remove from the inventory.
+     */
     public void removeItem(Item item) {
         this.items.remove(item);
         this.value -= item.getEstimatedValue();
     }
 
+    /**
+     * Removes an item at a specific index from the inventory and updates the total value.
+     *
+     * @param i The index of the item to remove.
+     */
     public void removeItemByIndex(int i) {
         this.value -= this.items.get(i).getEstimatedValue();
         this.items.remove(i);
