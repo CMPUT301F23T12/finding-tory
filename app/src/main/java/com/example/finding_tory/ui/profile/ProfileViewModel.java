@@ -19,7 +19,6 @@ public class ProfileViewModel extends ViewModel {
      * Constructor for ProfileViewModel.
      * Initializes the MutableLiveData object and sets its value.
      */
-
     public ProfileViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is profile fragment");

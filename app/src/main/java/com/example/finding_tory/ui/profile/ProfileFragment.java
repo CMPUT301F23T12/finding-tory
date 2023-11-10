@@ -24,11 +24,13 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
 
     /**
-     * ProfileFragment is a subclass of Fragment that represents the user profile section in the application.
-     * It handles the user interface for displaying profile-related information.
+     * Inflates the fragment layout, initializes the ViewModel, and sets up data binding.
+     * Observes changes in the profile data through the ViewModel and updates the UI accordingly.
      *
-     * The class uses data binding to manage the UI components and integrates with a ViewModel to observe and display
-     * profile information.
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          The parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return Returns the root view for the fragment's layout.
      */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
