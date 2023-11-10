@@ -46,6 +46,7 @@ public class SortItemFragment extends DialogFragment {
                     RadioButton selectedButton2 = view.findViewById(i2);
 
                     listener.onSortConfirmed(selectedButton1.getText().toString(), selectedButton2.getText().toString());
+                    dismiss();
                 }
             } else {
                 dismiss();

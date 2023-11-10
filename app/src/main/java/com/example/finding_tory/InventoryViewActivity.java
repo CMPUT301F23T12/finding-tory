@@ -104,7 +104,8 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                         @Override
                         public void onSortConfirmed(String sort_type, String sort_order) {
-
+                            inventory.sortItems(sort_type, sort_order);
+                            inventoryAdapter.notifyDataSetChanged();
                         }
                     });
                     sortDialog.show(getSupportFragmentManager(), "SORT_ITEM");

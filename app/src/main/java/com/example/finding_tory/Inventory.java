@@ -2,6 +2,8 @@ package com.example.finding_tory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Container class to hold a list of Items.
@@ -10,7 +12,6 @@ public class Inventory implements Serializable {
 
     private String name;
     private ArrayList<Item> items;
-    private ArrayList<Item> sorted_items;
     private double value;
 
     /**
@@ -21,7 +22,6 @@ public class Inventory implements Serializable {
     public Inventory(String name) {
         this.name = name;
         this.items = new ArrayList<>();
-        this.sorted_items = new ArrayList<>();
         this.value = 0;
     }
 
@@ -93,7 +93,7 @@ public class Inventory implements Serializable {
     }
 
     public Item get(int index) {
-        return items.get(index);
+        return this.items.get(index);
     }
 
     public void set(int index, Item item) {
@@ -120,5 +120,21 @@ public class Inventory implements Serializable {
     public void removeItemByIndex(int i) {
         this.value -= this.items.get(i).getEstimatedValue();
         this.items.remove(i);
+    }
+
+    public void sortItems(String sortType, String sortOrder) {
+        Comparator<Item> comparator;
+        switch (sortType) {
+            case "Description":
+                comparator = Comparator.comparing(Item::getDescription);
+                break;
+            // Add other cases if there are more sort types
+            default:
+                return;
+        }
+        if ("Descending".equals(sortOrder)) {
+            comparator = comparator.reversed();
+        }
+        Collections.sort(items, comparator);
     }
 }
