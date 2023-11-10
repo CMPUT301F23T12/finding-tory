@@ -3,8 +3,11 @@ package com.example.finding_tory;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -170,7 +173,18 @@ public class ItemViewActivity extends AppCompatActivity {
         TextView item_serial_number = findViewById(R.id.item_serial_number_text);
         item_serial_number.setText(passedItem.getSerialNumber());
 
-        TextView item_tags = findViewById(R.id.item_tags);
-        item_tags.setText(passedItem.getTagsString());
+        LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
+        tagsContainer.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (String tag : passedItem.getItemTags()) {
+            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setText(tag);
+
+            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            removeTagButton.setVisibility(View.GONE);
+            tagsContainer.addView(tagView); // Add the tag view to the container
+
+        }
     }
 }

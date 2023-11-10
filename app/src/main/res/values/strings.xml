@@ -13,4 +13,6 @@
     <string name="items_search_hint">Search for items...</string>
     <string name="add_item_btn_description">Add Item</string>
     <string name="upsert_title_text">Title</string>
+    <string name="remove_tag">Remove tag</string>
+
 </resources>
