@@ -114,4 +114,9 @@ public class Inventory implements Serializable {
         this.items.remove(item);
         this.value -= item.getEstimatedValue();
     }
+
+    public void removeItemByIndex(int i) {
+        this.value -= this.items.get(i).getEstimatedValue();
+        this.items.remove(i);
+    }
 }
