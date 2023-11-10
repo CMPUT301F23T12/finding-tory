@@ -66,6 +66,7 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         // modify TextViews with current item information
         descriptionTextView.setText(item.getDescription());
         valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getEstimatedValue()));
+
         StringBuilder tag_to_display = new StringBuilder();
         for (String tag : item.getItemTags()) {
             tag_to_display.append(tag).append(" ");
@@ -77,7 +78,8 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
                 toggleSelection(position);
             }
         });
-        tagsTextView.setText(tag_to_display);
+        tagsTextView.setText(item.getTagsString());
+
         return view;
     }
 

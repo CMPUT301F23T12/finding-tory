@@ -1,5 +1,6 @@
 package com.example.finding_tory;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -20,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
 /**
@@ -46,20 +48,11 @@ public class InventoryViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_inventory_view);
 
         // TODO get an actual inventory from the db
-        inventory = new Inventory("Dummy Inventory");
+        // get the inventory that's been passed by the ledger view parent activity
+        Intent intent = getIntent();
+        inventory = (Inventory) intent.getSerializableExtra("inventory");
+        assert (inventory != null);
         setTitle(inventory.getName());
-
-        // create some mock items to populate the list
-        ArrayList<String> tags1 = new ArrayList<String>();
-        tags1.add("testtag1");
-        tags1.add("testtag1.1");
-        ArrayList<String> tags2 = new ArrayList<String>();
-        tags2.add("testtag2");
-        tags2.add("testtag2.2");
-        inventory.addItem(new Item(new Date(2023, 1, 24), "Item1", "make1", "model1", 10.01f, "1", "no comment", tags1));
-        inventory.addItem(new Item(new Date(2023, 1, 25), "Item2", "make2", "model2", 20.02f, "2", "No comment", tags2));
-        inventory.addItem(new Item(new Date(2023, 2, 27), "Item3", "make1", "model3", 30.03f, "3", "no Comment", tags2));
-        inventory.addItem(new Item(new Date(2022, 9, 13), "Item4", "make4", "model1", 400.40f, "4", "no commenT", tags1));
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -76,7 +69,8 @@ public class InventoryViewActivity extends AppCompatActivity {
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: add start activity page for result for adding item
+                Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
+                startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
             }
         });
 
@@ -87,9 +81,10 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item selectedItem = inventoryAdapter.getItem(position);
 
                 Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
-                intent.putExtra("item", selectedItem);
+                intent.putExtra("selectedItem", selectedItem);
+                intent.putExtra("pos", position);
 
-                startActivity(intent);
+                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
             }
         });
         inventoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -154,6 +149,33 @@ public class InventoryViewActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // adding new item to list once user submits new item
+        if (requestCode == ActivityCodes.ADD_ITEM.getRequestCode()) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                Item selectedItem = (Item) data.getSerializableExtra("item_to_add");
+                assert selectedItem != null;
+                System.out.println(selectedItem.getDescription());
+                inventory.addItem(selectedItem);
+                inventoryAdapter.notifyDataSetChanged();
+                updateTotals();
+            }
+        }
+        // updates the item at position passed
+        if (requestCode == ActivityCodes.VIEW_ITEM.getRequestCode()){
+            int pos = data.getIntExtra("position", 0);
+            System.out.println(pos);
+            Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
+            inventory.set(pos, returnedItem);
+            inventoryAdapter.notifyDataSetChanged();
+            updateTotals();
+        }
+
+        // TODO: implement for deleting
+    }
 
     /**
      * Rewrites the TextView elements displaying the inventory totals to reflect new values.
