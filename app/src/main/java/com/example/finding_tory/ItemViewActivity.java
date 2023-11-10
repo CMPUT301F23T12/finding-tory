@@ -15,14 +15,25 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-
+/**
+ * ItemViewActivity is an AppCompatActivity that displays detailed information about a selected item.
+ * It allows users to view, edit, or delete an item, and navigate back to the inventory list.
+ *
+ * This activity handles various user interactions such as editing item details, confirming item deletion,
+ * and updating item views.
+ */
 public class ItemViewActivity extends AppCompatActivity {
-
     Item selectedItem;
     int position;
 
+    /**
+     * Initializes the activity, sets up the user interface, and retrieves the selected item from the intent.
+     * Populates the UI components with the item's details.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_view);
@@ -109,6 +120,15 @@ public class ItemViewActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Handles the result from the edit item activity.
+     * Updates the item view if the item was edited.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult(),
+     *                    allowing you to identify who this result came from.
+     * @param resultCode  The integer result code returned by the child activity through its setResult().
+     * @param data        An Intent, which can return result data to the caller.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -123,6 +143,11 @@ public class ItemViewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Populates the UI components with the item's details.
+     *
+     * @param passedItem The item whose details are to be displayed.
+     */
     private void setItemView(Item passedItem) {
         TextView item_name = findViewById(R.id.item_description_text);
         item_name.setText(passedItem.getDescription());

@@ -12,10 +12,24 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.finding_tory.databinding.FragmentProfileBinding;
 
+/**
+ * ProfileFragment is a subclass of Fragment that represents the user profile section in the application.
+ * It handles the user interface for displaying profile-related information.
+ *
+ * The class uses data binding to manage the UI components and integrates with a ViewModel to observe and display
+ * profile information.
+ */
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
 
+    /**
+     * ProfileFragment is a subclass of Fragment that represents the user profile section in the application.
+     * It handles the user interface for displaying profile-related information.
+     *
+     * The class uses data binding to manage the UI components and integrates with a ViewModel to observe and display
+     * profile information.
+     */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ProfileViewModel profileViewModel =
@@ -29,6 +43,10 @@ public class ProfileFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Called when the view hierarchy associated with the fragment is being destroyed.
+     * It cleans up the binding to prevent memory leaks.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

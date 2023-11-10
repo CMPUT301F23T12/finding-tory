@@ -41,6 +41,13 @@ public class UpsertViewActivity extends AppCompatActivity{
     boolean isAdd = false;
     ArrayList<String> tags = new ArrayList<>();
 
+    /**
+     * Initializes the activity, sets up the user interface, and prepares data models.
+     * It determines whether the operation is adding a new item or editing an existing one
+     * and sets up the UI accordingly.
+     *
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upsert_view);
@@ -165,6 +172,11 @@ public class UpsertViewActivity extends AppCompatActivity{
         });
     }
 
+    /**
+     * Adds an item to Firestore items collection.
+     *
+     * @param item The item to be added to Firestore.
+     */
     private void addItemToFirestore(Item item) {
         System.out.println(item.getDescription());
         FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
@@ -174,6 +186,12 @@ public class UpsertViewActivity extends AppCompatActivity{
                 });
     }
 
+    /**
+     * Edits an item in Firestore by deleting and re-adding the item from the DB.
+     *
+     * @param existingItem The existing item to be edited.
+     * @param updatedItem  The updated item.
+     */
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
         FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
         FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
