@@ -10,6 +10,7 @@ public class Inventory implements Serializable {
 
     private String name;
     private ArrayList<Item> items;
+    private ArrayList<Item> sorted_items;
     private double value;
 
     /**
@@ -20,6 +21,7 @@ public class Inventory implements Serializable {
     public Inventory(String name) {
         this.name = name;
         this.items = new ArrayList<>();
+        this.sorted_items = new ArrayList<>();
         this.value = 0;
     }
 

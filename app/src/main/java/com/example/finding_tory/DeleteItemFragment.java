@@ -12,12 +12,12 @@ import androidx.fragment.app.DialogFragment;
 public class DeleteItemFragment extends DialogFragment {
     public interface DeleteDialogListener {
         void onDialogDismissed();
+
         void onDeleteConfirmed();
     }
 
     private DeleteDialogListener listener;
 
-    // Call this method to set the listener in your fragment
     public void setDeleteDialogListener(DeleteDialogListener listener) {
         this.listener = listener;
     }

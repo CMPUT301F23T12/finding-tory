@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -92,7 +94,21 @@ public class InventoryViewActivity extends AppCompatActivity {
                     inventoryAdapter.clearSelection();
                     exitSelectionMode();
                 } else {
-                    // add sort functionality
+                    final View greyBack = findViewById(R.id.fadeBackground);
+                    SortItemFragment sortDialog = new SortItemFragment();
+                    sortDialog.setSortDialogListener(new SortItemFragment.SortDialogListener() {
+                        @Override
+                        public void onDialogDismissed() {
+                            greyBack.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onSortConfirmed(String sort_type, String sort_order) {
+
+                        }
+                    });
+                    sortDialog.show(getSupportFragmentManager(), "SORT_ITEM");
+                    greyBack.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -222,12 +238,10 @@ public class InventoryViewActivity extends AppCompatActivity {
     }
 
     private void removeItemFromFirestore(Item item) {
-        FirestoreDB.getItemsRef().document(item.getDescription())
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Remove item from inventory and update the adapter
-                    updateTotals();
-                    inventoryAdapter.notifyDataSetChanged();
-                });
+        FirestoreDB.getItemsRef().document(item.getDescription()).delete().addOnSuccessListener(aVoid -> {
+            // Remove item from inventory and update the adapter
+            updateTotals();
+            inventoryAdapter.notifyDataSetChanged();
+        });
     }
 }
