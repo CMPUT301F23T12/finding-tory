@@ -109,15 +109,14 @@ public class InventoryViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 List<Item> selectedItems = inventoryAdapter.getSelectedItems();
+                // Clear the selection and exit selection mode
+                inventoryAdapter.clearSelection();
+                exitSelectionMode();
 
                 // Remove selected items from the inventory
                 for (Item item : selectedItems) {
                     inventory.removeItem(item);
                 }
-
-                // Clear the selection and exit selection mode
-                inventoryAdapter.clearSelection();
-                exitSelectionMode();
 
                 // Notify the adapter of the data change
                 inventoryAdapter.notifyDataSetChanged();
@@ -159,7 +158,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 assert data != null;
                 Item selectedItem = (Item) data.getSerializableExtra("item_to_add");
                 assert selectedItem != null;
-                System.out.println(selectedItem.getDescription());
+
                 inventory.addItem(selectedItem);
 
                 inventoryAdapter.notifyDataSetChanged();
