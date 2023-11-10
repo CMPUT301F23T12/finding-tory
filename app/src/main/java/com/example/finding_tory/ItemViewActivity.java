@@ -12,13 +12,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+
 public class ItemViewActivity extends AppCompatActivity {
+
     Item selectedItem;
     int position;
+
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_view);
@@ -40,6 +45,8 @@ public class ItemViewActivity extends AppCompatActivity {
                 Intent intent = getIntent();
                 intent.putExtra("returnedItem", selectedItem);
                 intent.putExtra("position", position);
+                intent.putExtra("action", "edit");
+
                 setResult(RESULT_OK, intent);
                 finish(); // Return to Inventory View
             }
@@ -51,6 +58,26 @@ public class ItemViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Show Delete Confirmation Fragment
                 DeleteItemFragment deleteDialog = new DeleteItemFragment();
+                final View greyBack = findViewById(R.id.fadeBackground);
+                greyBack.setVisibility(View.VISIBLE);
+                // Set the listener to know when the dialog is dismissed
+                deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
+                    @Override
+                    public void onDialogDismissed() {
+                        // Make grey background invisible when the dialog is dismissed
+                        greyBack.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onDeleteConfirmed() {
+                        Intent data = new Intent();
+                        data.putExtra("pos", getIntent().getIntExtra("pos", -1));
+                        data.putExtra("action", "delete");
+                        // You can add extra data if needed
+                        setResult(RESULT_OK, data);
+                        finish();
+                    }
+                });
                 deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
             }
         });

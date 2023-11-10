@@ -81,6 +81,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item selectedItem = inventoryAdapter.getItem(position);
 
                 Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
+
                 intent.putExtra("selectedItem", selectedItem);
                 intent.putExtra("pos", position);
 
@@ -160,21 +161,28 @@ public class InventoryViewActivity extends AppCompatActivity {
                 assert selectedItem != null;
                 System.out.println(selectedItem.getDescription());
                 inventory.addItem(selectedItem);
+
                 inventoryAdapter.notifyDataSetChanged();
                 updateTotals();
             }
         }
+
         // updates the item at position passed
-        if (requestCode == ActivityCodes.VIEW_ITEM.getRequestCode()){
+        if (requestCode == ActivityCodes.VIEW_ITEM.getRequestCode()) {
             int pos = data.getIntExtra("position", 0);
-            System.out.println(pos);
-            Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
-            inventory.set(pos, returnedItem);
+            if (Objects.equals(data.getStringExtra("action"), "delete")) {
+                int position = data.getIntExtra("pos", -1);
+                if (position >= 0) {
+                    inventory.removeItemByIndex(position);
+                }
+            } else {
+                Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
+                inventory.set(pos, returnedItem);
+            }
+
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();
         }
-
-        // TODO: implement for deleting
     }
 
     /**
