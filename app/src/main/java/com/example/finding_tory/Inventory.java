@@ -122,19 +122,28 @@ public class Inventory implements Serializable {
         this.items.remove(i);
     }
 
-    public void sortItems(String sortType, String sortOrder) {
+    public Boolean sortItems(String sortType, String sortOrder) {
         Comparator<Item> comparator;
         switch (sortType) {
             case "Description":
                 comparator = Comparator.comparing(Item::getDescription);
                 break;
-            // Add other cases if there are more sort types
+            case "Date":
+                comparator = Comparator.comparing(Item::getPurchaseDate);
+                break;
+            case "Make":
+                comparator = Comparator.comparing(Item::getMake);
+                break;
+            case "Value":
+                comparator = Comparator.comparing(Item::getEstimatedValue);
+                break;
             default:
-                return;
+                return false;
         }
         if ("Descending".equals(sortOrder)) {
             comparator = comparator.reversed();
         }
         Collections.sort(items, comparator);
+        return true;
     }
 }
