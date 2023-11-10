@@ -164,13 +164,13 @@ public class Inventory implements Serializable {
         Comparator<Item> comparator;
         switch (this.sortType) {
             case "Description":
-                comparator = Comparator.comparing(Item::getDescription);
+                comparator = Comparator.comparing(item -> item.getDescription().toLowerCase());
                 break;
             case "Date":
                 comparator = Comparator.comparing(Item::getPurchaseDate);
                 break;
             case "Make":
-                comparator = Comparator.comparing(Item::getMake);
+                comparator = Comparator.comparing(item -> item.getMake().toLowerCase());
                 break;
             case "Value":
                 comparator = Comparator.comparing(Item::getEstimatedValue);
