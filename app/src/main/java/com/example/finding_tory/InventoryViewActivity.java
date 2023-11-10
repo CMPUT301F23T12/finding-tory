@@ -84,26 +84,33 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
                 intent.putExtra("item", selectedItem);
-
-                startActivity(intent);
+                intent.putExtra("position", position);
+                startActivityForResult(intent, 2); //2 = delete for now, merge with enum of parshvas
             }
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2) {
+            if (resultCode == RESULT_OK) {
+                // Remove the item from your inventory here
+                int position = data.getIntExtra("position", -1);
+                if (position >= 0) {
+                    inventory.removeItemByIndex(position);
+                }
+                inventoryAdapter.notifyDataSetChanged();
+                updateTotals();
+            }
+        }
+    }
 
     /**
      * Rewrites the TextView elements displaying the inventory totals to reflect new values.
      */
     public void updateTotals() {
-        totalItemsTextView.setText(
-                String.format(Locale.CANADA,
-                        "Total items: %d",
-                        inventory.getCount())
-        );
-        totalValueTextView.setText(
-                String.format(Locale.CANADA,
-                        "Total Value: $%.2f",
-                        inventory.getValue())
-        );
+        totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
+        totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getValue()));
     }
 }

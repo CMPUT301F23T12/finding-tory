@@ -12,10 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 
-public class ItemViewActivity extends AppCompatActivity {
+public class ItemViewActivity extends AppCompatActivity implements Serializable {
     private static final int EDIT_ITEM_REQUEST = 1; // Can be any integer unique to this activity
 
     @Override
@@ -54,6 +55,15 @@ public class ItemViewActivity extends AppCompatActivity {
                     public void onDialogDismissed() {
                         // Make grey background invisible when the dialog is dismissed
                         greyBack.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onDeleteConfirmed() {
+                        Intent data = new Intent();
+                        data.putExtra("position", getIntent().getIntExtra("position", -1));
+                        // You can add extra data if needed
+                        setResult(RESULT_OK, data);
+                        finish();
                     }
                 });
                 deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
