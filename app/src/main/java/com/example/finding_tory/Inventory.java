@@ -1,11 +1,12 @@
 package com.example.finding_tory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Container class to hold a list of Items.
  */
-public class Inventory {
+public class Inventory implements Serializable {
 
     private String name;
     private ArrayList<Item> items;
@@ -72,6 +73,12 @@ public class Inventory {
         this.name = name;
     }
 
+    public void calculateValue() {
+        this.value = 0;
+        for (Item item : items) {
+            this.value += item.getEstimatedValue();
+        }
+    }
 
     /**
      * Sets the list of Items being held in the inventory, overwriting any previous lists.
@@ -80,10 +87,16 @@ public class Inventory {
      */
     public void setItems(ArrayList<Item> items) {
         this.items = items;
-        this.value = 0;
-        for (Item item : items) {
-            this.value += item.getEstimatedValue();
-        }
+        calculateValue();
+    }
+
+    public Item get(int index) {
+        return items.get(index);
+    }
+
+    public void set(int index, Item item) {
+        items.set(index, item);
+        calculateValue();
     }
 
 

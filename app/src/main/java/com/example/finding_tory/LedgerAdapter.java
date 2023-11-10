@@ -14,31 +14,31 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * Implements adapter functionality in order to link the InventoryViewActivity's ListView
- * element to the array of Items in an Inventory.
+ * Implements adapter functionality in order to link the LedgerFragment's ListView
+ *  element to the array of Inventories in a Ledger.
  */
-public class InventoryAdapter extends ArrayAdapter<Item> {
+public class LedgerAdapter extends ArrayAdapter<Inventory> {
 
-    private ArrayList<Item> items;
+    private ArrayList<Inventory> inventories;
     private Context context;
 
     /**
-     * Creates a new InventoryAdapter object.
+     * Creates a new LedgerAdapter object.
      * @param context
      *          view/element this adapter is subordinate to
-     * @param items
-     *          list of Item objects being wrapped into the ListView
+     * @param inventories
+     *          list of Inventory objects being wrapped into the ListView
      */
-    public InventoryAdapter(Context context, ArrayList<Item> items) {
-        super(context, 0, items);
-        this.items = items;
+    public LedgerAdapter(Context context, ArrayList<Inventory> inventories) {
+        super(context, 0, inventories);
+        this.inventories = inventories;
         this.context = context;
     }
 
 
     /**
-     * Updates the contents of the TextView elements in an inventory row (ie. an item) to reflect
-     *  the state of a given Item object.
+     * Updates the contents of the TextView elements in a ledger row (ie. an inventory) to reflect
+     *  the state of a given Inventory object.
      *
      * @param position
      *          index of the Item object whose info we wish to update
@@ -54,18 +54,18 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
         if (view == null)
-            view = LayoutInflater.from(context).inflate(R.layout.item_content, parent, false);
+            view = LayoutInflater.from(context).inflate(R.layout.inventory_content, parent, false);
 
         // find TextView elements that we wish to update
-        Item item = items.get(position);
-        TextView descriptionTextView = view.findViewById(R.id.description_text);
+        Inventory inventory = inventories.get(position);
+        TextView nameTextView = view.findViewById(R.id.name_text);
+        TextView countTextView = view.findViewById(R.id.count_text);
         TextView valueTextView = view.findViewById(R.id.value_text);
-        TextView tagsTextView = view.findViewById(R.id.tags_text);
 
         // modify TextViews with current item information
-        descriptionTextView.setText(item.getDescription());
-        valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getEstimatedValue()));
-        tagsTextView.setText(item.getTagsString());
+        nameTextView.setText(inventory.getName());
+        countTextView.setText(String.format(Locale.CANADA, "Total items: %d",  inventory.getCount()));
+        valueTextView.setText(String.format(Locale.CANADA, "Total Value : $%.2f", inventory.getValue()));
         return view;
     }
 }
