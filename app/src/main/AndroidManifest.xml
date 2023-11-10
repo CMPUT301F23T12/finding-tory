@@ -24,6 +24,11 @@
         </activity>
 
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false">
+        </activity>
+
+        <activity
             android:name=".LedgerViewActivity"
             android:exported="true"
             android:theme="@style/Theme.Findingtory.NoActionBar">
@@ -43,6 +48,7 @@
             android:name=".UpsertViewActivity"
             android:exported="false">
         </activity>
+
     </application>
 
 </manifest>

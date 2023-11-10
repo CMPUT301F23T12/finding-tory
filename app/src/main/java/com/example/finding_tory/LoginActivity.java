@@ -12,7 +12,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 
 /**
- * Displays an activity allowing the user to login, or begin new account creation.
+ * LoginActivity is an AppCompatActivity that provides a user interface for login and new account registration.
+ * It allows users to enter their username and password to log in or to navigate to the registration process.
+ *
+ * This activity includes validation for user credentials and initiates transitions to other activities based on user actions.
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -20,10 +23,11 @@ public class LoginActivity extends AppCompatActivity {
     private EditText passwordEditText;
 
     /**
-     * Initializes the instance variables and bindings associated with this activity on creation.
+     * Initializes the activity, sets up the user interface, and prepares event listeners for buttons.
+     * User inputs for username and password are captured and processed in this method.
      *
-     * @param savedInstanceState
-     *          possible default layout
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +35,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // initialize and cache the EditTexts for user info
-        usernameEditText = findViewById(R.id.username_edittext);
-        passwordEditText = findViewById(R.id.password_edittext);
+        usernameEditText = findViewById(R.id.edit_text_username);
+        passwordEditText = findViewById(R.id.edit_text_password);
 
         // initialize registration button, set click listener
-        Button registerButton = findViewById(R.id.register_button);
+        Button registerButton = findViewById(R.id.button_register);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,7 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // initialize login button, set click listener
-        Button loginButton = findViewById(R.id.login_button);
+        Button loginButton = findViewById(R.id.button_login);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
