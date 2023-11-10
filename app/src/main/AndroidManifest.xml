@@ -38,6 +38,11 @@
             android:name=".ItemViewActivity"
             android:exported="false">
         </activity>
+
+        <activity
+            android:name=".UpsertViewActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>
