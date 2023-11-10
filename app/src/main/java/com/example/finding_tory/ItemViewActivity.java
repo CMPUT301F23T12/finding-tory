@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -50,21 +51,25 @@ public class ItemViewActivity extends AppCompatActivity {
         assert selectedItem != null;
         setItemView(selectedItem);
 
-        // Handles going back to Inventory view
+        // Handles going back to Inventory view (whether by phone back button or top-right X button)
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            // we need to override standard back behaviour because inventory view expects a result code
+            @Override
+            public void handleOnBackPressed() {
+                handleOnBack();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
         final FloatingActionButton closeItemViewButton = findViewById(R.id.button_close_item_view);
         closeItemViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = getIntent();
-                intent.putExtra("returnedItem", selectedItem);
-                intent.putExtra("position", position);
-                intent.putExtra("action", "edit");
-
-                setResult(RESULT_OK, intent);
-                finish(); // Return to Inventory View
+                handleOnBack();
             }
         });
 
+        // handles delete button being pressed (provides confirmation dialog: return to inventory if yes)
         final Button deleteItemButton = findViewById(R.id.button_delete_item);
         deleteItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +100,7 @@ public class ItemViewActivity extends AppCompatActivity {
             }
         });
 
+        // set click handler for edit button (launches an edit item activity)
         final Button editItemButton = findViewById(R.id.button_edit_item);
         editItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,6 +127,20 @@ public class ItemViewActivity extends AppCompatActivity {
                 // TODO: Will Implement Later
             }
         });
+    }
+
+    /**
+     * Handles what to do on a regular "back" action (whether by phone back gesture or X button).
+     * Returns to the inventory view, passing the currently viewed item and position back.
+     */
+    private void handleOnBack() {
+        Intent intent = getIntent();
+        intent.putExtra("returnedItem", selectedItem);
+        intent.putExtra("position", position);
+        intent.putExtra("action", "edit");
+
+        setResult(RESULT_OK, intent);
+        finish(); // Return to Inventory View
     }
 
     /**

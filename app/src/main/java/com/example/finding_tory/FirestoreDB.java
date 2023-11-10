@@ -26,6 +26,7 @@ public class FirestoreDB {
      * @return A CollectionReference pointing to the 'items' collection in Firestore.
      */
     public static CollectionReference getItemsRef() {
+        // TODO have multiple collections (1 for each inventory? or 1 for each user?)
         return FirebaseFirestore.getInstance().collection("items");
     }
 }
