@@ -199,7 +199,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     // Remove item from inventory and update the adapter
-                    inventory.removeItem(item);
                     updateTotals();
                     inventoryAdapter.notifyDataSetChanged();
                 });
