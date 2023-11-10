@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * Container class to hold a list of Items.
@@ -13,6 +14,9 @@ public class Inventory implements Serializable {
     private String name;
     private ArrayList<Item> items;
     private double value;
+
+    private String sortType = "Description";
+    private String sortOrder = "Ascending";
 
     /**
      * Creates a new Inventory object.
@@ -122,9 +126,18 @@ public class Inventory implements Serializable {
         this.items.remove(i);
     }
 
-    public Boolean sortItems(String sortType, String sortOrder) {
+    public void setSortData(String sortType, String sortOrder) {
+        if (!Objects.equals(sortType, "")) {
+            this.sortType = sortType;
+        }
+        if (!Objects.equals(sortOrder, "")) {
+            this.sortOrder = sortOrder;
+        }
+    }
+
+    public Boolean sortItems() {
         Comparator<Item> comparator;
-        switch (sortType) {
+        switch (this.sortType) {
             case "Description":
                 comparator = Comparator.comparing(Item::getDescription);
                 break;
@@ -140,7 +153,7 @@ public class Inventory implements Serializable {
             default:
                 return false;
         }
-        if ("Descending".equals(sortOrder)) {
+        if ("Descending".equals(this.sortOrder)) {
             comparator = comparator.reversed();
         }
         Collections.sort(items, comparator);

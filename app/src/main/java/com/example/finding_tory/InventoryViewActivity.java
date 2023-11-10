@@ -104,7 +104,8 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                         @Override
                         public void onSortConfirmed(String sort_type, String sort_order) {
-                            if (inventory.sortItems(sort_type, sort_order)){
+                            inventory.setSortData(sort_type, sort_order);
+                            if (inventory.sortItems()){
                                 inventoryAdapter.notifyDataSetChanged();
                             }
                         }
@@ -207,6 +208,9 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                 inventory.addItem(selectedItem);
 
+                if (inventory.sortItems()){
+                    inventoryAdapter.notifyDataSetChanged();
+                }
                 inventoryAdapter.notifyDataSetChanged();
                 updateTotals();
             }
