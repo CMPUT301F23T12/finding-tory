@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Class to represent the attributes of Items
+ * Represents an item with various attributes such as purchase date, description, make, model, serial number,
+ * estimated value, comments, and tags. This class is designed to be serializable to facilitate easy storage and retrieval.
  */
 public class Item implements Serializable {
     private Date purchaseDate;
@@ -20,6 +21,25 @@ public class Item implements Serializable {
     private ArrayList<String> itemTags;
     // TODO: Add ArrayList of Images
 
+    /**
+     * No-args constructor, required for deserialization from Firestore.
+     * Firestore creates instances of data model classes when retrieving data from db
+     */
+    public Item() {
+    }
+
+    /**
+     * Constructs an Item with specified attributes.
+     *
+     * @param purchaseDate    The purchase date of the item.
+     * @param description     The description of the item.
+     * @param make            The make of the item.
+     * @param model           The model of the item.
+     * @param estimatedValue  The estimated value of the item.
+     * @param serialNumber    The serial number of the item.
+     * @param comment         A comment about the item.
+     * @param itemTags        A list of tags associated with the item.
+     */
     public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags) {
         this.purchaseDate = purchaseDate;
         this.description = description;
@@ -170,12 +190,12 @@ public class Item implements Serializable {
      * displays tags as a space separated list
      * @return string to display tags
      */
-    public StringBuilder getTagsString() {
+    public String getTagsString() {
         StringBuilder tags_string = new StringBuilder();
         for (String tag: this.itemTags) {
             tags_string.append(tag).append(" ");
         }
-        return tags_string;
+        return tags_string.toString();
     }
 
     /**

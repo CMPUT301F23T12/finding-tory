@@ -179,12 +179,24 @@
             android:text="Upload Images"
             android:layout_marginTop="24dp"/>
 
-        <!-- Tag input can be complex depending on the UI/UX design,
-             here is a simple button placeholder for it -->
-        <TextView
-            android:id="@+id/tag_display"
+        <!-- Horizontal ScrollView to accommodate multiple tags -->
+        <HorizontalScrollView
+            android:id="@+id/horizontal_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            >
+
+            <!-- LinearLayout as a container for tag views -->
+            <LinearLayout
+                android:id="@+id/tags_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <!-- Tags will be dynamically added here -->
+            </LinearLayout>
+
+        </HorizontalScrollView>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -198,14 +210,14 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:minHeight="48dp"
-                android:hint="Enter tags"
+                android:hint="Add tags"
                 android:inputType="text"
                 android:autofillHints="" />
             <Button
                 android:id="@+id/add_tags_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add tags"/>
+                android:text="+"/>
         </LinearLayout>
 
         <LinearLayout

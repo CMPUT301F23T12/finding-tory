@@ -83,13 +83,22 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         return view;
     }
 
+    /**
+     * Toggles the selection status of an item at a given position.
+     *
+     * @param position The position of the item in the ListView.
+     */
     private void toggleSelection(int position) {
         boolean isSelected = selectedItems.get(position, false);
         selectedItems.put(position, !isSelected);
         notifyDataSetChanged();
     }
 
-    // Returns the list of selected items
+    /**
+     * Returns a list of selected items.
+     *
+     * @return A list containing the selected items.
+     */
     public List<Item> getSelectedItems() {
         List<Item> selected = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
@@ -100,7 +109,9 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         return selected;
     }
 
-    // Method to clear the selection of all items
+    /**
+     * Clears the selection of all items in the ListView.
+     */
     public void clearSelection() {
         selectedItems.clear();
         notifyDataSetChanged();

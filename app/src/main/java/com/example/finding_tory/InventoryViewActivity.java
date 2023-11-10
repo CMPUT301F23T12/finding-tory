@@ -7,15 +7,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -28,11 +24,10 @@ import java.util.Objects;
  * Displays the content of a given Inventory (ie. a list of Items).
  */
 public class InventoryViewActivity extends AppCompatActivity {
-
     private Inventory inventory;
     private ListView inventoryListView;
     private InventoryAdapter inventoryAdapter;
-
+    private boolean state_deletion = false;
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
     private FloatingActionButton addItemButton;
@@ -40,7 +35,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
      *
-     * @param savedInstanceState possible default layout
+     * @param savedInstanceState Possible saved state information for the activity.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,19 +83,17 @@ public class InventoryViewActivity extends AppCompatActivity {
                 startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
             }
         });
-        inventoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                enterSelectionMode();
-                return true;
-            }
-        });
 
         Button sort_cancel_button = findViewById(R.id.sort_inventory_button);
         sort_cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                exitSelectionMode();
+                if (state_deletion) {
+                    inventoryAdapter.clearSelection();
+                    exitSelectionMode();
+                } else {
+                    // add sort functionality
+                }
             }
         });
 
@@ -108,26 +101,63 @@ public class InventoryViewActivity extends AppCompatActivity {
         filter_delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Item> selectedItems = inventoryAdapter.getSelectedItems();
-                // Clear the selection and exit selection mode
-                inventoryAdapter.clearSelection();
-                exitSelectionMode();
+                final View greyBack = findViewById(R.id.fadeBackground);
+                if (state_deletion) {
+                    DeleteItemFragment deleteDialog = new DeleteItemFragment();
+                    deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
+                        @Override
+                        public void onDialogDismissed() {
+                            // Make grey background invisible when the dialog is dismissed
+                            inventoryAdapter.clearSelection();
+                            greyBack.setVisibility(View.GONE);
+                            exitSelectionMode();
+                        }
 
-                // Remove selected items from the inventory
-                for (Item item : selectedItems) {
-                    inventory.removeItem(item);
+                        @Override
+                        public void onDeleteConfirmed() {
+                            List<Item> selectedItems = inventoryAdapter.getSelectedItems();
+                            // Clear the selection and exit selection mode
+                            inventoryAdapter.clearSelection();
+                            exitSelectionMode();
+
+                            // Remove selected items from the inventory
+                            for (Item item : selectedItems) {
+                                inventory.removeItem(item);
+                                removeItemFromFirestore(item);
+                            }
+
+                            // Notify the adapter of the data change
+                            inventoryAdapter.notifyDataSetChanged();
+
+                            // Update totals
+                            updateTotals();
+                        }
+                    });
+                    deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
+                    greyBack.setVisibility(View.VISIBLE); // move to the bottom after filter is implemented
+                } else {
+                    // add filter functionality
                 }
+            }
+        });
 
-                // Notify the adapter of the data change
-                inventoryAdapter.notifyDataSetChanged();
-
-                // Update totals
-                updateTotals();
+        inventoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                enterSelectionMode();
+                // sort_cancel_button.setText("Cancel");
+                // filter_delete_button.setText("Delete");
+                return true;
             }
         });
     }
 
+    /**
+     * Enters the selection mode for the inventory items. In selection mode, checkboxes are displayed
+     * next to each item in the list, allowing the user to select multiple items for actions like deletion.
+     */
     private void enterSelectionMode() {
+        state_deletion = true;
         // Show checkboxes
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
@@ -138,17 +168,30 @@ public class InventoryViewActivity extends AppCompatActivity {
         }
     }
 
-    // Implement a method to exit the selection mode and hide checkboxes
+    /**
+     * Exits the selection mode for the inventory items. In selection mode, checkboxes are displayed
+     * next to each item in the list. This method hides the checkboxes and returns the inventory view
+     * to its normal state.
+     */
     private void exitSelectionMode() {
+        state_deletion = false;
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
             CheckBox checkBox = view.findViewById(R.id.item_checkbox);
             ImageView arrow = view.findViewById(R.id.arrow);
             checkBox.setVisibility(View.GONE);
             arrow.setVisibility(View.VISIBLE);
+            checkBox.setChecked(false);
         }
     }
 
+    /**
+     * Handles the result of activities that were started for a result.
+     *
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode  The result code returned by the activity.
+     * @param data        The data returned by the activity.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -172,6 +215,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             if (Objects.equals(data.getStringExtra("action"), "delete")) {
                 int position = data.getIntExtra("pos", -1);
                 if (position >= 0) {
+                    removeItemFromFirestore(inventory.getItems().get(position));
                     inventory.removeItemByIndex(position);
                 }
             } else {
@@ -190,5 +234,20 @@ public class InventoryViewActivity extends AppCompatActivity {
     public void updateTotals() {
         totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
         totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getValue()));
+    }
+
+    /**
+     * Removes an item from Firestore database and updates the inventory accordingly.
+     *
+     * @param item The Item object to be removed from Firestore.
+     */
+    private void removeItemFromFirestore(Item item) {
+        FirestoreDB.getItemsRef().document(item.getDescription())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Remove item from inventory and update the adapter
+                    updateTotals();
+                    inventoryAdapter.notifyDataSetChanged();
+                });
     }
 }

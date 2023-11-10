@@ -3,8 +3,11 @@ package com.example.finding_tory;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -12,18 +15,28 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-
+/**
+ * ItemViewActivity is an AppCompatActivity that displays detailed information about a selected item.
+ * It allows users to view, edit, or delete an item, and navigate back to the inventory list.
+ *
+ * This activity handles various user interactions such as editing item details, confirming item deletion,
+ * and updating item views.
+ */
 public class ItemViewActivity extends AppCompatActivity {
-
     Item selectedItem;
     int position;
 
+    /**
+     * Initializes the activity, sets up the user interface, and retrieves the selected item from the intent.
+     * Populates the UI components with the item's details.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
+     */
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_view);
@@ -110,6 +123,15 @@ public class ItemViewActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Handles the result from the edit item activity.
+     * Updates the item view if the item was edited.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult(),
+     *                    allowing you to identify who this result came from.
+     * @param resultCode  The integer result code returned by the child activity through its setResult().
+     * @param data        An Intent, which can return result data to the caller.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -124,6 +146,11 @@ public class ItemViewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Populates the UI components with the item's details.
+     *
+     * @param passedItem The item whose details are to be displayed.
+     */
     private void setItemView(Item passedItem) {
         TextView item_name = findViewById(R.id.item_description_text);
         item_name.setText(passedItem.getDescription());
@@ -146,7 +173,18 @@ public class ItemViewActivity extends AppCompatActivity {
         TextView item_serial_number = findViewById(R.id.item_serial_number_text);
         item_serial_number.setText(passedItem.getSerialNumber());
 
-        TextView item_tags = findViewById(R.id.item_tags);
-        item_tags.setText(passedItem.getTagsString());
+        LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
+        tagsContainer.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (String tag : passedItem.getItemTags()) {
+            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setText(tag);
+
+            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            removeTagButton.setVisibility(View.GONE);
+            tagsContainer.addView(tagView); // Add the tag view to the container
+
+        }
     }
 }

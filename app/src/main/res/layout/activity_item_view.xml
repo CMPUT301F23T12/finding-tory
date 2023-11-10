@@ -267,55 +267,30 @@
         </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="10sp"
+                android:paddingTop="10sp"
+                android:paddingEnd="5sp"
+                android:paddingBottom="5sp">
 
                 <TextView
                     android:id="@+id/item_tags_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginTop="0dp"
-                    android:paddingStart="10sp"
-                    android:paddingTop="10sp"
-                    android:paddingEnd="5sp"
                     android:text="Tags: "
-                    android:paddingBottom="5sp"
                     android:textSize="18sp"/>
-                <TextView
-                    android:id="@+id/item_tags"
-                    android:layout_width="match_parent"
+
+                <LinearLayout
+                    android:id="@+id/item_tag_container"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginTop="0dp"
-                    android:paddingTop="5sp"
-                    android:paddingEnd="10sp"
-                    android:paddingBottom="5sp"
-                    android:text="item_tags"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-            <!-- Tags Container -->
-            <LinearLayout
-                android:id="@+id/item_tag_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <!--Tags will be dynamically added, these are here as reference-->
-                <!--<TextView-->
-                <!--    android:layout_width="wrap_content"-->
-                <!--    android:layout_height="wrap_content"-->
-                <!--    android:padding="8dp"-->
-                <!--    android:text="item_tag1" />-->
-
-                <!--<TextView-->
-                <!--    android:layout_width="wrap_content"-->
-                <!--    android:layout_height="wrap_content"-->
-                <!--    android:padding="8dp"-->
-                <!--    android:text="item_tag2" />-->
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:gravity="center_vertical"
+                    tools:ignore="DuplicateIds">
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
