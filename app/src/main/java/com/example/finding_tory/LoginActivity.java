@@ -43,9 +43,8 @@ public class LoginActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO implement new user registration
-                Snackbar.make(v, "User registration coming soon!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -61,8 +60,8 @@ public class LoginActivity extends AppCompatActivity {
                 passwordEditText.setText("");  // when we return we need to re-enter password
 
                 if (!(username.equals("user") && password.equals("password"))) {
-                    Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(v, "Invalid user credentials. Please try again.",
+                            Snackbar.LENGTH_LONG).show();
                     return;
                 }
 
