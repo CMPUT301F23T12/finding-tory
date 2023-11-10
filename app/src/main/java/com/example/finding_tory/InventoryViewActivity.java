@@ -15,11 +15,15 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -50,6 +54,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventory = (Inventory) intent.getSerializableExtra("inventory");
         assert (inventory != null);
         setTitle(inventory.getName());
+        inventory.reset_tags();
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -66,8 +71,43 @@ public class InventoryViewActivity extends AppCompatActivity {
         addItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
-                startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
+                if (state_deletion) {
+                    final View greyBack = findViewById(R.id.fadeBackground);
+                    Set<String> current_tags = new HashSet<>();
+                    for (Item item : inventoryAdapter.getSelectedItems()) {
+                        current_tags.addAll(item.getItemTags());
+                    }
+                    BulkTagFragment tagDialog = new BulkTagFragment();
+                    Bundle args = new Bundle();
+                    args.putSerializable("inventory", inventory);
+                    args.putSerializable("tags", (Serializable) current_tags);
+                    tagDialog.setArguments(args);
+                    tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
+                        @Override
+                        public void onDialogDismissed() {
+                            greyBack.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onTagConfirmed(ArrayList<String> selectedTags) {
+                            for (Item item : inventoryAdapter.getSelectedItems()) {
+                                for (String str : selectedTags) {
+                                    item.addItemTag(str);
+                                }
+                                editItemFromFirestore(item, item);
+                            }
+                            inventoryAdapter.clearSelection();
+                            exitSelectionMode();
+                            // Notify the adapter of the data change
+                            inventoryAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
+                    greyBack.setVisibility(View.VISIBLE);
+                } else {
+                    Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
+                    startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
+                }
             }
         });
 
@@ -105,7 +145,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                         @Override
                         public void onSortConfirmed(String sort_type, String sort_order) {
                             inventory.setSortData(sort_type, sort_order);
-                            if (inventory.sortItems()){
+                            if (inventory.sortItems()) {
                                 inventoryAdapter.notifyDataSetChanged();
                             }
                         }
@@ -222,8 +262,8 @@ public class InventoryViewActivity extends AppCompatActivity {
                 assert selectedItem != null;
 
                 inventory.addItem(selectedItem);
-
-                if (inventory.sortItems()){
+                inventory.reset_tags();
+                if (inventory.sortItems()) {
                     inventoryAdapter.notifyDataSetChanged();
                 }
                 inventoryAdapter.notifyDataSetChanged();
@@ -244,7 +284,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
                 inventory.set(pos, returnedItem);
             }
-
+            inventory.reset_tags();
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();
         }
@@ -256,6 +296,11 @@ public class InventoryViewActivity extends AppCompatActivity {
     public void updateTotals() {
         totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
         totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getValue()));
+    }
+
+    private void editItemFromFirestore(Item existingItem, Item updatedItem) {
+        FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
+        FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
     }
 
     /**
