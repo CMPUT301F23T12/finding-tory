@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an item with various attributes such as purchase date, description, make, model, serial number,
@@ -31,14 +33,14 @@ public class Item implements Serializable {
     /**
      * Constructs an Item with specified attributes.
      *
-     * @param purchaseDate    The purchase date of the item.
-     * @param description     The description of the item.
-     * @param make            The make of the item.
-     * @param model           The model of the item.
-     * @param estimatedValue  The estimated value of the item.
-     * @param serialNumber    The serial number of the item.
-     * @param comment         A comment about the item.
-     * @param itemTags        A list of tags associated with the item.
+     * @param purchaseDate   The purchase date of the item.
+     * @param description    The description of the item.
+     * @param make           The make of the item.
+     * @param model          The model of the item.
+     * @param estimatedValue The estimated value of the item.
+     * @param serialNumber   The serial number of the item.
+     * @param comment        A comment about the item.
+     * @param itemTags       A list of tags associated with the item.
      */
     public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags) {
         this.purchaseDate = purchaseDate;
@@ -53,6 +55,7 @@ public class Item implements Serializable {
 
     /**
      * Copy the attributes of another item to this item
+     *
      * @param copy the item to be copied
      */
     public void updateItem(Item copy) {
@@ -68,6 +71,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the purchase date of item
+     *
      * @return purchase date
      */
     public Date getPurchaseDate() {
@@ -76,6 +80,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the purchase date of the item
+     *
      * @param purchaseDate new purchase date
      */
     public void setPurchaseDate(Date purchaseDate) {
@@ -84,6 +89,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the description (name) of the item
+     *
      * @return the item description
      */
     public String getDescription() {
@@ -92,6 +98,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the description of the item
+     *
      * @param description new description
      */
     public void setDescription(String description) {
@@ -100,6 +107,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the make of the item
+     *
      * @return the item make
      */
     public String getMake() {
@@ -108,6 +116,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the make of the item
+     *
      * @param make new make
      */
     public void setMake(String make) {
@@ -116,6 +125,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the model of the item
+     *
      * @return the item model
      */
     public String getModel() {
@@ -124,6 +134,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the model of the item
+     *
      * @param model new model
      */
     public void setModel(String model) {
@@ -132,6 +143,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the serial number of the item
+     *
      * @return the item serial number
      */
     public String getSerialNumber() {
@@ -140,6 +152,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the serial number of the item
+     *
      * @param serialNumber new serial number
      */
     public void setSerialNumber(String serialNumber) {
@@ -148,6 +161,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the estimated value of the item
+     *
      * @return the estimated value
      */
     public float getEstimatedValue() {
@@ -156,6 +170,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the estimated value of the item
+     *
      * @param estimatedValue new estimated value
      */
     public void setEstimatedValue(float estimatedValue) {
@@ -164,6 +179,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the the comment made about the item
+     *
      * @return the comment
      */
     public String getComment() {
@@ -172,6 +188,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the comment made for item
+     *
      * @param comment new comment
      */
     public void setComment(String comment) {
@@ -180,6 +197,7 @@ public class Item implements Serializable {
 
     /**
      * Gets the tags attached to an item
+     *
      * @return list of tags
      */
     public ArrayList<String> getItemTags() {
@@ -188,11 +206,12 @@ public class Item implements Serializable {
 
     /**
      * displays tags as a space separated list
+     *
      * @return string to display tags
      */
     public String getTagsString() {
         StringBuilder tags_string = new StringBuilder();
-        for (String tag: this.itemTags) {
+        for (String tag : this.itemTags) {
             tags_string.append(tag).append(" ");
         }
         return tags_string.toString();
@@ -200,6 +219,7 @@ public class Item implements Serializable {
 
     /**
      * Sets the tags to a new list of tags
+     *
      * @param itemTags new list of tags
      */
     public void setItemTags(ArrayList<String> itemTags) {
@@ -207,10 +227,21 @@ public class Item implements Serializable {
     }
 
     /**
+     * Sets the tags to a new list of tags
+     *
+     * @param itemTags new list of tags
+     */
+    public void addItemTag(String itemTags) {
+        if (!this.itemTags.contains(itemTags)) {
+            this.itemTags.add(itemTags);
+        }
+    }
+
+    /**
      * Checks inputs to ensure that the data being entered is valid
      *
-     * @param purchaseDate the date that user inputs
-     * @param description the description users inputs
+     * @param purchaseDate   the date that user inputs
+     * @param description    the description users inputs
      * @param estimatedValue the estimated value that user inputs
      * @return a string with error message or empty string (no errors)
      * @throws ParseException

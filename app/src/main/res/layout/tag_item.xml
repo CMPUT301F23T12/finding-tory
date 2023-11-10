@@ -1,0 +1,10 @@
+<!-- tag_item.xml -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tagTextView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@drawable/tag_background"
+    android:gravity="center_vertical" />
