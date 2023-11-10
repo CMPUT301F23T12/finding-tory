@@ -11,6 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -142,7 +145,9 @@ public class UpsertViewActivity extends AppCompatActivity{
 
                     if (isAdd) {
                         intent.putExtra("item_to_add", upsert_item);
+                        addItemToFirestore(upsert_item);
                     } else {
+                        editItemFromFirestore(item, upsert_item);
                         intent.putExtra("editedItem", upsert_item);
                     }
                     setResult(RESULT_OK, intent); // sends item back to parent activity
@@ -158,5 +163,19 @@ public class UpsertViewActivity extends AppCompatActivity{
                 finish();
             }
         });
+    }
+
+    private void addItemToFirestore(Item item) {
+        System.out.println(item.getDescription());
+        FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
+                .addOnSuccessListener(aVoid -> {
+                    // Item added successfully
+                    Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void editItemFromFirestore(Item existingItem, Item updatedItem) {
+        FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
+        FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
     }
 }

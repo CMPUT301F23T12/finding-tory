@@ -20,6 +20,11 @@ public class Item implements Serializable {
     private ArrayList<String> itemTags;
     // TODO: Add ArrayList of Images
 
+    // No-args constructor needed for object deserialization in Firestore
+    // Firestore creates instances of data model classes when retrieving data from db
+    public Item() {
+    }
+
     public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags) {
         this.purchaseDate = purchaseDate;
         this.description = description;
@@ -170,12 +175,12 @@ public class Item implements Serializable {
      * displays tags as a space separated list
      * @return string to display tags
      */
-    public StringBuilder getTagsString() {
+    public String getTagsString() {
         StringBuilder tags_string = new StringBuilder();
         for (String tag: this.itemTags) {
             tags_string.append(tag).append(" ");
         }
-        return tags_string;
+        return tags_string.toString();
     }
 
     /**

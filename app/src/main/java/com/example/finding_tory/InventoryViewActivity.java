@@ -123,6 +123,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                             // Remove selected items from the inventory
                             for (Item item : selectedItems) {
                                 inventory.removeItem(item);
+                                removeItemFromFirestore(item);
                             }
 
                             // Notify the adapter of the data change
@@ -199,6 +200,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             if (Objects.equals(data.getStringExtra("action"), "delete")) {
                 int position = data.getIntExtra("pos", -1);
                 if (position >= 0) {
+                    removeItemFromFirestore(inventory.getItems().get(position));
                     inventory.removeItemByIndex(position);
                 }
             } else {
@@ -217,5 +219,15 @@ public class InventoryViewActivity extends AppCompatActivity {
     public void updateTotals() {
         totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
         totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getValue()));
+    }
+
+    private void removeItemFromFirestore(Item item) {
+        FirestoreDB.getItemsRef().document(item.getDescription())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Remove item from inventory and update the adapter
+                    updateTotals();
+                    inventoryAdapter.notifyDataSetChanged();
+                });
     }
 }
