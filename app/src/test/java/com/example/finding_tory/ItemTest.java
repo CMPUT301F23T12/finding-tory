@@ -1,100 +1,180 @@
 package com.example.finding_tory;
 
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
 import junit.framework.TestCase;
+
+import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.ArrayList;
 
 public class ItemTest extends TestCase {
     private Item item;
+    private Date purchaseDate;
+    private String description;
+    private String make;
+    private String model;
+    private String serialNumber;
+    private float estimatedValue;
+    private String comment;
+    private ArrayList<String> itemTags;
 
-    protected void setUp() {
-        // Create a sample Item instance for testing
-        Date purchaseDate = new Date();
-        String description = "Test Item";
-        String make = "Test Make";
-        String model = "Test Model";
-        String serialNumber = "12345";
-        float estimatedValue = 100.0f;
-        String comment = "Test Comment";
-        ArrayList<String> tags = new ArrayList<String>();
-        tags.add("tag1");
-        tags.add("tag2");
-        item = new Item(purchaseDate, description, make, model, estimatedValue, serialNumber, comment, tags);
+    @BeforeEach
+    public void setUp() throws ParseException {
+        purchaseDate = new SimpleDateFormat("yyyy-MM-dd").parse("2023-01-01");
+        description = "computer";
+        make = "MacBook";
+        model = "Air";
+        serialNumber = "548FF45";
+        estimatedValue = 1799.99f;
+        comment = "This is a comment";
+        itemTags = new ArrayList<>(Arrays.asList("Home", "School"));
+        item = new Item(purchaseDate, description, make, model, estimatedValue, serialNumber, comment, itemTags);
     }
 
-    public void testGetPurchaseDate() {
-        assertEquals(item.getPurchaseDate(), item.getPurchaseDate());
+    @Test
+    public void testUpdateItem() {
+        Item newItem = new Item(new Date(), "New Description", "New Make", "New Model", 1f, "NewSerial", "New Comment", new ArrayList<>());
+        item.updateItem(newItem);
+        assertEquals(newItem.getPurchaseDate(), item.getPurchaseDate());
+        assertEquals(newItem.getDescription(), item.getDescription());
+        assertEquals(newItem.getMake(), item.getMake());
+        assertEquals(newItem.getModel(), item.getModel());
+        assertEquals(newItem.getSerialNumber(), item.getSerialNumber());
+        assertEquals(newItem.getEstimatedValue(), item.getEstimatedValue());
+        assertEquals(newItem.getComment(), item.getComment());
+        assertIterableEquals(newItem.getItemTags(), item.getItemTags());
     }
 
-    public void testSetPurchaseDate() {
+    @Test
+    public void testTestGetPurchaseDate() {
+        assertEquals(purchaseDate, item.getPurchaseDate());
+    }
+
+    @Test
+    public void testTestSetPurchaseDate() {
         Date newPurchaseDate = new Date();
         item.setPurchaseDate(newPurchaseDate);
         assertEquals(newPurchaseDate, item.getPurchaseDate());
     }
 
-    public void testGetDescription() {
-        assertEquals(item.getDescription(), "Test Item");
+    @Test
+    public void testTestGetDescription() {
+        assertEquals(description, item.getDescription());
     }
 
-    public void testSetDescription() {
-        item.setDescription("New Description");
-        assertEquals(item.getDescription(), "New Description");
+    @Test
+    public void testTestSetDescription() {
+        String newDescription = "New description";
+        item.setDescription(newDescription);
+        assertEquals(newDescription, item.getDescription());
     }
 
-    public void testGetMake() {
-        assertEquals(item.getMake(), "Test Make");
+    @Test
+    public void testTestGetMake() {
+        assertEquals(make, item.getMake());
     }
 
-    public void testSetMake() {
-        item.setMake("New Make");
-        assertEquals(item.getMake(), "New Make");
+    @Test
+    public void testTestSetMake() {
+        String newMake = "New make";
+        item.setMake(newMake);
+        assertEquals(newMake, item.getMake());
     }
 
-    public void testGetModel() {
-        assertEquals(item.getModel(), "Test Model");
+    @Test
+    public void testTestGetModel() {
+        assertEquals(model, item.getModel());
     }
 
-    public void testSetModel() {
-        item.setModel("New Model");
-        assertEquals(item.getModel(), "New Model");
+    @Test
+    public void testTestSetModel() {
+        String newModel = "New model";
+        item.setModel(newModel);
+        assertEquals(newModel, item.getModel());
     }
 
-    public void testGetSerialNumber() {
-        assertEquals(item.getSerialNumber(), "12345");
+    @Test
+    public void testTestGetSerialNumber() {
+        assertEquals(serialNumber, item.getSerialNumber());
     }
 
-    public void testSetSerialNumber() {
-        item.setSerialNumber("54321");
-        assertEquals(item.getSerialNumber(), 54321);
+    @Test
+    public void testTestSetSerialNumber() {
+        String newSN = "New serial number";
+        item.setSerialNumber(newSN);
+        assertEquals(newSN, item.getSerialNumber());
     }
 
-    public void testGetEstimatedValue() {
-        assertEquals(item.getEstimatedValue(), 100.0f, 0.001); // Use delta for floating-point comparisons
+    @Test
+    public void testTestGetEstimatedValue() {
+        assertEquals(estimatedValue, item.getEstimatedValue());
     }
 
-    public void testSetEstimatedValue() {
-        item.setEstimatedValue(200.0f);
-        assertEquals(item.getEstimatedValue(), 200.0f, 0.001);
+    @Test
+    public void testTestSetEstimatedValue() {
+        float newValue = 100.00f;
+        item.setEstimatedValue(newValue);
+        assertEquals(newValue, item.getEstimatedValue());
     }
 
-    public void testGetComment() {
-        assertEquals(item.getComment(), "Test Comment");
+    @Test
+    public void testTestGetComment() {
+        assertEquals(comment, item.getComment());
     }
 
-    public void testSetComment() {
-        item.setComment("New Comment");
-        assertEquals(item.getComment(), "New Comment");
+    @Test
+    public void testTestSetComment() {
+        String newComment = "New comment";
+        item.setComment(newComment);
+        assertEquals(newComment, item.getComment());
     }
 
-    public void testGetItemTags() {
-        assertNull(item.getItemTags());
+    @Test
+    public void testTestGetItemTags() {
+        assertIterableEquals(itemTags, item.getItemTags());
     }
 
-    public void testSetItemTags() {
-        ArrayList<String> tags = new ArrayList<>();
-        tags.add("Tag1");
-        tags.add("Tag2");
-        item.setItemTags(tags);
-        assertEquals(item.getItemTags(), tags);
+    @Test
+    public void testGetTagsString() {
+        StringBuilder expectedTagsString = new StringBuilder();
+        for (String tag: itemTags) {
+            expectedTagsString.append(tag).append(" ");
+        }
+        assertEquals(expectedTagsString.toString().trim(), item.getTagsString().toString().trim());
+    }
+
+    @Test
+    public void testTestSetItemTags() {
+        ArrayList<String> newItemTags = new ArrayList<>(Arrays.asList("tag1", "tag2"));
+        item.setItemTags(newItemTags);
+        assertIterableEquals(newItemTags, item.getItemTags());
+    }
+
+    @Test
+    public void testErrorHandleItemInput() throws ParseException {
+        String errorMessage = Item.errorHandleItemInput("2023-01-01", "Phone", "500");
+        assertTrue(errorMessage.isEmpty());
+
+        // Test for empty description
+        errorMessage = Item.errorHandleItemInput("2023-01-01", "", "500");
+        assertEquals("Item Description cannot be empty", errorMessage);
+
+        // Test for future date
+        errorMessage = Item.errorHandleItemInput("2024-01-01", "Phone", "500");
+        assertEquals("Date cannot be in the future", errorMessage);
+
+        // Test for empty estimated value
+        errorMessage = Item.errorHandleItemInput("2023-01-01", "Phone", "");
+        assertEquals("Estimated value cannot be empty", errorMessage);
+
+        // Test for negative estimated value
+        errorMessage = Item.errorHandleItemInput("2023-01-01", "Phone", "-500");
+        assertEquals("Cannot have a negative Estimated value", errorMessage);
     }
 }
