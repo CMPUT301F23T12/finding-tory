@@ -8,6 +8,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * It offers static methods to retrieve the Firestore database instance and specific collection references within the database.
  */
 public class FirestoreDB {
+    // debugMode true prevents any modifications to the Firestore DB.
+    private static boolean debugMode = false;
 
     /**
      * Retrieves the singleton instance of FirebaseFirestore.
@@ -28,5 +30,13 @@ public class FirestoreDB {
     public static CollectionReference getItemsRef() {
         // TODO have multiple collections (1 for each inventory? or 1 for each user?)
         return FirebaseFirestore.getInstance().collection("items");
+    }
+
+    public static CollectionReference getUsersRef() {
+        return FirebaseFirestore.getInstance().collection("users");
+    }
+
+    public static boolean isDebugMode() {
+        return debugMode;
     }
 }

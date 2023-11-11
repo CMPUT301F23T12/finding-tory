@@ -199,11 +199,13 @@ public class UpsertViewActivity extends AppCompatActivity{
      * @param item The item to be added to Firestore.
      */
     private void addItemToFirestore(Item item) {
-        FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
-                .addOnSuccessListener(aVoid -> {
-                    // Item added successfully
-                    Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
-                });
+        if (!FirestoreDB.isDebugMode()) {
+            FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
+                    .addOnSuccessListener(aVoid -> {
+                        // Item added successfully
+                        Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
 
     /**
@@ -213,7 +215,9 @@ public class UpsertViewActivity extends AppCompatActivity{
      * @param updatedItem  The updated item.
      */
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
-        FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
-        FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
+        if (!FirestoreDB.isDebugMode()) {
+            FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
+            FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
+        }
     }
 }
