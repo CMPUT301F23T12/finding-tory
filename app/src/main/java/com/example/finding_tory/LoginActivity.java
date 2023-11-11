@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 String password = String.valueOf(passwordEditText.getText());
                 passwordEditText.setText("");  // when we return we need to re-enter password
 
-                if (!(username.equals("user") && password.equals("password"))) {
+                if (!(username.equals("") && password.equals(""))) {
                     Snackbar.make(v, "Invalid user credentials. Please try again.",
                             Snackbar.LENGTH_LONG).show();
                     return;
