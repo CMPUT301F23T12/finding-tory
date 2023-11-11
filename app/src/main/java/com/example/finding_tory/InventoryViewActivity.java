@@ -17,8 +17,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -54,7 +52,6 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventory = (Inventory) intent.getSerializableExtra("inventory");
         assert (inventory != null);
         setTitle(inventory.getName());
-        inventory.reset_tags();
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -80,7 +77,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                     BulkTagFragment tagDialog = new BulkTagFragment();
                     Bundle args = new Bundle();
                     args.putSerializable("inventory", inventory);
-                    args.putSerializable("tags", (Serializable) current_tags);
+                    args.putSerializable("tags", (Serializable) new ArrayList<>(current_tags));
                     tagDialog.setArguments(args);
                     tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
                         @Override
@@ -262,7 +259,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                 assert selectedItem != null;
 
                 inventory.addItem(selectedItem);
-                inventory.reset_tags();
                 if (inventory.sortItems()) {
                     inventoryAdapter.notifyDataSetChanged();
                 }
@@ -284,7 +280,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
                 inventory.set(pos, returnedItem);
             }
-            inventory.reset_tags();
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();
         }

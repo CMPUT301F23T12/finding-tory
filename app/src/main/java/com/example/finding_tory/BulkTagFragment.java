@@ -12,8 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class BulkTagFragment extends DialogFragment {
     private TagDialogListener listener;
@@ -62,8 +60,9 @@ public class BulkTagFragment extends DialogFragment {
         // Initialize RecyclerView and Adapter
         tagsRecyclerView = view.findViewById(R.id.tagsRecyclerView);
         tagsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        allTags = inventory.getTags();
-        selectedTags = new ArrayList<>((Set<String>) getArguments().getSerializable("tags"));
+        assert inventory != null;
+        allTags = inventory.getAllTags();
+        selectedTags = (ArrayList<String>) getArguments().getSerializable("tags");
 
         tagAdapter = new TagAdapter(allTags, selectedTags);
         tagsRecyclerView.setAdapter(tagAdapter);
