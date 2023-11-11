@@ -35,7 +35,7 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         super(context, R.layout.item_content, items);
         this.items = items;
         this.context = context;
-        selectedItems = new SparseBooleanArray();
+        this.selectedItems = new SparseBooleanArray();
     }
 
 

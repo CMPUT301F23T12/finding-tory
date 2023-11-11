@@ -2,6 +2,11 @@ package com.example.finding_tory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents an inventory containing a collection of items. This class provides functionalities to manage
@@ -13,6 +18,9 @@ public class Inventory implements Serializable {
     private String name;
     private ArrayList<Item> items;
     private double value;
+    private Set<String> allTags;
+    private String sortType = "Description";
+    private String sortOrder = "Ascending";
 
     /**
      * Constructs a new Inventory object with a specified name.
@@ -23,6 +31,7 @@ public class Inventory implements Serializable {
     public Inventory(String name) {
         this.name = name;
         this.items = new ArrayList<>();
+        this.allTags = new HashSet<>();
         this.value = 0;
     }
 
@@ -100,7 +109,7 @@ public class Inventory implements Serializable {
      * @return The item at the specified index.
      */
     public Item get(int index) {
-        return items.get(index);
+        return this.items.get(index);
     }
 
     /**
@@ -108,7 +117,7 @@ public class Inventory implements Serializable {
      * Also recalculates the total inventory value after the replacement.
      *
      * @param index The index of the item to replace.
-     * @param item The new item to set in the inventory.
+     * @param item  The new item to set in the inventory.
      */
     public void set(int index, Item item) {
         items.set(index, item);
@@ -126,11 +135,14 @@ public class Inventory implements Serializable {
     }
 
     /**
-     * Removes an item from the inventory and updates the total value.
+     * Removes an item from the inventory and updates the total value, and tags.
      *
      * @param item The item to remove from the inventory.
      */
     public void removeItem(Item item) {
+        for (String tag : item.getItemTags()) {
+            this.allTags.remove(tag);
+        }
         this.items.remove(item);
         this.value -= item.getEstimatedValue();
     }
@@ -141,7 +153,55 @@ public class Inventory implements Serializable {
      * @param i The index of the item to remove.
      */
     public void removeItemByIndex(int i) {
+        for (String tag : this.items.remove(i).getItemTags()) {
+            this.allTags.remove(tag);
+        }
         this.value -= this.items.get(i).getEstimatedValue();
         this.items.remove(i);
+    }
+
+    public void setSortData(String sortType, String sortOrder) {
+        if (!Objects.equals(sortType, "")) {
+            this.sortType = sortType;
+        }
+        if (!Objects.equals(sortOrder, "")) {
+            this.sortOrder = sortOrder;
+        }
+    }
+
+    public void reset_tags() {
+        this.allTags.clear();
+        for (Item item : this.items) {
+            this.allTags.addAll(item.getItemTags());
+        }
+    }
+
+    public ArrayList<String> getTags() {
+        return new ArrayList<>(this.allTags);
+    }
+
+    public Boolean sortItems() {
+        Comparator<Item> comparator;
+        switch (this.sortType) {
+            case "Description":
+                comparator = Comparator.comparing(item -> item.getDescription().toLowerCase());
+                break;
+            case "Date":
+                comparator = Comparator.comparing(Item::getPurchaseDate);
+                break;
+            case "Make":
+                comparator = Comparator.comparing(item -> item.getMake().toLowerCase());
+                break;
+            case "Value":
+                comparator = Comparator.comparing(Item::getEstimatedValue);
+                break;
+            default:
+                return false;
+        }
+        if ("Descending".equals(this.sortOrder)) {
+            comparator = comparator.reversed();
+        }
+        Collections.sort(items, comparator);
+        return true;
     }
 }

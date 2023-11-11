@@ -199,7 +199,6 @@ public class UpsertViewActivity extends AppCompatActivity{
      * @param item The item to be added to Firestore.
      */
     private void addItemToFirestore(Item item) {
-        System.out.println(item.getDescription());
         FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
                 .addOnSuccessListener(aVoid -> {
                     // Item added successfully
