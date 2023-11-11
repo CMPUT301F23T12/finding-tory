@@ -27,22 +27,22 @@ import java.util.Date;
  * This class is responsible for updating/inserting items in an inventory
  */
 public class UpsertViewActivity extends AppCompatActivity{
-    Button add_tags_button;
-    Button submit_button;
-    Button cancel_button;
-    TextView view_title;
-    LinearLayout tags_container;
-    EditText description_text;
-    EditText make_text;
-    EditText model_text;
-    EditText date_purchased_text;
-    EditText estimated_cost_text;
-    EditText serial_number_text;
-    EditText comment_text;
-    EditText tags_entered;
-    Item item;
-    boolean isAdd = false;
-    ArrayList<String> tags = new ArrayList<>();
+    private Button add_tags_button;
+    private Button submit_button;
+    private Button cancel_button;
+    private TextView view_title;
+    private LinearLayout tags_container;
+    private EditText description_text;
+    private EditText make_text;
+    private EditText model_text;
+    private EditText date_purchased_text;
+    private EditText estimated_cost_text;
+    private EditText serial_number_text;
+    private EditText comment_text;
+    private EditText tags_entered;
+    private Item item;
+    private boolean isAdd = false;
+    private ArrayList<String> tags = new ArrayList<>();
 
     /**
      * Initializes the activity, sets up the user interface, and prepares data models.
