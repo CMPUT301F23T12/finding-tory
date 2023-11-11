@@ -2,9 +2,12 @@ package com.example.finding_tory;
 
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -47,9 +50,30 @@ public class LedgerViewActivity extends AppCompatActivity {
                 R.id.nav_ledger, R.id.nav_profile)
                 .setOpenableLayout(drawer)
                 .build();
+
+        // bind the logout "button" to end this activity
+        LinearLayout logoutLayout = findViewById(R.id.logout_layout);
+        logoutLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        // initialize the navigation bar functionality
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        // override back button behaviour to toggle drawer instead of finish()
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawer.isOpen()) drawer.close();
+                else drawer.open();
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     /**
