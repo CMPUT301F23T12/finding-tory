@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents an item with various attributes such as purchase date, description, make, model, serial number,
@@ -224,6 +223,14 @@ public class Item implements Serializable {
      */
     public void setItemTags(ArrayList<String> itemTags) {
         this.itemTags = itemTags;
+        this.SortItemTag();
+    }
+
+    /**
+     * Sort the tags in alphanumeric order
+     */
+    public void SortItemTag() {
+        Collections.sort(this.itemTags);
     }
 
     /**
@@ -235,6 +242,7 @@ public class Item implements Serializable {
         if (!this.itemTags.contains(itemTags)) {
             this.itemTags.add(itemTags);
         }
+        SortItemTag();
     }
 
     /**

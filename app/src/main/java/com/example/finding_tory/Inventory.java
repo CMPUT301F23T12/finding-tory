@@ -6,9 +6,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * Represents an inventory containing a collection of items. This class provides functionalities to manage
@@ -21,7 +18,7 @@ public class Inventory implements Serializable {
     private ArrayList<Item> items;
     private double inventoryEstimatedValue;
     private int inventoryTotalItems;
-    private Set<String> allTags;
+    private ArrayList<String> allTags;
     private String sortType = "Description";
     private String sortOrder = "Ascending";
 
@@ -36,9 +33,9 @@ public class Inventory implements Serializable {
     public Inventory(String name) {
         this.inventoryName = name;
         this.items = new ArrayList<>();
-        this.allTags = new HashSet<>();
         this.inventoryEstimatedValue = 0;
         this.inventoryTotalItems = 0;
+        this.allTags = new ArrayList<>();
     }
 
     /**
@@ -123,6 +120,14 @@ public class Inventory implements Serializable {
     public void setItems(ArrayList<Item> items) {
         this.items = items;
         calculateValue();
+        this.allTags = new ArrayList<>();
+        for (Item item : items) {
+            for (String s : item.getItemTags()) {
+                if (!this.allTags.contains(s)) {
+                    this.allTags.add(s);
+                }
+            }
+        }
     }
 
     /**
@@ -154,6 +159,12 @@ public class Inventory implements Serializable {
      */
     public void addItem(Item item) {
         this.items.add(item);
+        for (String s : item.getItemTags()) {
+            if (!this.allTags.contains(s)) {
+                this.allTags.add(s);
+            }
+        }
+        Collections.sort(this.allTags);
         this.inventoryEstimatedValue += item.getEstimatedValue();
     }
 
@@ -184,23 +195,12 @@ public class Inventory implements Serializable {
     }
 
     public void setSortData(String sortType, String sortOrder) {
-        if (!Objects.equals(sortType, "")) {
-            this.sortType = sortType;
-        }
-        if (!Objects.equals(sortOrder, "")) {
-            this.sortOrder = sortOrder;
-        }
+        this.sortType = sortType;
+        this.sortOrder = sortOrder;
     }
 
-    public void reset_tags() {
-        this.allTags.clear();
-        for (Item item : this.items) {
-            this.allTags.addAll(item.getItemTags());
-        }
-    }
-
-    public ArrayList<String> getTags() {
-        return new ArrayList<>(this.allTags);
+    public ArrayList<String> getAllTags() {
+        return this.allTags;
     }
 
     public Boolean sortItems() {

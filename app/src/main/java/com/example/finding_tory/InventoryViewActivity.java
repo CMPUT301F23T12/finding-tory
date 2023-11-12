@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
     private FloatingActionButton addItemButton;
+    private ImageButton filter_tag_button, sort_cancel_button;
 
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
@@ -55,8 +57,6 @@ public class InventoryViewActivity extends AppCompatActivity {
         assert (inventory != null);
         System.out.println(inventory.getInventoryName());
         setTitle(inventory.getInventoryName());
-//        inventory.reset_tags();
-        System.out.println("sdfg");
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -66,7 +66,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         // initialize and cache the TextViews for the totals
         totalItemsTextView = findViewById(R.id.total_items_textview);
         totalValueTextView = findViewById(R.id.total_value_textview);
-        addItemButton = findViewById(R.id.add_item_button);
+        addItemButton = findViewById(R.id.add_delete_item_button);
         updateTotals();
 
         // allows new items to be added
@@ -75,95 +75,6 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (state_deletion) {
                     final View greyBack = findViewById(R.id.fadeBackground);
-                    Set<String> current_tags = new HashSet<>();
-                    for (Item item : inventoryAdapter.getSelectedItems()) {
-                        current_tags.addAll(item.getItemTags());
-                    }
-                    BulkTagFragment tagDialog = new BulkTagFragment();
-                    Bundle args = new Bundle();
-                    args.putSerializable("inventory", inventory);
-                    args.putSerializable("tags", (Serializable) current_tags);
-                    tagDialog.setArguments(args);
-                    tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
-                        @Override
-                        public void onDialogDismissed() {
-                            greyBack.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onTagConfirmed(ArrayList<String> selectedTags) {
-                            for (Item item : inventoryAdapter.getSelectedItems()) {
-                                for (String str : selectedTags) {
-                                    item.addItemTag(str);
-                                }
-                                editItemFromFirestore(item, item);
-                            }
-                            inventoryAdapter.clearSelection();
-                            exitSelectionMode();
-                            // Notify the adapter of the data change
-                            inventoryAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
-                    greyBack.setVisibility(View.VISIBLE);
-                } else {
-                    Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
-                    startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
-                }
-            }
-        });
-
-        //allow the items in the list to be clickable
-        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Item selectedItem = inventoryAdapter.getItem(position);
-
-                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
-
-                intent.putExtra("selectedItem", selectedItem);
-                intent.putExtra("pos", position);
-
-                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
-            }
-        });
-
-        Button sort_cancel_button = findViewById(R.id.sort_inventory_button);
-        sort_cancel_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (state_deletion) {
-                    inventoryAdapter.clearSelection();
-                    exitSelectionMode();
-                } else {
-                    final View greyBack = findViewById(R.id.fadeBackground);
-                    SortItemFragment sortDialog = new SortItemFragment();
-                    sortDialog.setSortDialogListener(new SortItemFragment.SortDialogListener() {
-                        @Override
-                        public void onDialogDismissed() {
-                            greyBack.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onSortConfirmed(String sort_type, String sort_order) {
-                            inventory.setSortData(sort_type, sort_order);
-                            if (inventory.sortItems()) {
-                                inventoryAdapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
-                    sortDialog.show(getSupportFragmentManager(), "SORT_ITEM");
-                    greyBack.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        Button filter_delete_button = findViewById(R.id.filter_inventory_button);
-        filter_delete_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final View greyBack = findViewById(R.id.fadeBackground);
-                if (state_deletion) {
                     DeleteItemFragment deleteDialog = new DeleteItemFragment();
                     deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
                         @Override
@@ -197,6 +108,95 @@ public class InventoryViewActivity extends AppCompatActivity {
                     deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
                     greyBack.setVisibility(View.VISIBLE); // move to the bottom after filter is implemented
                 } else {
+                    Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
+                    startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
+                }
+            }
+        });
+
+        //allow the items in the list to be clickable
+        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Item selectedItem = inventoryAdapter.getItem(position);
+
+                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
+
+                intent.putExtra("selectedItem", selectedItem);
+                intent.putExtra("pos", position);
+
+                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
+            }
+        });
+
+        sort_cancel_button = findViewById(R.id.sort_cancel_button);
+        sort_cancel_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (state_deletion) {
+                    inventoryAdapter.clearSelection();
+                    exitSelectionMode();
+                } else {
+                    final View greyBack = findViewById(R.id.fadeBackground);
+                    SortItemFragment sortDialog = new SortItemFragment();
+                    sortDialog.setSortDialogListener(new SortItemFragment.SortDialogListener() {
+                        @Override
+                        public void onDialogDismissed() {
+                            greyBack.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onSortConfirmed(String sort_type, String sort_order) {
+                            inventory.setSortData(sort_type, sort_order);
+                            if (inventory.sortItems()) {
+                                inventoryAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    });
+                    sortDialog.show(getSupportFragmentManager(), "SORT_ITEM");
+                    greyBack.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        filter_tag_button = findViewById(R.id.filter_tag_button);
+        filter_tag_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (state_deletion) {
+                    final View greyBack = findViewById(R.id.fadeBackground);
+                    Set<String> current_tags = new HashSet<>();
+                    for (Item item : inventoryAdapter.getSelectedItems()) {
+                        current_tags.addAll(item.getItemTags());
+                    }
+                    BulkTagFragment tagDialog = new BulkTagFragment();
+                    Bundle args = new Bundle();
+                    args.putSerializable("inventory", inventory);
+                    args.putSerializable("tags", (Serializable) new ArrayList<>(current_tags));
+                    tagDialog.setArguments(args);
+                    tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
+                        @Override
+                        public void onDialogDismissed() {
+                            greyBack.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onTagConfirmed(ArrayList<String> selectedTags) {
+                            for (Item item : inventoryAdapter.getSelectedItems()) {
+                                for (String str : selectedTags) {
+                                    item.addItemTag(str);
+                                }
+                                editItemFromFirestore(item, item);
+                            }
+                            inventoryAdapter.clearSelection();
+                            exitSelectionMode();
+                            // Notify the adapter of the data change
+                            inventoryAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
+                    greyBack.setVisibility(View.VISIBLE);
+                } else {
                     // add filter functionality
                 }
             }
@@ -206,8 +206,6 @@ public class InventoryViewActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 enterSelectionMode();
-                // sort_cancel_button.setText("Cancel");
-                // filter_delete_button.setText("Delete");
                 return true;
             }
         });
@@ -219,6 +217,9 @@ public class InventoryViewActivity extends AppCompatActivity {
      */
     private void enterSelectionMode() {
         state_deletion = true;
+        filter_tag_button.setBackgroundResource(R.drawable.tag_png);
+        sort_cancel_button.setBackgroundResource(android.R.drawable.ic_delete);
+        addItemButton.setImageResource(android.R.drawable.ic_menu_delete);
         // Show checkboxes
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
@@ -236,6 +237,9 @@ public class InventoryViewActivity extends AppCompatActivity {
      */
     private void exitSelectionMode() {
         state_deletion = false;
+        filter_tag_button.setBackgroundResource(R.drawable.filter_png);
+        sort_cancel_button.setBackgroundResource(R.drawable.sort_png);
+        addItemButton.setImageResource(android.R.drawable.ic_input_add);
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
             CheckBox checkBox = view.findViewById(R.id.item_checkbox);
@@ -264,7 +268,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                 assert selectedItem != null;
 
                 inventory.addItem(selectedItem);
-                inventory.reset_tags();
                 if (inventory.sortItems()) {
                     inventoryAdapter.notifyDataSetChanged();
                 }
@@ -286,7 +289,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
                 inventory.set(pos, returnedItem);
             }
-            inventory.reset_tags();
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();
         }
