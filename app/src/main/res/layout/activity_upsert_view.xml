@@ -172,13 +172,24 @@
         </LinearLayout>
 
         <!-- Additional fields can go here -->
-        <Button
-            android:id="@+id/upload_images_button"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Upload Images"
-            android:layout_marginTop="24dp"/>
+            android:orientation="vertical">
 
+            <ListView
+                android:id="@+id/image_listview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                android:id="@+id/upload_images_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Upload Images"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
         <!-- Horizontal ScrollView to accommodate multiple tags -->
         <HorizontalScrollView
             android:id="@+id/horizontal_scroll_view"
