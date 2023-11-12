@@ -8,8 +8,15 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexWrap;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 
 import java.util.ArrayList;
 
@@ -56,16 +63,20 @@ public class BulkTagFragment extends DialogFragment {
         if (getArguments() != null) {
             inventory = (Inventory) getArguments().getSerializable("inventory");
         }
-
-        // Initialize RecyclerView and Adapter
-        tagsRecyclerView = view.findViewById(R.id.tagsRecyclerView);
-        tagsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         assert inventory != null;
         allTags = inventory.getAllTags();
         selectedTags = (ArrayList<String>) getArguments().getSerializable("tags");
 
+        // Initialize RecyclerView and Adapter
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.tagsRecyclerView);
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setJustifyContent(JustifyContent.FLEX_END);
+        recyclerView.setLayoutManager(layoutManager);
+
         tagAdapter = new TagAdapter(allTags, selectedTags);
-        tagsRecyclerView.setAdapter(tagAdapter);
+        recyclerView.setAdapter(tagAdapter);
+
         // Add action buttons
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnAdd).setOnClickListener(v -> {
@@ -75,7 +86,6 @@ public class BulkTagFragment extends DialogFragment {
             }
             dismiss();
         });
-
         return builder.create();
     }
 

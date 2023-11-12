@@ -1,5 +1,4 @@
-<!-- res/drawable/tag_background.xml -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@android:color/holo_blue_dark" android:state_selected="true" /> <!-- Blue for selected -->
-    <item android:drawable="@color/white" /> <!-- Grey for not selected -->
+    <item android:drawable="@color/default_grey" />
 </selector>

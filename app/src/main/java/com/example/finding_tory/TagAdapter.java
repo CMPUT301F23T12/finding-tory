@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +23,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
     @NonNull
     @Override
     public TagAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.tag_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.tag_item_layout, parent, false);
         return new ViewHolder(view);
     }
 
@@ -33,14 +34,13 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
         holder.itemView.setSelected(selectedTags.contains(tag)); // Set the selected state
 
         holder.itemView.setOnClickListener(v -> {
-            if(selectedTags.contains(tag)) {
+            if (selectedTags.contains(tag)) {
                 selectedTags.remove(tag);
                 v.setSelected(false);
             } else {
                 selectedTags.add(tag);
                 v.setSelected(true);
             }
-            // Notify any other component if necessary, or you can just update the UI
         });
     }
 
@@ -54,7 +54,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
 
         public ViewHolder(View view) {
             super(view);
-            tagTextView = view.findViewById(R.id.tagTextView); // Assuming you have a TextView with this ID in your tag_item.xml
+            tagTextView = view.findViewById(R.id.tag_text);
         }
     }
 }
