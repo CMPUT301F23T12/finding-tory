@@ -21,6 +21,14 @@ public class FirestoreDB {
         return FirebaseFirestore.getInstance();
     }
 
+    public static CollectionReference getUsersRef() {
+        return FirebaseFirestore.getInstance().collection("users");
+    }
+
+    public static CollectionReference getInventoriesRef(String username) {
+        return FirebaseFirestore.getInstance().collection("users").document(username).collection("inventories");
+    }
+
     /**
      * Retrieves a reference to the 'items' collection in Firebase Firestore.
      * This collection is used to store and manage item-related data in the database.
@@ -30,10 +38,6 @@ public class FirestoreDB {
     public static CollectionReference getItemsRef() {
         // TODO have multiple collections (1 for each inventory? or 1 for each user?)
         return FirebaseFirestore.getInstance().collection("items");
-    }
-
-    public static CollectionReference getUsersRef() {
-        return FirebaseFirestore.getInstance().collection("users");
     }
 
     public static boolean isDebugMode() {

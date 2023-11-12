@@ -17,8 +17,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -48,13 +46,17 @@ public class InventoryViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_view);
 
+
         // TODO get an actual inventory from the db
         // get the inventory that's been passed by the ledger view parent activity
         Intent intent = getIntent();
         inventory = (Inventory) intent.getSerializableExtra("inventory");
+        System.out.println("dfas");
         assert (inventory != null);
-        setTitle(inventory.getName());
-        inventory.reset_tags();
+        System.out.println(inventory.getInventoryName());
+        setTitle(inventory.getInventoryName());
+//        inventory.reset_tags();
+        System.out.println("sdfg");
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -295,7 +297,7 @@ public class InventoryViewActivity extends AppCompatActivity {
      */
     public void updateTotals() {
         totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
-        totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getValue()));
+        totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
     }
 
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {

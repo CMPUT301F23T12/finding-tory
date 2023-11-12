@@ -5,9 +5,13 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.example.finding_tory.ui.ledger.LedgerFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,6 +20,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * LedgerViewActivity is an AppCompatActivity that manages the main user interface for the application.
@@ -37,9 +45,14 @@ public class LedgerViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Get user and pass to LedgerFragment
+        String username = (String) getIntent().getSerializableExtra("username");
+//        System.out.println("LVA: " + user.printInventories());
+        LedgerFragment ledgerFragment = LedgerFragment.newInstance(username);
 
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
@@ -51,6 +64,14 @@ public class LedgerViewActivity extends AppCompatActivity {
                 .setOpenableLayout(drawer)
                 .build();
 
+
+
+        // Use the NavController to navigate to the LedgerFragment
+        // initialize the navigation bar functionality
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        navController.navigate(R.id.nav_ledger, ledgerFragment.getArguments());
+        NavigationUI.setupWithNavController(navigationView, navController);
+
         // bind the logout "button" to end this activity
         LinearLayout logoutLayout = findViewById(R.id.logout_layout);
         logoutLayout.setOnClickListener(new View.OnClickListener() {
@@ -59,11 +80,6 @@ public class LedgerViewActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        // initialize the navigation bar functionality
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
 
         // override back button behaviour to toggle drawer instead of finish()
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -99,5 +115,31 @@ public class LedgerViewActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    public ArrayList<Inventory> getUserInventories(User user) {
+        ArrayList<Inventory> inventories = new ArrayList<>();
+        // Assuming FirestoreDB.getUsersRef() returns a CollectionReference to the 'users' collection
+//        FirestoreDB.getUsersRef().document(user.getUsername()) // replace "userId" with the actual user ID
+//                .get()
+//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                        User user = documentSnapshot.toObject(User.class);
+//                        if (user != null) {
+//                            // The user object should now contain all user details including the inventories
+//                            inventories = user.getInventories();
+//                            // Do something with the inventories
+//
+//                        }
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // Handle any errors here
+//                    }
+//                });
+        return inventories;
     }
 }

@@ -1,5 +1,7 @@
 package com.example.finding_tory;
 
+import com.google.firebase.firestore.PropertyName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,12 +17,15 @@ import java.util.Set;
  */
 public class Inventory implements Serializable {
 
-    private String name;
+    private String inventoryName;
     private ArrayList<Item> items;
-    private double value;
+    private double inventoryEstimatedValue;
+    private int inventoryTotalItems;
     private Set<String> allTags;
     private String sortType = "Description";
     private String sortOrder = "Ascending";
+
+    public Inventory() {}
 
     /**
      * Constructs a new Inventory object with a specified name.
@@ -29,10 +34,11 @@ public class Inventory implements Serializable {
      * @param name The name of the inventory.
      */
     public Inventory(String name) {
-        this.name = name;
+        this.inventoryName = name;
         this.items = new ArrayList<>();
         this.allTags = new HashSet<>();
-        this.value = 0;
+        this.inventoryEstimatedValue = 0;
+        this.inventoryTotalItems = 0;
     }
 
     /**
@@ -40,8 +46,9 @@ public class Inventory implements Serializable {
      *
      * @return inventory name
      */
-    public String getName() {
-        return name;
+    @PropertyName("inventoryName")
+    public String getInventoryName() {
+        return inventoryName;
     }
 
     /**
@@ -49,8 +56,20 @@ public class Inventory implements Serializable {
      *
      * @return ArrayList holding the inventory's items
      */
+
+    @PropertyName("items")
     public ArrayList<Item> getItems() {
         return items;
+    }
+
+    @PropertyName("inventoryEstimatedValue")
+    public double getInventoryEstimatedValue() {
+        return inventoryEstimatedValue;
+    }
+
+    @PropertyName("inventoryTotalItems")
+    public int getInventoryTotalItems() {
+        return inventoryTotalItems;
     }
 
     /**
@@ -58,6 +77,7 @@ public class Inventory implements Serializable {
      *
      * @return size of the inventory
      */
+    @PropertyName("itemsCount")
     public int getCount() {
         return items.size();
     }
@@ -67,9 +87,6 @@ public class Inventory implements Serializable {
      *
      * @return sum of all item values
      */
-    public double getValue() {
-        return value;
-    }
 
     /**
      * Sets the name of the inventory object.
@@ -77,18 +94,24 @@ public class Inventory implements Serializable {
      * @param name new name to rename to
      */
     public void setName(String name) {
-        this.name = name;
+        this.inventoryName = name;
     }
+
 
     /**
      * Recalculates the total value of all items in the inventory.
      * This method should be called whenever the list of items is modified.
      */
     public void calculateValue() {
-        this.value = 0;
+        this.inventoryEstimatedValue = 0;
         for (Item item : items) {
-            this.value += item.getEstimatedValue();
+            this.inventoryEstimatedValue += item.getEstimatedValue();
         }
+    }
+
+    public void setInventoryTotalItems() {
+        this.inventoryTotalItems = this.items.size();
+        System.out.println(this.items.size());
     }
 
     /**
@@ -131,7 +154,7 @@ public class Inventory implements Serializable {
      */
     public void addItem(Item item) {
         this.items.add(item);
-        this.value += item.getEstimatedValue();
+        this.inventoryEstimatedValue += item.getEstimatedValue();
     }
 
     /**
@@ -144,7 +167,7 @@ public class Inventory implements Serializable {
             this.allTags.remove(tag);
         }
         this.items.remove(item);
-        this.value -= item.getEstimatedValue();
+        this.inventoryEstimatedValue -= item.getEstimatedValue();
     }
 
     /**
@@ -156,7 +179,7 @@ public class Inventory implements Serializable {
         for (String tag : this.items.remove(i).getItemTags()) {
             this.allTags.remove(tag);
         }
-        this.value -= this.items.get(i).getEstimatedValue();
+        this.inventoryEstimatedValue -= this.items.get(i).getEstimatedValue();
         this.items.remove(i);
     }
 

@@ -14,16 +14,15 @@ import androidx.fragment.app.Fragment;
 import com.example.finding_tory.FirestoreDB;
 import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
-import com.example.finding_tory.Item;
 import com.example.finding_tory.LedgerAdapter;
 import com.example.finding_tory.databinding.FragmentLedgerBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
+
 
 /**
  * Displays the Ledger: a list of all the signed-in user's Inventories.
@@ -34,11 +33,20 @@ public class LedgerFragment extends Fragment {
     private FragmentLedgerBinding binding;
 
     // TODO use a Ledger instead of an ArrayList of Inventories
-    private ArrayList<Inventory> inventories;
+    private ArrayList<Inventory> inventories = new ArrayList<>();
     private ListView ledgerListView;
     private LedgerAdapter ledgerAdapter;
 
     private FloatingActionButton addInvButton;
+
+    public static LedgerFragment newInstance(String username) {
+        LedgerFragment fragment = new LedgerFragment();
+        Bundle args = new Bundle();
+        System.out.println("LF: " + username);
+        args.putSerializable("username", username); // Use putSerializable for User
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     /**
      * Maps the ledger adapter to the underlying list of inventories, and sets
@@ -61,27 +69,62 @@ public class LedgerFragment extends Fragment {
         View root = binding.getRoot();
 
         // create a mock inventory with mock items to populate the list
-        Inventory mockInventory = new Inventory("Home Inventory");
-        inventories = new ArrayList<>();
-        inventories.add(mockInventory);
 
-        // Populate the view with retrieved items from the db
-        FirestoreDB.getItemsRef().get().addOnSuccessListener(queryDocumentSnapshots -> {
-            for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                Item item = documentSnapshot.toObject(Item.class);
-                if (item != null) {
-                    mockInventory.addItem(item);
-                }
-            }
-            // need to notify because this block may or may not finish before the next block.
-            // since it's a "success listener", we have no idea when this code gets executed.
-            ledgerAdapter.notifyDataSetChanged();
-        });
+
+//        Inventory mockInventory = new Inventory("Home Inventory");
+//        inventories = new ArrayList<>();
+
+//        User user = (User) getIntent().getSerializableExtra("user");
+//        fetchUserInventories();
+//        inventories.add(mockInventory);
+//
+//        // Populate the view with retrieved items from the db
+//        FirestoreDB.getItemsRef().get().addOnSuccessListener(queryDocumentSnapshots -> {
+//            for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+//                Item item = documentSnapshot.toObject(Item.class);
+//                if (item != null) {
+//                    mockInventory.addItem(item);
+//                }
+//            }
+//            // need to notify because this block may or may not finish before the next block.
+//            // since it's a "success listener", we have no idea when this code gets executed.
+//            ledgerAdapter.notifyDataSetChanged();
+//        });
 
         // map the listview to the ledger's list of items via custom ledger adapter
         ledgerListView = binding.ledgerListview;
         ledgerAdapter = new LedgerAdapter(root.getContext(), inventories);
         ledgerListView.setAdapter(ledgerAdapter);
+
+        // Retrieve from fragment arguments
+        if (getArguments() != null) {
+            String username = getArguments().getString("username");
+            System.out.println("LF2: " + username);
+            if (username != null) {
+                FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        System.out.println("LF3: " + username);
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Assuming you have a constructor in your Inventory class that can create an instance from a DocumentSnapshot
+                            Inventory inventory = document.toObject(Inventory.class);
+
+
+                            inventories.add(inventory);
+                            ledgerAdapter.notifyDataSetChanged();
+                            System.out.println(document.getData());
+                            System.out.println(inventory.getInventoryName());
+                        }
+                        ledgerAdapter = new LedgerAdapter(root.getContext(), inventories);
+                        ledgerListView.setAdapter(ledgerAdapter);
+                        // Do something with the list of inventories
+                    } else {
+                        // Handle the error
+                    }
+                });
+            }
+        }
+
+
 
         // cache the add button
         addInvButton = binding.addInventoryButton;
@@ -109,6 +152,22 @@ public class LedgerFragment extends Fragment {
         return root;
     }
 
+//    private void fetchUserInventories() {
+//        // Replace with your FirestoreDB logic to fetch user inventories
+//        FirestoreDB.getInventoriesRef().get().addOnSuccessListener(queryDocumentSnapshots -> {
+//            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+//                Inventory inventory = documentSnapshot.toObject(Inventory.class);
+//                if (inventory != null) {
+//                    inventories.add(inventory);
+//                }
+//            }
+//            // Notify the adapter that data has changed
+//            ledgerAdapter.notifyDataSetChanged();
+//        }).addOnFailureListener(e -> {
+//            // Handle any errors that occur during the fetch
+//            // You may want to log or display an error message
+//        });
+//    }
 
     /**
      * Cleanup when this fragment's life cycle is over.
@@ -118,4 +177,27 @@ public class LedgerFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    private void fetchUserInventories(String username) {
+        // Assuming FirestoreDB.getUsersRef() gives you a CollectionReference to the 'users' collection
+        FirestoreDB.getUsersRef().document(username).collection("inventories")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+//                    inventories.clear(); // Clear existing data to avoid duplicates
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Inventory inventory = documentSnapshot.toObject(Inventory.class);
+                        if (inventory != null) {
+                            inventories.add(inventory);
+                            System.out.println(inventory.getInventoryName());
+                        }
+                    }
+                    // Notify the adapter that data has changed
+                    ledgerAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    // Handle any errors that occur during the fetch
+                    // You may want to log or display an error message
+                });
+    }
+
 }
