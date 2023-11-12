@@ -36,7 +36,7 @@ public class InventoryUITest {
     @Test
     public void testAddAndDeleteItem() {
         navigateToInventory();
-        onView(withId(R.id.add_item_button)).perform(click());
+        onView(withId(R.id.add_delete_item_button)).perform(click());
 
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Apple Macbook Pro 2022"));
         onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Macbook"));
@@ -62,7 +62,7 @@ public class InventoryUITest {
     @Test
     public void testCancelAddItem() {
         navigateToInventory();
-        onView(withId(R.id.add_item_button)).perform(click());
+        onView(withId(R.id.add_delete_item_button)).perform(click());
         onView(withId(R.id.cancel_button)).perform(scrollTo());
         onView(withId(R.id.cancel_button)).perform(click());
     }
@@ -79,7 +79,7 @@ public class InventoryUITest {
     @Test
     public void testSortItems() {
         navigateToInventory();
-        onView(withId(R.id.sort_inventory_button)).perform(click());
+        onView(withId(R.id.sort_cancel_button)).perform(click());
         onView(withId(R.id.radio_Value)).perform(click());
         onView(withId(R.id.ascending_descending)).perform(click());
         onView(withId(R.id.btnSort)).perform(click());
@@ -124,7 +124,7 @@ public class InventoryUITest {
                 .onChildView(withId(R.id.item_checkbox))
                 .perform(click());
 
-        onView(withId(R.id.filter_inventory_button)).perform(click());
+        onView(withId(R.id.filter_tag_button)).perform(click());
 
         onView(withText("Blender")).check(doesNotExist());
         onView(withText("Dining Table")).check(doesNotExist());
@@ -150,7 +150,7 @@ public class InventoryUITest {
 
     public void resetAppState() {
         // Add all the stuff we deleted since DB is affected permanently
-        onView(withId(R.id.add_item_button)).perform(click());
+        onView(withId(R.id.add_delete_item_button)).perform(click());
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
         onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
         onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
@@ -163,7 +163,7 @@ public class InventoryUITest {
         onView(withId(R.id.add_button)).perform(scrollTo());
         onView(withId(R.id.add_button)).perform(click());
 
-        onView(withId(R.id.add_item_button)).perform(click());
+        onView(withId(R.id.add_delete_item_button)).perform(click());
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Dining Table"));
         onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2019-02-18"));
         onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("800"), ViewActions.closeSoftKeyboard());
