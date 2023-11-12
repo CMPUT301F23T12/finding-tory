@@ -1,12 +1,12 @@
 package com.example.finding_tory;
 
+import android.net.Uri;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents an item with various attributes such as purchase date, description, make, model, serial number,
@@ -21,7 +21,7 @@ public class Item implements Serializable {
     private float estimatedValue;
     private String comment;
     private ArrayList<String> itemTags;
-    // TODO: Add ArrayList of Images
+    private ArrayList<Uri> imageUris;
 
     /**
      * No-args constructor, required for deserialization from Firestore.
@@ -42,7 +42,7 @@ public class Item implements Serializable {
      * @param comment        A comment about the item.
      * @param itemTags       A list of tags associated with the item.
      */
-    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags) {
+    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags, ArrayList<Uri> imageUris) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -51,6 +51,7 @@ public class Item implements Serializable {
         this.estimatedValue = estimatedValue;
         this.comment = comment;
         this.itemTags = itemTags;
+        this.imageUris = imageUris;
     }
 
     /**
@@ -67,6 +68,7 @@ public class Item implements Serializable {
         this.estimatedValue = copy.getEstimatedValue();
         this.comment = copy.getComment();
         this.itemTags = copy.getItemTags();
+        this.imageUris = copy.getImageUris();
     }
 
     /**
@@ -235,6 +237,26 @@ public class Item implements Serializable {
         if (!this.itemTags.contains(itemTags)) {
             this.itemTags.add(itemTags);
         }
+    }
+
+    public ArrayList<Uri> getImageUris() {
+        return imageUris;
+    }
+
+    public void setImageUris(ArrayList<Uri> imageUris) {
+        this.imageUris = imageUris;
+    }
+
+    public void addImageUri(Uri uri) {
+        imageUris.add(uri);
+    }
+
+    public void deleteImageUri(int index) {
+        imageUris.remove(index);
+    }
+
+    public Uri getUri(int index) {
+        return imageUris.get(index);
     }
 
     /**

@@ -1,25 +1,32 @@
 package com.example.finding_tory;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,8 +39,6 @@ import java.util.Date;
 public class UpsertViewActivity extends AppCompatActivity{
     Button add_tags_button;
     Button upload_image_button;
-    private ListView imageListView;
-    private ImageAdapter imageAdapter;
     Button submit_button;
     Button cancel_button;
     TextView view_title;
@@ -48,6 +53,9 @@ public class UpsertViewActivity extends AppCompatActivity{
     EditText tags_entered;
     Item item;
     boolean isAdd = false;
+    private ListView imageListView;
+    private ImageAdapter imageAdapter;
+    private ArrayList<Uri> imageUris = new ArrayList<>();
     ArrayList<String> tags = new ArrayList<>();
 
     /**
@@ -76,6 +84,11 @@ public class UpsertViewActivity extends AppCompatActivity{
         comment_text = findViewById(R.id.comment_edittext);
         tags_entered = findViewById(R.id.add_tags_edittext);
 
+        // sets image adapter to view image uploaded list
+        imageListView = findViewById(R.id.image_listview);
+        imageAdapter = new ImageAdapter(this, imageUris);
+        imageListView.setAdapter(imageAdapter);
+
         Bundle extras = getIntent().getExtras();
         item = null;
         // if no data is sent through intent, then user wants to add an item
@@ -84,6 +97,7 @@ public class UpsertViewActivity extends AppCompatActivity{
         else {
             item = (Item) (extras.getSerializable("selectedItem"));
             tags.addAll(item.getItemTags());
+            // TODO: add image uris for existing list items
         }
 
         //initializes UI based on if user wants to add or edit item
@@ -111,6 +125,7 @@ public class UpsertViewActivity extends AppCompatActivity{
                 });
                 tags_container.addView(tagView);
             }
+            imageAdapter.notifyDataSetChanged();
         }
 
         /**
@@ -147,6 +162,7 @@ public class UpsertViewActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 chooseImageDialog();
+                //TODO: add functionality to remove image
             }
         });
 
@@ -187,7 +203,7 @@ public class UpsertViewActivity extends AppCompatActivity{
                     float estimated_cost = Float.parseFloat(estimated_cost_text.getText().toString());
                     String serial_number = serial_number_text.getText().toString();
                     String comment = comment_text.getText().toString();
-                    Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
+                    Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags, imageUris);
 
                     if (isAdd) {
                         intent.putExtra("item_to_add", upsert_item);
@@ -239,27 +255,36 @@ public class UpsertViewActivity extends AppCompatActivity{
      * Creates a dialog prompting user to select from where they want to upload their pictures from
      */
     private void chooseImageDialog() {
+        // sets background to be grey
         final View greyBack = findViewById(R.id.fadeBackgroundUpsert);
         greyBack.setVisibility(View.VISIBLE);
-        // start picker to get image for cropping and then use the image in cropping activity
+
+        //initialize bottom dialog to display options to upload image
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(R.layout.select_image_dialog_layout);
 
         LinearLayout pickCamera = bottomSheetDialog.findViewById(R.id.take_photo);
         LinearLayout pickGallery = bottomSheetDialog.findViewById(R.id.select_from_gallery);
         Button cancelDialog = bottomSheetDialog.findViewById(R.id.image_select_cancel_button);
+
+        // take picture using camera
         pickCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Add Camera Functionality", Toast.LENGTH_LONG).show();
+                ImagePicker.with(UpsertViewActivity.this)
+                        .cameraOnly()
+                        .start(ActivityCodes.CAMERA_PHOTO.getRequestCode());
                 bottomSheetDialog.dismiss();
             }
         });
 
+        // select picture from gallery
         pickGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Add Gallery Functionality", Toast.LENGTH_LONG).show();
+                ImagePicker.with(UpsertViewActivity.this)
+                        .galleryOnly()
+                        .start(ActivityCodes.GALLERY_PHOTO.getRequestCode());
                 bottomSheetDialog.dismiss();
             }
         });
@@ -271,14 +296,62 @@ public class UpsertViewActivity extends AppCompatActivity{
             }
         });
 
+        // displays default upsert view with fields
         bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 greyBack.setVisibility(View.GONE);
             }
         });
-
         bottomSheetDialog.show();
+    }
 
+    /**
+     * Handles the result of activities that were started for a result.
+     *
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode  The result code returned by the activity.
+     * @param data        The data returned by the activity.
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == ActivityCodes.CAMERA_PHOTO.getRequestCode()) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                imageUris.add(uri);
+                // TODO: store image in gallery
+                imageAdapter.notifyDataSetChanged();
+                justifyListViewHeightBasedOnChildren();
+            }
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
+        }
+        //TODO: implement selecting picture from gallery
+    }
+
+    /**
+     * Updates the list view to make the height such that all the images can be seen instead of
+     * having the list scrollable
+     */
+    public void justifyListViewHeightBasedOnChildren () {
+        if (imageAdapter == null) {
+            return;
+        }
+        int totalHeight = 0;
+        // incrementing total height of list view by adding heights of each item
+        for (int i = 0; i < imageAdapter.getCount(); i++) {
+            View listItem = imageAdapter.getView(i, null, imageListView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        // changing layout of list view to reflect new height
+        ViewGroup.LayoutParams par = imageListView.getLayoutParams();
+        par.height = totalHeight + (imageListView.getDividerHeight() * (imageAdapter.getCount() - 1));
+        imageListView.setLayoutParams(par);
+        imageListView.requestLayout();
     }
 }

@@ -1,13 +1,11 @@
 package com.example.finding_tory;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.media.Image;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,15 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
-public class ImageAdapter extends ArrayAdapter<Bitmap> {
-    private ArrayList<Bitmap> bitmaps;
+public class ImageAdapter extends ArrayAdapter<Uri> {
+    private ArrayList<Uri> uris;
     private Context context;
 
-    public ImageAdapter(Context context, ArrayList<Bitmap> bitmaps) {
-        super(context, R.layout.picture_layout, bitmaps);
-        this.bitmaps = bitmaps;
+    public ImageAdapter(Context context, ArrayList<Uri> uris) {
+        super(context, R.layout.picture_layout, uris);
+        this.uris = uris;
         this.context = context;
     }
 
@@ -34,10 +31,10 @@ public class ImageAdapter extends ArrayAdapter<Bitmap> {
         if (view == null)
             view = LayoutInflater.from(context).inflate(R.layout.picture_layout, parent, false);
 
-        // find TextView elements that we wish to update
-        Bitmap bitmap = bitmaps.get(position);
-        ImageView image = view.findViewById(R.id.image_listview);
-        image.setImageBitmap(bitmap);
+        // find Imageview and TextView elements that we wish to update
+        Uri uri = uris.get(position);
+        ImageView image = view.findViewById(R.id.image_view);
+        image.setImageURI(uri);
         TextView imageTitle = view.findViewById(R.id.image_title);
         imageTitle.setText("image-" + Integer.toString(position+1));
 
