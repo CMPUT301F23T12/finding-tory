@@ -194,6 +194,14 @@ public class Inventory implements Serializable {
         this.items.remove(i);
     }
 
+    public void addTagsToInventory(ArrayList<String> newTags){
+        for (String s : newTags){
+            if(!allTags.contains(s)){
+                newTags.add(s);
+            }
+        }
+    }
+
     public void setSortData(String sortType, String sortOrder) {
         this.sortType = sortType;
         this.sortOrder = sortOrder;

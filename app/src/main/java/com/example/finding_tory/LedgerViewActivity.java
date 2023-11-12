@@ -5,25 +5,19 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.example.finding_tory.ui.ledger.LedgerFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.navigation.NavigationView;
-
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.example.finding_tory.ui.ledger.LedgerFragment;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * LedgerViewActivity is an AppCompatActivity that manages the main user interface for the application.

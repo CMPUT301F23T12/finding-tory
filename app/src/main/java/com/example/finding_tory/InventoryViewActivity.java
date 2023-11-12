@@ -1,18 +1,17 @@
 package com.example.finding_tory;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -188,6 +187,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                                 }
                                 editItemFromFirestore(item, item);
                             }
+                            inventory.addTagsToInventory(selectedTags);
                             inventoryAdapter.clearSelection();
                             exitSelectionMode();
                             // Notify the adapter of the data change
