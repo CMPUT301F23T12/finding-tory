@@ -2,6 +2,7 @@ package com.example.finding_tory;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -11,9 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -28,6 +31,9 @@ import java.util.Date;
  */
 public class UpsertViewActivity extends AppCompatActivity{
     Button add_tags_button;
+    Button upload_image_button;
+    private ListView imageListView;
+    private ImageAdapter imageAdapter;
     Button submit_button;
     Button cancel_button;
     TextView view_title;
@@ -56,6 +62,7 @@ public class UpsertViewActivity extends AppCompatActivity{
         setContentView(R.layout.activity_upsert_view);
         add_tags_button = findViewById(R.id.add_tags_button);
         submit_button = findViewById(R.id.add_button);
+        upload_image_button = findViewById(R.id.upload_images_button);
         cancel_button = findViewById(R.id.cancel_button);
         view_title = findViewById(R.id.upsert_title);
         tags_container = findViewById(R.id.tags_container);
@@ -130,6 +137,17 @@ public class UpsertViewActivity extends AppCompatActivity{
                 }
             }
             tags_entered.setText("");
+        });
+
+        /**
+         * Creates a pop-up dialog for user to upload pictures by using their camera or
+         * from the gallery
+         */
+        upload_image_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chooseImageDialog();
+            }
         });
 
         /**
@@ -215,5 +233,52 @@ public class UpsertViewActivity extends AppCompatActivity{
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
         FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
         FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
+    }
+
+    /**
+     * Creates a dialog prompting user to select from where they want to upload their pictures from
+     */
+    private void chooseImageDialog() {
+        final View greyBack = findViewById(R.id.fadeBackgroundUpsert);
+        greyBack.setVisibility(View.VISIBLE);
+        // start picker to get image for cropping and then use the image in cropping activity
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.select_image_dialog_layout);
+
+        LinearLayout pickCamera = bottomSheetDialog.findViewById(R.id.take_photo);
+        LinearLayout pickGallery = bottomSheetDialog.findViewById(R.id.select_from_gallery);
+        Button cancelDialog = bottomSheetDialog.findViewById(R.id.image_select_cancel_button);
+        pickCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Add Camera Functionality", Toast.LENGTH_LONG).show();
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        pickGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Add Gallery Functionality", Toast.LENGTH_LONG).show();
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        cancelDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                greyBack.setVisibility(View.GONE);
+            }
+        });
+
+        bottomSheetDialog.show();
+
     }
 }
