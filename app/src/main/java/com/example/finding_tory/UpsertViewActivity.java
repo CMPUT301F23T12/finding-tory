@@ -2,12 +2,14 @@ package com.example.finding_tory;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -17,32 +19,35 @@ import android.widget.Toast;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * This class is responsible for updating/inserting items in an inventory
  */
-public class UpsertViewActivity extends AppCompatActivity{
-    Button add_tags_button;
-    Button submit_button;
-    Button cancel_button;
-    TextView view_title;
-    LinearLayout tags_container;
-    EditText description_text;
-    EditText make_text;
-    EditText model_text;
-    EditText date_purchased_text;
-    EditText estimated_cost_text;
-    EditText serial_number_text;
-    EditText comment_text;
-    EditText tags_entered;
-    Item item;
-    boolean isAdd = false;
-    ArrayList<String> tags = new ArrayList<>();
+public class UpsertViewActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+    private Button add_tags_button;
+    private Button submit_button;
+    private Button cancel_button;
+    private TextView view_title;
+    private LinearLayout tags_container;
+    private EditText description_text;
+    private EditText make_text;
+    private EditText model_text;
+    private EditText date_purchased_text;
+    private EditText estimated_cost_text;
+    private EditText serial_number_text;
+    private EditText comment_text;
+    private EditText tags_entered;
+    private Item item;
+    private boolean isAdd = false;
+    private ArrayList<String> tags = new ArrayList<>();
 
     /**
      * Initializes the activity, sets up the user interface, and prepares data models.
@@ -83,13 +88,14 @@ public class UpsertViewActivity extends AppCompatActivity{
         if (isAdd) {
             view_title.setText("Add Item Information");
             submit_button.setText("Add");
+            date_purchased_text.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         } else {
             view_title.setText("Edit Item Information");
             description_text.setText(item.getDescription());
             make_text.setText(item.getMake());
             model_text.setText(item.getModel());
             date_purchased_text.setText(new SimpleDateFormat("yyyy-MM-dd").format(item.getPurchaseDate()));
-            estimated_cost_text.setText(Float.toString(item.getEstimatedValue()));
+            estimated_cost_text.setText(String.format(Locale.CANADA, "%.2f", item.getEstimatedValue()));
             serial_number_text.setText(item.getSerialNumber());
             comment_text.setText(item.getComment());
             submit_button.setText("Update");
@@ -105,6 +111,25 @@ public class UpsertViewActivity extends AppCompatActivity{
                 tags_container.addView(tagView);
             }
         }
+
+        /**
+         * Display a Date Picker fragment on screen for user to pick a date from a calendar
+         */
+        date_purchased_text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                DatePickerFragment DatePickerDialogFragment;
+                DatePickerDialogFragment = new DatePickerFragment();
+
+                if (!date_purchased_text.getText().toString().equals("")) {
+                    bundle.putString("date", date_purchased_text.getText().toString());
+                }
+
+                DatePickerDialogFragment.setArguments(bundle);
+                DatePickerDialogFragment.show(getSupportFragmentManager(), "DATE PICK");
+            }
+        });
 
         /**
          * Displays any tags user entered in the search bar (space-separated) adds it to all
@@ -184,6 +209,9 @@ public class UpsertViewActivity extends AppCompatActivity{
             }
         });
 
+        /**
+         * Will go back to parent activity
+         */
         cancel_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -215,5 +243,25 @@ public class UpsertViewActivity extends AppCompatActivity{
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
         FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
         FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
+    }
+
+    /**
+     * Gets the date from the dater picker and formats it to be displayed to user
+     *
+     * @param view the date picker picker
+     * @param year the year picked
+     * @param month the month picked
+     * @param dayOfMonth the day picked
+     */
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String selectedDate = sdf.format(calendar.getTime());
+        date_purchased_text.setText(selectedDate);
     }
 }
