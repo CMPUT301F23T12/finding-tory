@@ -34,6 +34,7 @@ public class LedgerFragment extends Fragment {
 
     // TODO use a Ledger instead of an ArrayList of Inventories
     private ArrayList<Inventory> inventories = new ArrayList<>();
+    private String username;
     private ListView ledgerListView;
     private LedgerAdapter ledgerAdapter;
 
@@ -98,25 +99,19 @@ public class LedgerFragment extends Fragment {
 
         // Retrieve from fragment arguments
         if (getArguments() != null) {
-            String username = getArguments().getString("username");
-            System.out.println("LF2: " + username);
+            username = getArguments().getString("username");
             if (username != null) {
                 FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        System.out.println("LF3: " + username);
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Assuming you have a constructor in your Inventory class that can create an instance from a DocumentSnapshot
+                            // Add the inventories
                             Inventory inventory = document.toObject(Inventory.class);
-
-
                             inventories.add(inventory);
                             ledgerAdapter.notifyDataSetChanged();
                             System.out.println(document.getData());
-                            System.out.println(inventory.getInventoryName());
                         }
                         ledgerAdapter = new LedgerAdapter(root.getContext(), inventories);
                         ledgerListView.setAdapter(ledgerAdapter);
-                        // Do something with the list of inventories
                     } else {
                         // Handle the error
                     }
@@ -134,7 +129,8 @@ public class LedgerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), InventoryViewActivity.class);
-                intent.putExtra("inventory", inventories.get(position));
+                intent.putExtra("inventoryName", inventories.get(position).getInventoryName());
+                intent.putExtra("username", username);
                 getActivity().startActivity(intent);  // launch the InventoryViewActivity
             }
         });

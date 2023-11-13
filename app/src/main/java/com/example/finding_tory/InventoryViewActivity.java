@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.Set;
  * Displays the content of a given Inventory (ie. a list of Items).
  */
 public class InventoryViewActivity extends AppCompatActivity {
+    private String username;
     private Inventory inventory;
     private ListView inventoryListView;
     private InventoryAdapter inventoryAdapter;
@@ -51,11 +53,11 @@ public class InventoryViewActivity extends AppCompatActivity {
         // TODO get an actual inventory from the db
         // get the inventory that's been passed by the ledger view parent activity
         Intent intent = getIntent();
-        inventory = (Inventory) intent.getSerializableExtra("inventory");
-        System.out.println("dfas");
+        String inventoryName = (String) intent.getSerializableExtra("inventoryName");
+        username = (String) intent.getSerializableExtra("username");
+        populateInventoryItems(inventoryName);
         assert (inventory != null);
-        System.out.println(inventory.getInventoryName());
-        setTitle(inventory.getInventoryName());
+        setTitle(inventoryName);
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -107,13 +109,16 @@ public class InventoryViewActivity extends AppCompatActivity {
                     deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
                     greyBack.setVisibility(View.VISIBLE); // move to the bottom after filter is implemented
                 } else {
+                    System.out.println("IVA1");
                     Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
+                    editItemIntent.putExtra("username", username);
+                    editItemIntent.putExtra("inventory", inventory);
                     startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
                 }
             }
         });
 
-        //allow the items in the list to be clickable
+        // Handles creating new activity for viewing item
         inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -123,6 +128,8 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                 intent.putExtra("selectedItem", selectedItem);
                 intent.putExtra("pos", position);
+                intent.putExtra("inventory", inventory);
+                intent.putExtra("username", username);
 
                 startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
             }
@@ -262,11 +269,11 @@ public class InventoryViewActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         // adding new item to list once user submits new item
         if (requestCode == ActivityCodes.ADD_ITEM.getRequestCode()) {
+            System.out.println(requestCode);
             if (resultCode == RESULT_OK) {
                 assert data != null;
                 Item selectedItem = (Item) data.getSerializableExtra("item_to_add");
                 assert selectedItem != null;
-
                 inventory.addItem(selectedItem);
                 if (inventory.sortItems()) {
                     inventoryAdapter.notifyDataSetChanged();
@@ -303,8 +310,9 @@ public class InventoryViewActivity extends AppCompatActivity {
     }
 
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
-        FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
-        FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
+        // TODO
+//        FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
+//        FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
     }
 
     /**
@@ -313,10 +321,32 @@ public class InventoryViewActivity extends AppCompatActivity {
      * @param item The Item object to be removed from Firestore.
      */
     private void removeItemFromFirestore(Item item) {
-        FirestoreDB.getItemsRef().document(item.getDescription()).delete().addOnSuccessListener(aVoid -> {
-            // Remove item from inventory and update the adapter
-            updateTotals();
-            inventoryAdapter.notifyDataSetChanged();
-        });
+        // TODO
+//        FirestoreDB.getItemsRef().document(item.getDescription()).delete().addOnSuccessListener(aVoid -> {
+//            // Remove item from inventory and update the adapter
+//            updateTotals();
+//            inventoryAdapter.notifyDataSetChanged();
+//        });
+    }
+
+    /**
+     * Queries for user's items in the selected inventory and add to the current inventory
+     *
+     * @param inventoryName The inventory name to retrieve from Firestore
+     */
+    public void populateInventoryItems(String inventoryName) {
+        inventory = new Inventory(inventoryName);
+        FirestoreDB.getItemsRef(username, inventoryName)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Item item = documentSnapshot.toObject(Item.class);
+                        inventory.addItem(item);
+                    }
+                    inventoryAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    // TODO
+                });
     }
 }

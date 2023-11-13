@@ -41,12 +41,10 @@ public class LedgerViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Get user and pass to LedgerFragment
         String username = (String) getIntent().getSerializableExtra("username");
-//        System.out.println("LVA: " + user.printInventories());
         LedgerFragment ledgerFragment = LedgerFragment.newInstance(username);
 
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
 
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
@@ -57,8 +55,6 @@ public class LedgerViewActivity extends AppCompatActivity {
                 R.id.nav_ledger, R.id.nav_profile)
                 .setOpenableLayout(drawer)
                 .build();
-
-
 
         // Use the NavController to navigate to the LedgerFragment
         // initialize the navigation bar functionality

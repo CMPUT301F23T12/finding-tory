@@ -8,7 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * It offers static methods to retrieve the Firestore database instance and specific collection references within the database.
  */
 public class FirestoreDB {
-    // debugMode true prevents any modifications to the Firestore DB.
+    // debugMode true prevents any modifications to the Firestore DB, retrieval is still allowed
     private static boolean debugMode = false;
 
     /**
@@ -21,10 +21,23 @@ public class FirestoreDB {
         return FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Retrieves a reference to the 'users' collection in Firebase Firestore.
+     * This collection is used to store and manage user-related data in the database.
+     *
+     * @return A CollectionReference pointing to the 'users' collection in Firestore.
+     */
     public static CollectionReference getUsersRef() {
         return FirebaseFirestore.getInstance().collection("users");
     }
 
+    /**
+     * Retrieves a reference to the 'inventories' collection of a specific user in Firebase Firestore.
+     * This collection is nested within the 'users' collection and is used to store and manage inventory-related data for each user.
+     *
+     * @param username The username identifying the specific user.
+     * @return A CollectionReference pointing to the 'inventories' collection of the specified user in Firestore.
+     */
     public static CollectionReference getInventoriesRef(String username) {
         return FirebaseFirestore.getInstance().collection("users").document(username).collection("inventories");
     }
@@ -35,11 +48,19 @@ public class FirestoreDB {
      *
      * @return A CollectionReference pointing to the 'items' collection in Firestore.
      */
-    public static CollectionReference getItemsRef() {
-        // TODO have multiple collections (1 for each inventory? or 1 for each user?)
-        return FirebaseFirestore.getInstance().collection("items");
+    public static CollectionReference getItemsRef(String username, String inventoryName) {
+        return FirebaseFirestore.getInstance().collection("users")
+                .document(username)
+                .collection("inventories")
+                .document(inventoryName)
+                .collection("items");
     }
 
+    /**
+     * Getter method for debug mode
+     *
+     * @return debugMode
+     */
     public static boolean isDebugMode() {
         return debugMode;
     }

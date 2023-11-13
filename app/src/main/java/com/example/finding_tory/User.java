@@ -17,7 +17,7 @@ public class User implements Serializable {
         this.username = username;
         this.name = name;
         this.password = password;
-        this.inventories = new ArrayList<Inventory>();
+        this.inventories = new ArrayList<>();
     }
 
     public void addInventory(Inventory inventory) {

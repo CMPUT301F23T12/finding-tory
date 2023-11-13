@@ -235,4 +235,12 @@ public class Inventory implements Serializable {
         Collections.sort(items, comparator);
         return true;
     }
+
+    public void printItems() {
+        String s = "";
+        for (Item i : items) {
+            s += i.getDescription() + ", ";
+        }
+        System.out.println(s);
+    }
 }

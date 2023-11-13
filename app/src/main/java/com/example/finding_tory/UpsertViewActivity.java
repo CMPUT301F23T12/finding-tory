@@ -22,7 +22,7 @@ import java.util.Date;
 /**
  * This class is responsible for updating/inserting items in an inventory
  */
-public class UpsertViewActivity extends AppCompatActivity{
+public class UpsertViewActivity extends AppCompatActivity {
     Button add_tags_button;
     Button submit_button;
     Button cancel_button;
@@ -37,6 +37,8 @@ public class UpsertViewActivity extends AppCompatActivity{
     EditText comment_text;
     EditText tags_entered;
     Item item;
+    Inventory inventory;
+    String username;
     boolean isAdd = false;
     ArrayList<String> tags = new ArrayList<>();
 
@@ -60,7 +62,7 @@ public class UpsertViewActivity extends AppCompatActivity{
         model_text = findViewById(R.id.model_edittext);
         date_purchased_text = findViewById(R.id.date_edittext);
         estimated_cost_text = findViewById(R.id.amount_edittext);
-        estimated_cost_text.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10,2)});
+        estimated_cost_text.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
         serial_number_text = findViewById(R.id.serial_number_edittext);
         comment_text = findViewById(R.id.comment_edittext);
         tags_entered = findViewById(R.id.add_tags_edittext);
@@ -68,13 +70,18 @@ public class UpsertViewActivity extends AppCompatActivity{
         Bundle extras = getIntent().getExtras();
         item = null;
         // if no data is sent through intent, then user wants to add an item
-        if (extras == null)
-            isAdd = true;
-        else {
-            item = (Item) (extras.getSerializable("selectedItem"));
-            tags.addAll(item.getItemTags());
+        if (extras != null) {
+            // if item != null then we are editing an item
+            if (item != null) {
+                tags.addAll(item.getItemTags());
+            } else {
+                isAdd = true;
+                inventory = (Inventory) extras.getSerializable("inventory");
+                username = (String) extras.getSerializable("username");
+                item = (Item) (extras.getSerializable("selectedItem"));
+            }
         }
-
+        System.out.println(isAdd);
         //initializes UI based on if user wants to add or edit item
         if (isAdd) {
             view_title.setText("Add Item Information");
@@ -100,7 +107,9 @@ public class UpsertViewActivity extends AppCompatActivity{
                 });
                 tags_container.addView(tagView);
             }
+
         }
+
 
         /**
          * Displays any tags user entered in the search bar (space-separated) adds it to all
@@ -146,7 +155,7 @@ public class UpsertViewActivity extends AppCompatActivity{
                     error = "Invalid Date Format";
                 }
 
-                if (!error.equals("")){
+                if (!error.equals("")) {
                     // TODO: display error message on screen
                     Toast toast = Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG);
                     toast.show();
@@ -196,7 +205,8 @@ public class UpsertViewActivity extends AppCompatActivity{
      */
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
-            FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
+            System.out.println("UVA");
+            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item)
                     .addOnSuccessListener(aVoid -> {
                         // Item added successfully
                         Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
@@ -212,8 +222,7 @@ public class UpsertViewActivity extends AppCompatActivity{
      */
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
         if (!FirestoreDB.isDebugMode()) {
-            FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
-            FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
+            // TODO
         }
     }
 }
