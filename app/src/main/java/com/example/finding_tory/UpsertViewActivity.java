@@ -363,12 +363,16 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             Uri uri = data.getData();
             if (uri != null) {
                 imageUris.add(uri);
-                // TODO: store image in gallery
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
         } else if (resultCode == Activity.RESULT_OK && requestCode == ActivityCodes.GALLERY_PHOTO.getRequestCode()) {
-            //TODO: implement selecting picture from gallery
+            Uri uri = data.getData();
+            if (uri != null) {
+                imageUris.add(uri);
+                imageAdapter.notifyDataSetChanged();
+                justifyListViewHeightBasedOnChildren();
+            }
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
         } else {
@@ -380,7 +384,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      * Updates the list view to make the height such that all the images can be seen instead of
      * having the list scrollable
      */
-    public void justifyListViewHeightBasedOnChildren () {
+    public void justifyListViewHeightBasedOnChildren() {
         if (imageAdapter == null) {
             return;
         }
