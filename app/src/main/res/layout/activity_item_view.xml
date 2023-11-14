@@ -279,6 +279,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tags: "
+                    android:gravity="center_vertical"
                     android:textSize="18sp"/>
 
                 <LinearLayout
@@ -287,8 +288,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="horizontal"
-                    android:padding="8dp"
-                    android:gravity="center_vertical"
+                    android:gravity="fill_vertical"
                     tools:ignore="DuplicateIds">
                 </LinearLayout>
             </LinearLayout>
