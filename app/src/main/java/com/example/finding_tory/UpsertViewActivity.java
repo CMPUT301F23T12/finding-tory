@@ -324,12 +324,13 @@ public class UpsertViewActivity extends AppCompatActivity{
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
+        } else if (resultCode == Activity.RESULT_OK && requestCode == ActivityCodes.GALLERY_PHOTO.getRequestCode()) {
+            //TODO: implement selecting picture from gallery
         } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Task Cancelled", Toast.LENGTH_SHORT).show();
         }
-        //TODO: implement selecting picture from gallery
     }
 
     /**
