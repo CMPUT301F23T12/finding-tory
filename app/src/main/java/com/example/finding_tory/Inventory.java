@@ -187,7 +187,8 @@ public class Inventory implements Serializable {
      * @param i The index of the item to remove.
      */
     public void removeItemByIndex(int i) {
-        for (String tag : this.items.remove(i).getItemTags()) {
+        System.out.println(i);
+        for (String tag : this.items.get(i).getItemTags()) {
             this.allTags.remove(tag);
         }
         this.inventoryEstimatedValue -= this.items.get(i).getEstimatedValue();

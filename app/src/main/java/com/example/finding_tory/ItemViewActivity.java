@@ -46,10 +46,10 @@ public class ItemViewActivity extends AppCompatActivity {
         setTitle("View Item");
 
         // Retrieve the selected item from the Intent
-        selectedItem = (Item) getIntent().getSerializableExtra("selectedItem");
-        selectedInventory = (Inventory) getIntent().getSerializableExtra("inventory");
-        position = getIntent().getIntExtra("pos", 0);
         username = (String) getIntent().getSerializableExtra("username");
+        selectedInventory = (Inventory) getIntent().getSerializableExtra("inventory");
+        selectedItem = (Item) getIntent().getSerializableExtra("selectedItem");
+        position = getIntent().getIntExtra("pos", 0);
 
         // Use the selectedItem to populate the views in the item_click_view layout
         assert selectedItem != null;
@@ -95,6 +95,7 @@ public class ItemViewActivity extends AppCompatActivity {
                         Intent data = new Intent();
                         data.putExtra("pos", getIntent().getIntExtra("pos", -1));
                         data.putExtra("action", "delete");
+                        FirestoreDB.deleteItemDB(username, selectedInventory, selectedItem);
                         // You can add extra data if needed
                         setResult(RESULT_OK, data);
                         finish();
@@ -111,6 +112,7 @@ public class ItemViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Start Edit Activity
                 Intent editItemIntent = new Intent(ItemViewActivity.this, UpsertViewActivity.class);
+                editItemIntent.putExtra("username", username);
                 editItemIntent.putExtra("selectedItem", selectedItem);
                 editItemIntent.putExtra("inventory", selectedInventory);
                 startActivityForResult(editItemIntent, ActivityCodes.EDIT_ITEM.getRequestCode());

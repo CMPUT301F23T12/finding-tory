@@ -109,7 +109,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                     deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
                     greyBack.setVisibility(View.VISIBLE); // move to the bottom after filter is implemented
                 } else {
-                    System.out.println("IVA1");
                     Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
                     editItemIntent.putExtra("username", username);
                     editItemIntent.putExtra("inventory", inventory);
@@ -130,7 +129,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                 intent.putExtra("pos", position);
                 intent.putExtra("inventory", inventory);
                 intent.putExtra("username", username);
-
                 startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
             }
         });

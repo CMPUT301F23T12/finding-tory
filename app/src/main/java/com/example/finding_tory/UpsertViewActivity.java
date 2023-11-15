@@ -71,17 +71,16 @@ public class UpsertViewActivity extends AppCompatActivity {
         item = null;
         // if no data is sent through intent, then user wants to add an item
         if (extras != null) {
+            item = (Item) (extras.getSerializable("selectedItem"));
+            inventory = (Inventory) extras.getSerializable("inventory");
+            username = (String) extras.getSerializable("username");
             // if item != null then we are editing an item
             if (item != null) {
                 tags.addAll(item.getItemTags());
             } else {
                 isAdd = true;
-                inventory = (Inventory) extras.getSerializable("inventory");
-                username = (String) extras.getSerializable("username");
-                item = (Item) (extras.getSerializable("selectedItem"));
             }
         }
-        System.out.println(isAdd);
         //initializes UI based on if user wants to add or edit item
         if (isAdd) {
             view_title.setText("Add Item Information");
@@ -205,7 +204,6 @@ public class UpsertViewActivity extends AppCompatActivity {
      */
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
-            System.out.println("UVA");
             FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item)
                     .addOnSuccessListener(aVoid -> {
                         // Item added successfully
@@ -215,14 +213,20 @@ public class UpsertViewActivity extends AppCompatActivity {
     }
 
     /**
-     * Edits an item in Firestore by deleting and re-adding the item from the DB.
+     * Edits an item in Firestore by set method which overwrites the existing data
      *
      * @param existingItem The existing item to be edited.
      * @param updatedItem  The updated item.
      */
     private void editItemFromFirestore(Item existingItem, Item updatedItem) {
+        // existingItem is not used as of right now but might need in future if we chose to use itemID as the key
         if (!FirestoreDB.isDebugMode()) {
-            // TODO
+//            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(existingItem.getDescription()).delete();
+            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(updatedItem.getDescription()).set(updatedItem)
+                    .addOnSuccessListener(aVoid -> {
+                        // Item added successfully
+                        Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
+                    });
         }
     }
 }

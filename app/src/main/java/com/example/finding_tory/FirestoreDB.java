@@ -56,6 +56,15 @@ public class FirestoreDB {
                 .collection("items");
     }
 
+    public static void deleteItemDB(String username, Inventory inventory, Item item) {
+        FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).delete();
+    }
+
+    public static void updateInventoryDB() {
+
+    }
+
+
     /**
      * Getter method for debug mode
      *

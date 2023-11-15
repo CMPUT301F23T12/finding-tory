@@ -19,7 +19,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 /**
  * LoginActivity is an AppCompatActivity that provides a user interface for login and new account registration.
  * It allows users to enter their username and password to log in or to navigate to the registration process.
- *
+ * <p>
  * This activity includes validation for user credentials and initiates transitions to other activities based on user actions.
  */
 public class LoginActivity extends AppCompatActivity {
@@ -64,21 +64,24 @@ public class LoginActivity extends AppCompatActivity {
                 String password = String.valueOf(passwordEditText.getText());
                 passwordEditText.setText("");  // when we return we need to re-enter password
 
-                loginUser(username, password);
-//                if (!(username.equals("") && password.equals(""))) {
-//                    Snackbar.make(v, "Invalid user credentials. Please try again.",
-//                            Snackbar.LENGTH_LONG).show();
-//                    return;
-//                }
 
-//                Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
-//                intent.putExtra("user", username);
-//                startActivity(intent);
+                if (!(username.equals("") && password.equals(""))) {
+                    // Default login is abc to make it easier for testing
+                    loginUser("abc", "123");
+                    // loginUser(username, password);
+                } else {
+                    Snackbar.make(v, "Invalid user credentials. Please try again.",
+                            Snackbar.LENGTH_LONG).show();
+                    return;
+                }
             }
         });
     }
 
     public void loginUser(final String username, final String enteredPassword) {
+        Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
+
+        // Retrieve the user object from the Firestore document
         FirestoreDB.getUsersRef().whereEqualTo("username", username)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

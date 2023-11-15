@@ -7,20 +7,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * RegisterActivity is an AppCompatActivity that provides a user interface for new account registration.
@@ -62,12 +57,9 @@ public class RegisterActivity extends AppCompatActivity {
                 String name = String.valueOf(nameEditText.getText());
                 String password = String.valueOf(passwordEditText.getText());
                 String confirmPassword = String.valueOf(confirmPwdEditText.getText());
-                // TODO handle new user registration
 
-                registerUser("", "", "");
                 if (!(username.equals("") && name.equals("") && password.equals("") && confirmPassword.equals(""))) {
                     if (password.equals(confirmPassword)) {
-//                        addDummyData();
                         registerUser(username, name, password);
                     } else {
                         passwordEditText.setText("");
@@ -83,9 +75,28 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void registerUser(String username, String name, String password) {
         if (!FirestoreDB.isDebugMode()) {
-            User user = new User(username, name, password);
-            FirebaseFirestore.getInstance().collection("users").document(username).set(user);
-//            FirestoreDB.getUsersRef().document(username).set(user);
+            FirestoreDB.getUsersRef().whereEqualTo("username", username)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            // Username already exists
+                            usernameEditText.setText("");
+                            Toast.makeText(RegisterActivity.this, "Username already taken!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Username is available, we can add the user to collection
+                            User user = new User(username, name, password);
+                            FirestoreDB.getUsersRef().document(username).set(user)
+                                    .addOnSuccessListener(documentReference -> {
+                                        Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
+                                        intent.putExtra("user", user);
+                                        startActivity(intent);
+                                        Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
+                                    }).addOnFailureListener(e -> {
+                                        // Error occurred while adding user
+                                        Toast.makeText(RegisterActivity.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    });
         } else {
             User user = new User(username, name, password);
             Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
@@ -93,36 +104,6 @@ public class RegisterActivity extends AppCompatActivity {
             startActivity(intent);
             Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
         }
-//        if (!FirestoreDB.isDebugMode()) {
-//            FirestoreDB.getUsersRef().whereEqualTo("username", username)
-//                .get()
-//                .addOnSuccessListener(queryDocumentSnapshots -> {
-//                    if (!queryDocumentSnapshots.isEmpty()) {
-//                        // Username already exists
-//                        Toast.makeText(RegisterActivity.this, "Username already taken!", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        // Username is available, we can add the user to collection
-//                        User user = new User(username, name, password);
-////                    FirestoreDB.getUsersRef().document(username).set(user)
-////                            .addOnSuccessListener(documentReference -> {
-////                                Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
-////                                intent.putExtra("user", user);
-////                                startActivity(intent);
-////                                Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
-////                            }).addOnFailureListener(e -> {
-////                                // Error occurred while adding user
-////                                Toast.makeText(RegisterActivity.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-////                            });
-//                        FirestoreDB.getUsersRef().document(username).set(user);
-//                    }
-//                });
-//        } else {
-//            User user = new User(username, name, password);
-//            Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
-//            intent.putExtra("user", user);
-//            startActivity(intent);
-//            Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
-//        }
     }
 
     public void addDummyData() {
