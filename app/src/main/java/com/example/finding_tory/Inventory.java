@@ -22,7 +22,8 @@ public class Inventory implements Serializable {
     private String sortType = "Description";
     private String sortOrder = "Ascending";
 
-    public Inventory() {}
+    public Inventory() {
+    }
 
     /**
      * Constructs a new Inventory object with a specified name.
@@ -123,8 +124,8 @@ public class Inventory implements Serializable {
         this.allTags = new ArrayList<>();
         for (Item item : items) {
             for (String s : item.getItemTags()) {
-                if (!this.allTags.contains(s)) {
-                    this.allTags.add(s);
+                if (!this.allTags.contains(capitalizeFirstLetter(s))) {
+                    this.allTags.add(capitalizeFirstLetter(s));
                 }
             }
         }
@@ -160,8 +161,8 @@ public class Inventory implements Serializable {
     public void addItem(Item item) {
         this.items.add(item);
         for (String s : item.getItemTags()) {
-            if (!this.allTags.contains(s)) {
-                this.allTags.add(s);
+            if (!this.allTags.contains(capitalizeFirstLetter(s))) {
+                this.allTags.add(capitalizeFirstLetter(s));
             }
         }
         Collections.sort(this.allTags);
@@ -175,7 +176,7 @@ public class Inventory implements Serializable {
      */
     public void removeItem(Item item) {
         for (String tag : item.getItemTags()) {
-            this.allTags.remove(tag);
+            this.allTags.remove(capitalizeFirstLetter(tag));
         }
         this.items.remove(item);
         this.inventoryEstimatedValue -= item.getEstimatedValue();
@@ -187,28 +188,57 @@ public class Inventory implements Serializable {
      * @param i The index of the item to remove.
      */
     public void removeItemByIndex(int i) {
-        for (String tag : this.items.remove(i).getItemTags()) {
-            this.allTags.remove(tag);
+        for (String tag : this.items.get(i).getItemTags()) {
+            this.allTags.remove(capitalizeFirstLetter(tag));
         }
         this.inventoryEstimatedValue -= this.items.get(i).getEstimatedValue();
         this.items.remove(i);
     }
 
-    public void addTagsToInventory(ArrayList<String> newTags){
-        for (String s : newTags){
-            if(!allTags.contains(s)){
-                newTags.add(s);
+    /**
+     * Adds unique tags to the inventory.
+     *
+     * @param newTags An ArrayList of new tags to be added.
+     */
+    public void addTagsToInventory(ArrayList<String> newTags) {
+        for (String s : newTags) {
+            if (!allTags.contains(capitalizeFirstLetter(s))) {
+                newTags.add(capitalizeFirstLetter(s));
             }
         }
     }
 
+    /**
+     * Retrieves all the tags in the inventory.
+     *
+     * @return An ArrayList of all tags present in the inventory.
+     */
+    public ArrayList<String> getAllTags() {
+        return this.allTags;
+    }
+
+    /**
+     * Capitalizes the first letter of a string and makes the rest lowercase.
+     *
+     * @param str The string to be processed.
+     * @return The processed string with the first letter capitalized and the rest lowercase.
+     */
+    private static String capitalizeFirstLetter(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
+    /**
+     * Sets the sorting criteria for the inventory.
+     *
+     * @param sortType  The type of sorting to be applied (e.g., name, date).
+     * @param sortOrder The order of sorting (e.g., ascending, descending).
+     */
     public void setSortData(String sortType, String sortOrder) {
         this.sortType = sortType;
         this.sortOrder = sortOrder;
-    }
-
-    public ArrayList<String> getAllTags() {
-        return this.allTags;
     }
 
     public Boolean sortItems() {
@@ -225,6 +255,9 @@ public class Inventory implements Serializable {
                 break;
             case "Value":
                 comparator = Comparator.comparing(Item::getEstimatedValue);
+                break;
+            case "Tags":
+                comparator = Comparator.comparing(Item::getTagsString);
                 break;
             default:
                 return false;
