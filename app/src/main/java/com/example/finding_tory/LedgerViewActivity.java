@@ -17,12 +17,10 @@ import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
 import com.example.finding_tory.ui.ledger.LedgerFragment;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.ArrayList;
-
 /**
  * LedgerViewActivity is an AppCompatActivity that manages the main user interface for the application.
  * It sets up a DrawerLayout with a NavigationView for navigating between different sections of the app like ledger and profile.
- *
+ * <p>
  * This activity handles the setup of the app bar and navigation components and manages navigation between different fragments.
  */
 public class LedgerViewActivity extends AppCompatActivity {
@@ -51,10 +49,7 @@ public class LedgerViewActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_ledger, R.id.nav_profile)
-                .setOpenableLayout(drawer)
-                .build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_ledger, R.id.nav_profile).setOpenableLayout(drawer).build();
 
         // Use the NavController to navigate to the LedgerFragment
         // initialize the navigation bar functionality
@@ -103,7 +98,6 @@ public class LedgerViewActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-                || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 }

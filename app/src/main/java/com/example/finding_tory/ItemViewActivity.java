@@ -22,7 +22,7 @@ import java.util.Locale;
 /**
  * ItemViewActivity is an AppCompatActivity that displays detailed information about a selected item.
  * It allows users to view, edit, or delete an item, and navigate back to the inventory list.
- *
+ * <p>
  * This activity handles various user interactions such as editing item details, confirming item deletion,
  * and updating item views.
  */

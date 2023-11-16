@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * DecimalDigitsInputFilter is an implementation of InputFilter that restricts the number of digits before and after
  * the decimal point in numerical input. This class is particularly useful for fields where precise decimal values are required,
  * such as monetary amounts.
- *
+ * <p>
  * The class uses regular expressions to enforce the input constraints.
  */
 class DecimalDigitsInputFilter implements InputFilter {
@@ -26,7 +26,9 @@ class DecimalDigitsInputFilter implements InputFilter {
      * @param digitsAfterZero  The maximum number of digits allowed after the decimal point.
      */
     DecimalDigitsInputFilter(int digitsBeforeZero, int digitsAfterZero) {
-        mPattern=Pattern.compile("[0-9]{0," + (digitsBeforeZero-1) + "}+((\\.[0-9]{0," + (digitsAfterZero-1) + "})?)||(\\.)?");    }
+        mPattern = Pattern.compile("[0-9]{0," + (digitsBeforeZero - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) + "})?)||(\\.)?");
+    }
+
     @Override
 
     /**
@@ -39,11 +41,9 @@ class DecimalDigitsInputFilter implements InputFilter {
      * @param dstart The starting index in dest of the range of the original text to be replaced.
      * @param dend   The ending index in dest of the range of the original text to be replaced.
      * @return The modified CharSequence to replace the original input, or null to accept the original input.
-     */
-    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+     */ public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
         Matcher matcher = mPattern.matcher(dest);
-        if (!matcher.matches())
-            return "";
+        if (!matcher.matches()) return "";
         return null;
     }
 }
