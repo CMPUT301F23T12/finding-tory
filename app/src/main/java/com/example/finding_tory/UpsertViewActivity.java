@@ -1,6 +1,5 @@
 package com.example.finding_tory;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,11 +16,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -46,6 +43,8 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private Item item;
     private boolean isAdd = false;
     private ArrayList<String> tags = new ArrayList<>();
+    private String username;
+    private Inventory inventory;
 
     /**
      * Initializes the activity, sets up the user interface, and prepares data models.
@@ -238,9 +237,9 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     /**
      * Gets the date from the dater picker and formats it to be displayed to user
      *
-     * @param view the date picker picker
-     * @param year the year picked
-     * @param month the month picked
+     * @param view       the date picker picker
+     * @param year       the year picked
+     * @param month      the month picked
      * @param dayOfMonth the day picked
      */
     @Override

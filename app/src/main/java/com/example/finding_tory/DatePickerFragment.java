@@ -4,14 +4,13 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 /**
  * This class is responsible for creating the date picker dialog
@@ -40,7 +39,6 @@ public class DatePickerFragment extends DialogFragment {
 
         // creates the fragment to pick date
         //TODO: Fix color of header background
-        return new DatePickerDialog(getActivity(),(DatePickerDialog.OnDateSetListener)
-                getActivity(), year, month, dayOfMonth);
+        return new DatePickerDialog(getActivity(), (DatePickerDialog.OnDateSetListener) getActivity(), year, month, dayOfMonth);
     }
 }
