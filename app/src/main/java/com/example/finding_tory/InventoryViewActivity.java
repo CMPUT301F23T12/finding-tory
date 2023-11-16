@@ -190,7 +190,8 @@ public class InventoryViewActivity extends AppCompatActivity {
                                 for (String str : selectedTags) {
                                     item.addItemTag(str);
                                 }
-                                editItemFromFirestore(item, item);
+                                FirestoreDB.editItemFromFirestore(username, inventory, item, item);
+//                                editItemFromFirestore(item, item);
                             }
                             inventory.addTagsToInventory(selectedTags);
                             inventoryAdapter.clearSelection();
