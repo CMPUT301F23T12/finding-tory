@@ -42,7 +42,7 @@ public class LedgerFragment extends Fragment {
     public static LedgerFragment newInstance(String username) {
         LedgerFragment fragment = new LedgerFragment();
         Bundle args = new Bundle();
-        args.putSerializable("username", username); // Use putSerializable for User
+        args.putSerializable("username", username);
         fragment.setArguments(args);
         return fragment;
     }
@@ -114,6 +114,13 @@ public class LedgerFragment extends Fragment {
         binding = null;
     }
 
+    /**
+     * Called when an activity launched by this fragment returns a result.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult().
+     * @param resultCode  The integer result code returned by the child activity.
+     * @param data        An Intent that carries the result data.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -123,12 +130,15 @@ public class LedgerFragment extends Fragment {
         }
     }
 
+    /**
+     * Fetches the user's inventories from Firestore and updates the UI with the retrieved data.
+     */
     private void fetchUserInventories() {
         inventories = new ArrayList<>();
         FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    // Add the inventories
+                    // Add the inventories to the ledger view
                     Inventory inv = document.toObject(Inventory.class);
                     inventories.add(inv);
                 }

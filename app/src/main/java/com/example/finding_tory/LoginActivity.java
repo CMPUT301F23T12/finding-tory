@@ -63,22 +63,29 @@ public class LoginActivity extends AppCompatActivity {
                 String password = String.valueOf(passwordEditText.getText());
                 passwordEditText.setText("");  // when we return we need to re-enter password
 
+                // For ease of testing, login will login to the testing abc account
+                loginUser("abc", "123");
 
-                if (!(username.equals("") && password.equals(""))) {
-                    // Default login is abc to make it easier for testing
-                    loginUser("abc", "123");
-                    // loginUser(username, password);
-                } else {
-                    Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
-                    return;
-                }
+                // TODO: DO NOT DELETE
+//                if (!(username.equals("") && password.equals(""))) {
+//                     loginUser(username, password);
+//                } else {
+//                    Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
+//                    return;
+//                }
             }
         });
     }
 
+    /**
+     * Login the user with the provided username and password.
+     * Communicates with FirestoreDB to authenticate the user and, upon success,
+     * transitions to the LedgerViewActivity.
+     *
+     * @param username        The username entered by the user.
+     * @param enteredPassword The password entered by the user.
+     */
     public void loginUser(final String username, final String enteredPassword) {
-        Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
-
         // Retrieve the user object from the Firestore document
         FirestoreDB.getUsersRef().whereEqualTo("username", username).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -92,9 +99,8 @@ public class LoginActivity extends AppCompatActivity {
                     // User with the provided username exists, get the stored password from the query result
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
                     if (enteredPassword.equals(storedPassword)) {
+                        // Start the LedgerViewActivity for the validated user
                         Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
-
-                        // Retrieve the user object from the Firestore document
                         intent.putExtra("username", user.getUsername());
                         startActivity(intent);
                     } else {
@@ -109,7 +115,6 @@ public class LoginActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                // Handle the failure to query the database (e.g., network issues)
                 Snackbar.make(usernameEditText, "Failed to check user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
             }
         });

@@ -73,6 +73,13 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Registers a new user by checking if the username is available and adding the user to Firestore.
+     *
+     * @param username The desired username for the new user.
+     * @param name     The name of the new user.
+     * @param password The password for the new user.
+     */
     public void registerUser(String username, String name, String password) {
         if (!FirestoreDB.isDebugMode()) {
             FirestoreDB.getUsersRef().whereEqualTo("username", username)
@@ -105,84 +112,4 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
         }
     }
-
-    public void addDummyData() {
-        // Create a new User
-        String username = "abc";
-        Date dateFormatted = null;
-        try {
-            dateFormatted = new SimpleDateFormat("yyyy-MM-dd").parse("2001-02-12");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        User user = new User("kevin", "kevin", "123");
-
-        // Create an Inventory
-        Inventory inventory = new Inventory("Home Inventory");
-        addUserToFirestore(user);
-        // Create Items
-        Item item1 = new Item(dateFormatted, "item1", "make1", "model1", 10.99f, "", "Comment", new ArrayList<>());
-        Item item2 = new Item(dateFormatted, "item2", "make2", "model2", 10.99f, "", "Comment", new ArrayList<>());
-//        addInventoryToFirestore(username, inventory);
-
-//        inventory.addItem(item1);
-//        inventory.addItem(item2);
-//        inventory.setInventoryTotalItems();
-//        inventory.calculateValue();
-//        addInventoryToFirestore(username, inventory);
-//
-//        // Save the inventory and items to Firestore under the user's subcollection
-//
-//        addItemsToFirestore(username, inventory, Arrays.asList(item1, item2));
-    }
-
-    public void addUserToFirestore(User user) {
-        FirestoreDB.getUsersRef().document(user.getUsername())
-                .set(user)
-                .addOnSuccessListener(aVoid -> {
-
-                    // Log success or show a toast
-                })
-                .addOnFailureListener(e -> {
-                    // Log error or show a toast
-                });
-    }
-
-    public void addInventoryToFirestore(String username, Inventory inventory) {
-        FirestoreDB.getInventoriesRef(username).document(inventory.getInventoryName()).set(inventory);
-    }
-
-    public void addItemsToFirestore(String username, Inventory inventory, List<Item> items) {
-        // Get a reference to the specific inventory's subcollection for items
-        CollectionReference itemsRef = FirestoreDB.getInventoriesRef(username).document(inventory.getInventoryName()).collection("Items");
-
-        // Iterate over the list of items and add each to Firestore
-        for (Item item : items) {
-            // You can use the item name as a document ID, or let Firestore generate an ID
-            itemsRef.document(item.getDescription()).set(item)
-                    .addOnSuccessListener(aVoid -> {
-                        // Handle successful addition, e.g., logging or showing a toast
-                    })
-                    .addOnFailureListener(e -> {
-                        // Handle any errors here, e.g., logging or showing a toast
-                    });
-        }
-    }
 }
-//FirestoreDB.getUsersRef().whereEqualTo("username", username)
-//                    .get()
-//                    .addOnCompleteListener(task -> {
-//                        if (task.isSuccessful()) {
-//                            if (task.getResult().isEmpty()) {
-//                                // Username is not taken, insert the new user
-//                                Map<String, Object> newUser = new HashMap<>();
-//                                newUser.put("username", username);
-//                                // Add other user details to newUser map as needed
-//                                FirestoreDB.getUsersRef().document(username).set(newUser);
-//                            } else {
-//                                // Username is already taken
-//                            }
-//                        } else {
-//                            // Handle the error in task
-//                        }
-//                    });

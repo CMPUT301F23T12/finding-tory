@@ -106,30 +106,4 @@ public class LedgerViewActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-
-    public ArrayList<Inventory> getUserInventories(User user) {
-        ArrayList<Inventory> inventories = new ArrayList<>();
-        // Assuming FirestoreDB.getUsersRef() returns a CollectionReference to the 'users' collection
-//        FirestoreDB.getUsersRef().document(user.getUsername()) // replace "userId" with the actual user ID
-//                .get()
-//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        User user = documentSnapshot.toObject(User.class);
-//                        if (user != null) {
-//                            // The user object should now contain all user details including the inventories
-//                            inventories = user.getInventories();
-//                            // Do something with the inventories
-//
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        // Handle any errors here
-//                    }
-//                });
-        return inventories;
-    }
 }

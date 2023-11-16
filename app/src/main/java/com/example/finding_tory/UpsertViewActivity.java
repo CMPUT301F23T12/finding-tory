@@ -207,22 +207,4 @@ public class UpsertViewActivity extends AppCompatActivity {
             });
         }
     }
-
-//    /**
-//     * Edits an item in Firestore by set method which overwrites the existing data
-//     *
-//     * @param existingItem The existing item to be edited.
-//     * @param updatedItem  The updated item.
-//     */
-//    private void editItemFromFirestore(Item existingItem, Item updatedItem) {
-//        // existingItem is not used as of right now but might need in future if we chose to use itemID as the key
-//        if (!FirestoreDB.isDebugMode()) {
-////            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(existingItem.getDescription()).delete();
-//            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(updatedItem.getDescription()).set(updatedItem)
-//                    .addOnSuccessListener(aVoid -> {
-//                        // Item added successfully
-//                        Toast.makeText(UpsertViewActivity.this, "Item edited successfully!", Toast.LENGTH_SHORT).show();
-//                    });
-//        }
-//    }
 }

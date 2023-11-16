@@ -58,12 +58,4 @@ public class User implements Serializable {
     public void setInventories(ArrayList<Inventory> inventories) {
         this.inventories = inventories;
     }
-
-    public String printInventories() {
-        String s = "";
-        for (Inventory i : inventories) {
-            s += i.getInventoryName() + " ";
-        }
-        return s;
-    }
 }

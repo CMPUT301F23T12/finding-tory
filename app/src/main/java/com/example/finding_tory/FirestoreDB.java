@@ -52,19 +52,24 @@ public class FirestoreDB {
         return FirebaseFirestore.getInstance().collection("users").document(username).collection("inventories").document(inventoryName).collection("items");
     }
 
+    /**
+     * Deletes an item from the Firestore database.
+     *
+     * @param username     The username identifying the specific user.
+     * @param inventory    The Inventory from which to delete the item.
+     * @param item         The Item to be deleted.
+     */
     public static void deleteItemDB(String username, Inventory inventory, Item item) {
         FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).delete();
-    }
-
-    public static void updateInventoryDB() {
-
     }
 
     /**
      * Edits an item in Firestore by set method which overwrites the existing data
      *
-     * @param existingItem The existing item to be edited.
-     * @param updatedItem  The updated item.
+     * @param username      The username identifying the specific user.
+     * @param inventory     The Inventory containing the item to be edited.
+     * @param existingItem  The existing item to be edited.
+     * @param updatedItem   The updated item
      */
     public static void editItemFromFirestore(String username, Inventory inventory, Item existingItem, Item updatedItem) {
         // existingItem is not used as of right now but might need in future if we chose to use itemID as the key
