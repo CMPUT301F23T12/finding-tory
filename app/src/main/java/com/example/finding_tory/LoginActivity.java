@@ -65,7 +65,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 // For ease of testing, login will login to the testing abc account
                 loginUser("abc", "123");
-
                 // TODO: DO NOT DELETE
 //                if (!(username.equals("") && password.equals(""))) {
 //                     loginUser(username, password);
