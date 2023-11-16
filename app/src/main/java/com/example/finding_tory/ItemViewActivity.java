@@ -95,7 +95,6 @@ public class ItemViewActivity extends AppCompatActivity {
                         Intent data = new Intent();
                         data.putExtra("pos", getIntent().getIntExtra("pos", -1));
                         data.putExtra("action", "delete");
-                        FirestoreDB.deleteItemDB(username, selectedInventory, selectedItem);
                         // You can add extra data if needed
                         setResult(RESULT_OK, data);
                         finish();

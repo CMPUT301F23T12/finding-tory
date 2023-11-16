@@ -1,7 +1,5 @@
 package com.example.finding_tory;
 
-import android.widget.Toast;
-
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -51,11 +49,7 @@ public class FirestoreDB {
      * @return A CollectionReference pointing to the 'items' collection in Firestore.
      */
     public static CollectionReference getItemsRef(String username, String inventoryName) {
-        return FirebaseFirestore.getInstance().collection("users")
-                .document(username)
-                .collection("inventories")
-                .document(inventoryName)
-                .collection("items");
+        return FirebaseFirestore.getInstance().collection("users").document(username).collection("inventories").document(inventoryName).collection("items");
     }
 
     public static void deleteItemDB(String username, Inventory inventory, Item item) {
@@ -76,7 +70,12 @@ public class FirestoreDB {
         // existingItem is not used as of right now but might need in future if we chose to use itemID as the key
         if (!FirestoreDB.isDebugMode()) {
 //            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(existingItem.getDescription()).delete();
-            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(updatedItem.getDescription()).set(updatedItem);
+            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(updatedItem.getDescription()).set(updatedItem).addOnSuccessListener(aVoid -> {
+                System.out.println("hihihih");
+            }).addOnFailureListener(e -> {
+                // Handle failure
+                e.printStackTrace();
+            });
         }
     }
 

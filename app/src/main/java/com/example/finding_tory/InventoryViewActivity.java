@@ -96,7 +96,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                             // Remove selected items from the inventory
                             for (Item item : selectedItems) {
                                 inventory.removeItem(item);
-                                removeItemFromFirestore(item);
+                                FirestoreDB.deleteItemDB(username, inventory, item);
                             }
 
                             // Notify the adapter of the data change
@@ -191,7 +191,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                                     item.addItemTag(str);
                                 }
                                 FirestoreDB.editItemFromFirestore(username, inventory, item, item);
-//                                editItemFromFirestore(item, item);
                             }
                             inventory.addTagsToInventory(selectedTags);
                             inventoryAdapter.clearSelection();
@@ -288,7 +287,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             if (Objects.equals(data.getStringExtra("action"), "delete")) {
                 int position = data.getIntExtra("pos", -1);
                 if (position >= 0) {
-                    removeItemFromFirestore(inventory.getItems().get(position));
+                    FirestoreDB.deleteItemDB(username, inventory, inventory.getItems().get(position));
                     inventory.removeItemByIndex(position);
                 }
             } else {
@@ -308,26 +307,6 @@ public class InventoryViewActivity extends AppCompatActivity {
         totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
     }
 
-    private void editItemFromFirestore(Item existingItem, Item updatedItem) {
-        // TODO
-//        FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
-//        FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
-    }
-
-    /**
-     * Removes an item from Firestore database and updates the inventory accordingly.
-     *
-     * @param item The Item object to be removed from Firestore.
-     */
-    private void removeItemFromFirestore(Item item) {
-        // TODO
-//        FirestoreDB.getItemsRef().document(item.getDescription()).delete().addOnSuccessListener(aVoid -> {
-//            // Remove item from inventory and update the adapter
-//            updateTotals();
-//            inventoryAdapter.notifyDataSetChanged();
-//        });
-    }
-
     /**
      * Queries for user's items in the selected inventory and add to the current inventory
      *
@@ -335,17 +314,15 @@ public class InventoryViewActivity extends AppCompatActivity {
      */
     public void populateInventoryItems(String inventoryName) {
         inventory = new Inventory(inventoryName);
-        FirestoreDB.getItemsRef(username, inventoryName)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        Item item = documentSnapshot.toObject(Item.class);
-                        inventory.addItem(item);
-                    }
-                    inventoryAdapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    // TODO
-                });
+        FirestoreDB.getItemsRef(username, inventoryName).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                Item item = documentSnapshot.toObject(Item.class);
+                inventory.addItem(item);
+            }
+            updateTotals();
+            inventoryAdapter.notifyDataSetChanged();
+        }).addOnFailureListener(e -> {
+            // TODO
+        });
     }
 }

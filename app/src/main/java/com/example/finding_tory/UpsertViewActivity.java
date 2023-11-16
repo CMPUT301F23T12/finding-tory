@@ -106,7 +106,6 @@ public class UpsertViewActivity extends AppCompatActivity {
                 });
                 tags_container.addView(tagView);
             }
-
         }
 
 
@@ -146,10 +145,7 @@ public class UpsertViewActivity extends AppCompatActivity {
                 // checks for error and makes sure required input is filled
                 String error;
                 try {
-                    error = Item.errorHandleItemInput(
-                            date_purchased_text.getText().toString(),
-                            description_text.getText().toString(),
-                            estimated_cost_text.getText().toString());
+                    error = Item.errorHandleItemInput(date_purchased_text.getText().toString(), description_text.getText().toString(), estimated_cost_text.getText().toString());
                 } catch (ParseException e) {
                     error = "Invalid Date Format";
                 }
@@ -205,11 +201,10 @@ public class UpsertViewActivity extends AppCompatActivity {
      */
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
-            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item)
-                    .addOnSuccessListener(aVoid -> {
-                        // Item added successfully
-                        Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
-                    });
+            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item).addOnSuccessListener(aVoid -> {
+                // Item added successfully
+                Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
+            });
         }
     }
 
