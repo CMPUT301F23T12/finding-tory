@@ -5,21 +5,24 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
+
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class BulkTagFragment extends DialogFragment {
     private TagDialogListener listener;
     private RecyclerView tagsRecyclerView;
     private TagAdapter tagAdapter;
-    private ArrayList<String> allTags; // This should be populated with inventory.getTags()
+    private ArrayList<String> allTags;
     private ArrayList<String> selectedTags = new ArrayList<>();
 
     /**
@@ -58,25 +61,43 @@ public class BulkTagFragment extends DialogFragment {
         if (getArguments() != null) {
             inventory = (Inventory) getArguments().getSerializable("inventory");
         }
+        assert inventory != null;
+        allTags = inventory.getAllTags();
+        selectedTags = (ArrayList<String>) getArguments().getSerializable("tags");
 
         // Initialize RecyclerView and Adapter
-        tagsRecyclerView = view.findViewById(R.id.tagsRecyclerView);
-        tagsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        allTags = inventory.getTags();
-        selectedTags = new ArrayList<>((Set<String>) getArguments().getSerializable("tags"));
+        tagsRecyclerView = (RecyclerView) view.findViewById(R.id.tagsRecyclerView);
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setJustifyContent(JustifyContent.SPACE_AROUND);
+        tagsRecyclerView.setLayoutManager(layoutManager);
 
         tagAdapter = new TagAdapter(allTags, selectedTags);
         tagsRecyclerView.setAdapter(tagAdapter);
+
+        EditText tags_entered = view.findViewById(R.id.add_tags_edittext);
+
+        Button add_tags_button = view.findViewById(R.id.add_tags_button);
+        add_tags_button.setOnClickListener(v -> {
+            String tagText = tags_entered.getText().toString().trim();
+            String[] tagParts = tagText.split("\\s+");
+            for (String tag : tagParts) {
+                if (!tag.isEmpty() && !allTags.contains(tag)) {
+                    allTags.add(tag);
+                }
+            }
+            tags_entered.setText("");
+            tagAdapter.notifyDataSetChanged();
+        });
+
         // Add action buttons
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnAdd).setOnClickListener(v -> {
             if (listener != null) {
                 listener.onTagConfirmed(selectedTags); // Notify the listener
-
             }
             dismiss();
         });
-
         return builder.create();
     }
 

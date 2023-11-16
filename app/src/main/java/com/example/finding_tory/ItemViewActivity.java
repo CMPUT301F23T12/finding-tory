@@ -27,7 +27,9 @@ import java.util.Locale;
  * and updating item views.
  */
 public class ItemViewActivity extends AppCompatActivity {
-    Item selectedItem;
+    private String username;
+    private Inventory selectedInventory;
+    private Item selectedItem;
     int position;
 
     /**
@@ -44,6 +46,8 @@ public class ItemViewActivity extends AppCompatActivity {
         setTitle("View Item");
 
         // Retrieve the selected item from the Intent
+        username = (String) getIntent().getSerializableExtra("username");
+        selectedInventory = (Inventory) getIntent().getSerializableExtra("inventory");
         selectedItem = (Item) getIntent().getSerializableExtra("selectedItem");
         position = getIntent().getIntExtra("pos", 0);
 
@@ -107,7 +111,9 @@ public class ItemViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Start Edit Activity
                 Intent editItemIntent = new Intent(ItemViewActivity.this, UpsertViewActivity.class);
+                editItemIntent.putExtra("username", username);
                 editItemIntent.putExtra("selectedItem", selectedItem);
+                editItemIntent.putExtra("inventory", selectedInventory);
                 startActivityForResult(editItemIntent, ActivityCodes.EDIT_ITEM.getRequestCode());
             }
         });

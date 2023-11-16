@@ -63,9 +63,9 @@ public class LedgerAdapter extends ArrayAdapter<Inventory> {
         TextView valueTextView = view.findViewById(R.id.value_text);
 
         // modify TextViews with current item information
-        nameTextView.setText(inventory.getName());
+        nameTextView.setText(inventory.getInventoryName());
         countTextView.setText(String.format(Locale.CANADA, "Total items: %d",  inventory.getCount()));
-        valueTextView.setText(String.format(Locale.CANADA, "Total Value : $%.2f", inventory.getValue()));
+        valueTextView.setText(String.format(Locale.CANADA, "Total Value : $%.2f", inventory.getInventoryEstimatedValue()));
         return view;
     }
 }

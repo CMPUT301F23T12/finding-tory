@@ -20,7 +20,6 @@ import com.example.finding_tory.databinding.FragmentProfileBinding;
  * profile information.
  */
 public class ProfileFragment extends Fragment {
-
     private FragmentProfileBinding binding;
 
     /**

@@ -11,7 +11,15 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * SortItemFragment is a DialogFragment that allows users to choose sorting criteria.
+ * It provides a customizable dialog with sorting options, and it communicates the user's
+ * choice back to the parent context through the SortDialogListener interface.
+ */
 public class SortItemFragment extends DialogFragment {
+    /**
+     * The interface for event handling from the SortItemFragment.
+     */
     public interface SortDialogListener {
         void onDialogDismissed();
 
@@ -21,10 +29,23 @@ public class SortItemFragment extends DialogFragment {
     private SortItemFragment.SortDialogListener listener;
     private int i1 = -1, i2 = -1;
 
+    /**
+     * Sets the listener that will handle events from this dialog.
+     *
+     * @param listener The SortDialogListener to set.
+     */
     public void setSortDialogListener(SortItemFragment.SortDialogListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * Creates the sorting dialog with the specified options.
+     *
+     * @param savedInstanceState If the dialog is being re-initialized after previously
+     *                           being shut down, this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle).
+     * @return A new dialog instance to be displayed by the Fragment.
+     */
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -56,6 +77,11 @@ public class SortItemFragment extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Called when the dialog is closed.
+     *
+     * @param dialog The dialog that was dismissed.
+     */
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);

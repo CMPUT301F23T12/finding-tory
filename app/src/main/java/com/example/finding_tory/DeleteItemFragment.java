@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment;
 /**
  * DeleteItemFragment is a DialogFragment subclass used for confirming item deletion in the application.
  * It provides a dialog interface to the user for confirming or canceling the deletion of an item.
- *
+ * <p>
  * The fragment uses an AlertDialog to present the options to the user and communicates the user's actions
  * back to the parent context using a custom listener interface.
  */
