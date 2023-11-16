@@ -71,7 +71,6 @@ public class FirestoreDB {
         if (!FirestoreDB.isDebugMode()) {
 //            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(existingItem.getDescription()).delete();
             FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(updatedItem.getDescription()).set(updatedItem).addOnSuccessListener(aVoid -> {
-                System.out.println("hihihih");
             }).addOnFailureListener(e -> {
                 // Handle failure
                 e.printStackTrace();

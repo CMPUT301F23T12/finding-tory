@@ -267,7 +267,6 @@ public class InventoryViewActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         // adding new item to list once user submits new item
         if (requestCode == ActivityCodes.ADD_ITEM.getRequestCode()) {
-            System.out.println(requestCode);
             if (resultCode == RESULT_OK) {
                 assert data != null;
                 Item selectedItem = (Item) data.getSerializableExtra("item_to_add");
@@ -305,6 +304,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     public void updateTotals() {
         totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
         totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
+        FirestoreDB.getInventoriesRef(username).document(inventory.getInventoryName()).set(inventory);
     }
 
     /**

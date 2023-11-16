@@ -17,7 +17,6 @@ public class Inventory implements Serializable {
     private String inventoryName;
     private ArrayList<Item> items;
     private double inventoryEstimatedValue;
-    private int inventoryTotalItems;
     private ArrayList<String> allTags;
     private String sortType = "Description";
     private String sortOrder = "Ascending";
@@ -35,7 +34,6 @@ public class Inventory implements Serializable {
         this.inventoryName = name;
         this.items = new ArrayList<>();
         this.inventoryEstimatedValue = 0;
-        this.inventoryTotalItems = 0;
         this.allTags = new ArrayList<>();
     }
 
@@ -63,11 +61,6 @@ public class Inventory implements Serializable {
     @PropertyName("inventoryEstimatedValue")
     public double getInventoryEstimatedValue() {
         return inventoryEstimatedValue;
-    }
-
-    @PropertyName("inventoryTotalItems")
-    public int getInventoryTotalItems() {
-        return inventoryTotalItems;
     }
 
     /**
@@ -105,11 +98,6 @@ public class Inventory implements Serializable {
         for (Item item : items) {
             this.inventoryEstimatedValue += item.getEstimatedValue();
         }
-    }
-
-    public void setInventoryTotalItems() {
-        this.inventoryTotalItems = this.items.size();
-        System.out.println(this.items.size());
     }
 
     /**
@@ -162,7 +150,6 @@ public class Inventory implements Serializable {
         this.items.add(item);
         for (String s : item.getItemTags()) {
             if (!this.allTags.contains(capitalizeFirstLetter(s))) {
-                System.out.println(capitalizeFirstLetter(s));
                 this.allTags.add(capitalizeFirstLetter(s));
             }
         }

@@ -23,7 +23,6 @@ import com.google.firebase.firestore.QuerySnapshot;
  * This activity includes validation for user credentials and initiates transitions to other activities based on user actions.
  */
 public class LoginActivity extends AppCompatActivity {
-
     private EditText usernameEditText;
     private EditText passwordEditText;
 
@@ -70,8 +69,7 @@ public class LoginActivity extends AppCompatActivity {
                     loginUser("abc", "123");
                     // loginUser(username, password);
                 } else {
-                    Snackbar.make(v, "Invalid user credentials. Please try again.",
-                            Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
                     return;
                 }
             }
@@ -82,42 +80,38 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
 
         // Retrieve the user object from the Firestore document
-        FirestoreDB.getUsersRef().whereEqualTo("username", username)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        if (!queryDocumentSnapshots.isEmpty()) {
-                            DocumentSnapshot userSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+        FirestoreDB.getUsersRef().whereEqualTo("username", username).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    DocumentSnapshot userSnapshot = queryDocumentSnapshots.getDocuments().get(0);
 
-                            // Retrieve the user object from the Firestore document
-                            User user = userSnapshot.toObject(User.class);
+                    // Retrieve the user object from the Firestore document
+                    User user = userSnapshot.toObject(User.class);
 
-                            // User with the provided username exists, get the stored password from the query result
-                            String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
-                            if (enteredPassword.equals(storedPassword)) {
-                                Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
+                    // User with the provided username exists, get the stored password from the query result
+                    String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
+                    if (enteredPassword.equals(storedPassword)) {
+                        Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
 
-                                // Retrieve the user object from the Firestore document
-                                intent.putExtra("username", user.getUsername());
-                                startActivity(intent);
-                            } else {
-                                // Password is incorrect
-                                Snackbar.make(usernameEditText, "Invalid password. Please try again.", Snackbar.LENGTH_LONG).show();
-                            }
-                        } else {
-                            // User with the provided username doesn't exist
-                            Snackbar.make(usernameEditText, "User not found. Please try again.", Snackbar.LENGTH_LONG).show();
-                        }
+                        // Retrieve the user object from the Firestore document
+                        intent.putExtra("username", user.getUsername());
+                        startActivity(intent);
+                    } else {
+                        // Password is incorrect
+                        Snackbar.make(usernameEditText, "Invalid password. Please try again.", Snackbar.LENGTH_LONG).show();
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Handle the failure to query the database (e.g., network issues)
-                        Snackbar.make(usernameEditText, "Failed to check user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
-                    }
-                });
+                } else {
+                    // User with the provided username doesn't exist
+                    Snackbar.make(usernameEditText, "User not found. Please try again.", Snackbar.LENGTH_LONG).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Handle the failure to query the database (e.g., network issues)
+                Snackbar.make(usernameEditText, "Failed to check user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
-
 }

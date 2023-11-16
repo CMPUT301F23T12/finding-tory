@@ -11,7 +11,8 @@ public class User implements Serializable {
     private String password;
     private ArrayList<Inventory> inventories;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String name, String password) {
         this.username = username;
@@ -23,6 +24,7 @@ public class User implements Serializable {
     public void addInventory(Inventory inventory) {
         inventories.add(inventory);
     }
+
     public String getUsername() {
         return username;
     }
@@ -62,6 +64,6 @@ public class User implements Serializable {
         for (Inventory i : inventories) {
             s += i.getInventoryName() + " ";
         }
-        return  s;
+        return s;
     }
 }
