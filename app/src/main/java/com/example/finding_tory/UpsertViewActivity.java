@@ -95,7 +95,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         // if no data is sent through intent, then user wants to add an item
         if (extras != null) {
             item = (Item) (extras.getSerializable("selectedItem"));
-            tags.addAll(item.getItemTags());
+
             // TODO: add image uris for existing list items
             inventory = (Inventory) extras.getSerializable("inventory");
             username = (String) extras.getSerializable("username");
