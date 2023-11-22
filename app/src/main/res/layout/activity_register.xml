@@ -10,7 +10,7 @@
         android:id="@+id/finding_tory_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
+        android:layout_marginTop="72dp"
         android:text="Finding 'Tory"
         android:textSize="24sp"
         android:textStyle="bold"

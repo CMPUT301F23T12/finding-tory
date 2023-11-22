@@ -22,12 +22,14 @@ import java.util.Locale;
 /**
  * ItemViewActivity is an AppCompatActivity that displays detailed information about a selected item.
  * It allows users to view, edit, or delete an item, and navigate back to the inventory list.
- *
+ * <p>
  * This activity handles various user interactions such as editing item details, confirming item deletion,
  * and updating item views.
  */
 public class ItemViewActivity extends AppCompatActivity {
-    Item selectedItem;
+    private String username;
+    private Inventory selectedInventory;
+    private Item selectedItem;
     int position;
 
     /**
@@ -44,6 +46,8 @@ public class ItemViewActivity extends AppCompatActivity {
         setTitle("View Item");
 
         // Retrieve the selected item from the Intent
+        username = (String) getIntent().getSerializableExtra("username");
+        selectedInventory = (Inventory) getIntent().getSerializableExtra("inventory");
         selectedItem = (Item) getIntent().getSerializableExtra("selectedItem");
         position = getIntent().getIntExtra("pos", 0);
 
@@ -107,7 +111,9 @@ public class ItemViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Start Edit Activity
                 Intent editItemIntent = new Intent(ItemViewActivity.this, UpsertViewActivity.class);
+                editItemIntent.putExtra("username", username);
                 editItemIntent.putExtra("selectedItem", selectedItem);
+                editItemIntent.putExtra("inventory", selectedInventory);
                 startActivityForResult(editItemIntent, ActivityCodes.EDIT_ITEM.getRequestCode());
             }
         });

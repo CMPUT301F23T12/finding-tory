@@ -15,7 +15,7 @@ import java.util.Locale;
 
 /**
  * Implements adapter functionality in order to link the LedgerFragment's ListView
- *  element to the array of Inventories in a Ledger.
+ * element to the array of Inventories in a Ledger.
  */
 public class LedgerAdapter extends ArrayAdapter<Inventory> {
 
@@ -24,10 +24,9 @@ public class LedgerAdapter extends ArrayAdapter<Inventory> {
 
     /**
      * Creates a new LedgerAdapter object.
-     * @param context
-     *          view/element this adapter is subordinate to
-     * @param inventories
-     *          list of Inventory objects being wrapped into the ListView
+     *
+     * @param context     view/element this adapter is subordinate to
+     * @param inventories list of Inventory objects being wrapped into the ListView
      */
     public LedgerAdapter(Context context, ArrayList<Inventory> inventories) {
         super(context, 0, inventories);
@@ -38,15 +37,11 @@ public class LedgerAdapter extends ArrayAdapter<Inventory> {
 
     /**
      * Updates the contents of the TextView elements in a ledger row (ie. an inventory) to reflect
-     *  the state of a given Inventory object.
+     * the state of a given Inventory object.
      *
-     * @param position
-     *          index of the Item object whose info we wish to update
-     * @param convertView
-     *          view that will be returned at the end
-     * @param parent
-     *          used to define return in case convertView is null
-     *
+     * @param position    index of the Item object whose info we wish to update
+     * @param convertView view that will be returned at the end
+     * @param parent      used to define return in case convertView is null
      * @return the element that is updated
      */
     @NonNull
@@ -63,9 +58,9 @@ public class LedgerAdapter extends ArrayAdapter<Inventory> {
         TextView valueTextView = view.findViewById(R.id.value_text);
 
         // modify TextViews with current item information
-        nameTextView.setText(inventory.getName());
-        countTextView.setText(String.format(Locale.CANADA, "Total items: %d",  inventory.getCount()));
-        valueTextView.setText(String.format(Locale.CANADA, "Total Value : $%.2f", inventory.getValue()));
+        nameTextView.setText(inventory.getInventoryName());
+        countTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
+        valueTextView.setText(String.format(Locale.CANADA, "Total Value : $%.2f", inventory.getInventoryEstimatedValue()));
         return view;
     }
 }

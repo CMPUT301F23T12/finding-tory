@@ -36,26 +36,28 @@ import java.util.Locale;
  * This class is responsible for updating/inserting items in an inventory
  */
 public class UpsertViewActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
-    Button add_tags_button;
-    Button upload_image_button;
-    Button submit_button;
-    Button cancel_button;
-    TextView view_title;
-    LinearLayout tags_container;
-    EditText description_text;
-    EditText make_text;
-    EditText model_text;
-    EditText date_purchased_text;
-    EditText estimated_cost_text;
-    EditText serial_number_text;
-    EditText comment_text;
-    EditText tags_entered;
-    Item item;
+    private Button add_tags_button;
+    private Button upload_image_button;
+    private Button submit_button;
+    private Button cancel_button;
+    private TextView view_title;
+    private LinearLayout tags_container;
+    private EditText description_text;
+    private EditText make_text;
+    private EditText model_text;
+    private EditText date_purchased_text;
+    private EditText estimated_cost_text;
+    private EditText serial_number_text;
+    private EditText comment_text;
+    private EditText tags_entered;
+    private Item item;
     boolean isAdd = false;
     private ListView imageListView;
     private ImageAdapter imageAdapter;
     private ArrayList<Uri> imageUris = new ArrayList<>();
-    ArrayList<String> tags = new ArrayList<>();
+    private ArrayList<String> tags = new ArrayList<>();
+    private String username;
+    private Inventory inventory;
 
     /**
      * Initializes the activity, sets up the user interface, and prepares data models.
@@ -78,7 +80,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         model_text = findViewById(R.id.model_edittext);
         date_purchased_text = findViewById(R.id.date_edittext);
         estimated_cost_text = findViewById(R.id.amount_edittext);
-        estimated_cost_text.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10,2)});
+        estimated_cost_text.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(10, 2)});
         serial_number_text = findViewById(R.id.serial_number_edittext);
         comment_text = findViewById(R.id.comment_edittext);
         tags_entered = findViewById(R.id.add_tags_edittext);
@@ -91,14 +93,19 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         Bundle extras = getIntent().getExtras();
         item = null;
         // if no data is sent through intent, then user wants to add an item
-        if (extras == null)
-            isAdd = true;
-        else {
+        if (extras != null) {
             item = (Item) (extras.getSerializable("selectedItem"));
             tags.addAll(item.getItemTags());
             // TODO: add image uris for existing list items
+            inventory = (Inventory) extras.getSerializable("inventory");
+            username = (String) extras.getSerializable("username");
+            // if item != null then we are editing an item
+            if (item != null) {
+                tags.addAll(item.getItemTags());
+            } else {
+                isAdd = true;
+            }
         }
-
         //initializes UI based on if user wants to add or edit item
         if (isAdd) {
             view_title.setText("Add Item Information");
@@ -195,15 +202,12 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 // checks for error and makes sure required input is filled
                 String error;
                 try {
-                    error = Item.errorHandleItemInput(
-                            date_purchased_text.getText().toString(),
-                            description_text.getText().toString(),
-                            estimated_cost_text.getText().toString());
+                    error = Item.errorHandleItemInput(date_purchased_text.getText().toString(), description_text.getText().toString(), estimated_cost_text.getText().toString());
                 } catch (ParseException e) {
                     error = "Invalid Date Format";
                 }
 
-                if (!error.equals("")){
+                if (!error.equals("")) {
                     // TODO: display error message on screen
                     Toast toast = Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG);
                     toast.show();
@@ -228,7 +232,8 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                         intent.putExtra("item_to_add", upsert_item);
                         addItemToFirestore(upsert_item);
                     } else {
-                        editItemFromFirestore(item, upsert_item);
+//                        editItemFromFirestore(item, upsert_item);
+                        FirestoreDB.editItemFromFirestore(username, inventory, item, upsert_item);
                         intent.putExtra("editedItem", upsert_item);
                     }
                     setResult(RESULT_OK, intent); // sends item back to parent activity
@@ -255,30 +260,20 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      * @param item The item to be added to Firestore.
      */
     private void addItemToFirestore(Item item) {
-        FirestoreDB.getItemsRef().document(item.getDescription()).set(item)
-                .addOnSuccessListener(aVoid -> {
-                    // Item added successfully
-                    Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    /**
-     * Edits an item in Firestore by deleting and re-adding the item from the DB.
-     *
-     * @param existingItem The existing item to be edited.
-     * @param updatedItem  The updated item.
-     */
-    private void editItemFromFirestore(Item existingItem, Item updatedItem) {
-        FirestoreDB.getItemsRef().document(existingItem.getDescription()).delete();
-        FirestoreDB.getItemsRef().document(updatedItem.getDescription()).set(updatedItem);
+        if (!FirestoreDB.isDebugMode()) {
+            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item).addOnSuccessListener(aVoid -> {
+                // Item added successfully
+                Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     /**
      * Gets the date from the dater picker and formats it to be displayed to user
      *
-     * @param view the date picker picker
-     * @param year the year picked
-     * @param month the month picked
+     * @param view       the date picker picker
+     * @param year       the year picked
+     * @param month      the month picked
      * @param dayOfMonth the day picked
      */
     @Override

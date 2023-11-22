@@ -22,7 +22,7 @@ public class InventoryTest extends TestCase {
     }
 
     public void testTestGetName() {
-        assertEquals("Test Inventory", inventory.getName());
+        assertEquals("Test Inventory", inventory.getInventoryName());
     }
 
     public void testGetItems() {
@@ -37,12 +37,12 @@ public class InventoryTest extends TestCase {
 
     public void testGetValue() {
         inventory.calculateValue();
-        assertEquals(300.0, inventory.getValue());
+        assertEquals(300.0, inventory.getInventoryEstimatedValue());
     }
 
     public void testTestSetName() {
         inventory.setName("New Name");
-        assertEquals("New Name", inventory.getName());
+        assertEquals("New Name", inventory.getInventoryName());
     }
 
     public void testSetItems() {

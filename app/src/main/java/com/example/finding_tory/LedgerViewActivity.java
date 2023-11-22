@@ -5,22 +5,22 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.google.android.material.navigation.NavigationView;
-
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
+import com.example.finding_tory.ui.ledger.LedgerFragment;
+import com.google.android.material.navigation.NavigationView;
 
 /**
  * LedgerViewActivity is an AppCompatActivity that manages the main user interface for the application.
  * It sets up a DrawerLayout with a NavigationView for navigating between different sections of the app like ledger and profile.
- *
+ * <p>
  * This activity handles the setup of the app bar and navigation components and manages navigation between different fragments.
  */
 public class LedgerViewActivity extends AppCompatActivity {
@@ -37,6 +37,9 @@ public class LedgerViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Get user and pass to LedgerFragment
+        String username = (String) getIntent().getSerializableExtra("username");
+        LedgerFragment ledgerFragment = LedgerFragment.newInstance(username);
 
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -46,10 +49,13 @@ public class LedgerViewActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_ledger, R.id.nav_profile)
-                .setOpenableLayout(drawer)
-                .build();
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_ledger, R.id.nav_profile).setOpenableLayout(drawer).build();
+
+        // Use the NavController to navigate to the LedgerFragment
+        // initialize the navigation bar functionality
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        navController.navigate(R.id.nav_ledger, ledgerFragment.getArguments());
+        NavigationUI.setupWithNavController(navigationView, navController);
 
         // bind the logout "button" to end this activity
         LinearLayout logoutLayout = findViewById(R.id.logout_layout);
@@ -59,11 +65,6 @@ public class LedgerViewActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        // initialize the navigation bar functionality
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
 
         // override back button behaviour to toggle drawer instead of finish()
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -97,7 +98,6 @@ public class LedgerViewActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-                || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 }

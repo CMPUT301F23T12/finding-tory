@@ -26,25 +26,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/sort_inventory_button"
+        <ImageButton
+            android:id="@+id/sort_cancel_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="15dp"
-            android:text="v"
+            android:background="@drawable/sort_png"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="W,1:1"
-            app:layout_constraintEnd_toStartOf="@+id/filter_inventory_button"
+            app:layout_constraintEnd_toStartOf="@+id/filter_tag_button"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/filter_inventory_button"
+        <ImageButton
+            android:id="@+id/filter_tag_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="15dp"
-            android:text="Y"
+            android:background="@drawable/filter_png"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="W,1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -78,7 +78,7 @@
         android:layout_marginTop="10dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_item_button"
+        android:id="@+id/add_delete_item_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
