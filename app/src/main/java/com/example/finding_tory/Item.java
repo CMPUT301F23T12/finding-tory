@@ -22,7 +22,7 @@ public class Item implements Serializable {
     private float estimatedValue;
     private String comment;
     private ArrayList<String> itemTags;
-    private ArrayList<Uri> imageUris;
+    private ArrayList<String> imageUris;
 
     /**
      * No-args constructor, required for deserialization from Firestore.
@@ -43,7 +43,7 @@ public class Item implements Serializable {
      * @param comment        A comment about the item.
      * @param itemTags       A list of tags associated with the item.
      */
-    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags, ArrayList<Uri> imageUris) {
+    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags, ArrayList<String> imageUris) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -265,23 +265,23 @@ public class Item implements Serializable {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
-    public ArrayList<Uri> getImageUris() {
+    public ArrayList<String> getImageUris() {
         return imageUris;
     }
 
-    public void setImageUris(ArrayList<Uri> imageUris) {
+    public void setImageUris(ArrayList<String> imageUris) {
         this.imageUris = imageUris;
     }
 
     public void addImageUri(Uri uri) {
-        imageUris.add(uri);
+        imageUris.add(uri.toString());
     }
 
     public void deleteImageUri(int index) {
         imageUris.remove(index);
     }
 
-    public Uri getUri(int index) {
+    public String getUri(int index) {
         return imageUris.get(index);
     }
 

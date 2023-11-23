@@ -54,7 +54,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     boolean isAdd = false;
     private ListView imageListView;
     private ImageAdapter imageAdapter;
-    private ArrayList<Uri> imageUris = new ArrayList<>();
+    private ArrayList<String> imageUris = new ArrayList<>();
     private ArrayList<String> tags = new ArrayList<>();
     private String username;
     private Inventory inventory;
@@ -87,7 +87,13 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
         // sets image adapter to view image uploaded list
         imageListView = findViewById(R.id.image_listview);
-        imageAdapter = new ImageAdapter(this, imageUris);
+
+        //convert the URI strings to actual URI'S
+        ArrayList<Uri> trueImageUris = new ArrayList<>();
+        for (int i = 0; i < imageUris.size(); i++) {
+            trueImageUris.add(Uri.parse(imageUris.get(i)));
+        }
+        imageAdapter = new ImageAdapter(this, trueImageUris);
         imageListView.setAdapter(imageAdapter);
 
         Bundle extras = getIntent().getExtras();
@@ -357,14 +363,14 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         if (resultCode == Activity.RESULT_OK && requestCode == ActivityCodes.CAMERA_PHOTO.getRequestCode()) {
             Uri uri = data.getData();
             if (uri != null) {
-                imageUris.add(uri);
+                imageUris.add(uri.toString());
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
         } else if (resultCode == Activity.RESULT_OK && requestCode == ActivityCodes.GALLERY_PHOTO.getRequestCode()) {
             Uri uri = data.getData();
             if (uri != null) {
-                imageUris.add(uri);
+                imageUris.add(uri.toString());
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
