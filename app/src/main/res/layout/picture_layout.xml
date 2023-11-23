@@ -22,7 +22,7 @@
         android:textSize="18sp"/>
 
     <ImageButton
-        android:id="@+id/remove_tag_button"
+        android:id="@+id/remove_image_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center_vertical|end"

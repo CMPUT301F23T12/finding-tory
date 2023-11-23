@@ -6,8 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,6 +40,13 @@ public class ImageAdapter extends ArrayAdapter<Uri> {
         image.setImageURI(uri);
         TextView imageTitle = view.findViewById(R.id.image_title);
         imageTitle.setText("image-" + Integer.toString(position+1));
+        ImageButton delete_button = view.findViewById(R.id.remove_image_button);
+        delete_button.setOnClickListener(v -> {
+            View parentRow = (View) v.getParent();
+            ListView listView = (ListView) parentRow.getParent();
+            final int item_number = listView.getPositionForView(parentRow);
+            Toast.makeText(v.getContext(), "Button 1  clicked for row position=" + position, Toast.LENGTH_SHORT).show();
+        });
 
         return view;
     }
