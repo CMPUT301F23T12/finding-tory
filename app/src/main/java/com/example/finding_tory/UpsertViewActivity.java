@@ -36,7 +36,7 @@ import java.util.Locale;
 /**
  * This class is responsible for updating/inserting items in an inventory
  */
-public class UpsertViewActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class UpsertViewActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, ImageAdapter.OnDeleteButtonClickListener {
     private Button add_tags_button;
     private Button upload_image_button;
     private Button submit_button;
@@ -89,11 +89,11 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
         // sets image adapter to view image uploaded list
         imageListView = findViewById(R.id.image_listview);
-
         //convert the URI strings to actual URI'S
         castStringToUri();
         imageAdapter = new ImageAdapter(this, trueImageUris);
         imageListView.setAdapter(imageAdapter);
+        imageAdapter.setOnDeleteButtonClickListener(this);
 
         Bundle extras = getIntent().getExtras();
         item = null;
@@ -418,5 +418,17 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         for (int i = 0; i < imageUris.size(); i++) {
             trueImageUris.add(Uri.parse(imageUris.get(i)));
         }
+    }
+    /**
+     * deletes an image from the listed images
+     * called when the user clicks on the delete button of a given image
+     */
+    @Override
+    public void onDeleteButtonClick(int position) {
+        imageUris.remove(position);
+        castStringToUri();
+        imageAdapter.notifyDataSetChanged();
+        position += 1;
+        Toast.makeText(this, "Image " + position + " deleted", Toast.LENGTH_SHORT).show();
     }
 }

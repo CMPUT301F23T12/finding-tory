@@ -20,6 +20,7 @@ import java.util.ArrayList;
 public class ImageAdapter extends ArrayAdapter<Uri> {
     private ArrayList<Uri> uris;
     private Context context;
+    private OnDeleteButtonClickListener onDeleteButtonClickListener;
 
     public ImageAdapter(Context context, ArrayList<Uri> uris) {
         super(context, R.layout.picture_layout, uris);
@@ -40,14 +41,25 @@ public class ImageAdapter extends ArrayAdapter<Uri> {
         image.setImageURI(uri);
         TextView imageTitle = view.findViewById(R.id.image_title);
         imageTitle.setText("image-" + Integer.toString(position+1));
+
+        // make the image delete buttons functional
         ImageButton delete_button = view.findViewById(R.id.remove_image_button);
         delete_button.setOnClickListener(v -> {
-            View parentRow = (View) v.getParent();
-            ListView listView = (ListView) parentRow.getParent();
-            final int item_number = listView.getPositionForView(parentRow);
-            Toast.makeText(v.getContext(), "Button 1  clicked for row position=" + position, Toast.LENGTH_SHORT).show();
+            if (onDeleteButtonClickListener != null) {
+                onDeleteButtonClickListener.onDeleteButtonClick(position);
+            }
         });
 
         return view;
+    }
+    /**
+     * sets a listener to an adapter in a parent class that will allow the adapter to listen for clicks here
+     * called for the image adapter when a new upsertview activity is started
+     */
+    public void setOnDeleteButtonClickListener(OnDeleteButtonClickListener listener) {
+        this.onDeleteButtonClickListener = listener;
+    }
+    public interface OnDeleteButtonClickListener {
+        void onDeleteButtonClick(int position);
     }
 }
