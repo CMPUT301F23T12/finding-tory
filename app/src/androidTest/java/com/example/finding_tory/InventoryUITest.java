@@ -21,6 +21,7 @@ import androidx.test.espresso.Espresso;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.idling.CountingIdlingResource;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -39,7 +40,7 @@ import org.junit.runners.MethodSorters;
 public class InventoryUITest {
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule = new ActivityScenarioRule<>(LoginActivity.class);
-    private MyIdlingResource idlingResource;
+    private CountingIdlingResource idlingResource;
 
     @Test
     public void testAddAndDeleteItem() {
@@ -176,6 +177,7 @@ public class InventoryUITest {
     public void login() {
         onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("abc"));
         onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("123"));
+
         onView(withId(R.id.button_login)).perform(click());
     }
 
@@ -220,7 +222,7 @@ public class InventoryUITest {
     @Before
     public void setUp() {
         // Initialize your IdlingResource that monitors your DB operations
-        idlingResource = new MyIdlingResource();
+        idlingResource = new CountingIdlingResource("DataLoader");
         // Register the IdlingResource with Espresso
         IdlingRegistry.getInstance().register(idlingResource);
     }
@@ -232,12 +234,11 @@ public class InventoryUITest {
     }
 
     @Test
-    public void addTestData() {
-//        IdlingRegistry.getInstance().register(myIdlingResource);
+    public void addTestData() {IdlingRegistry.getInstance().register(idlingResource);
         login();
-        idlingResource.setIdle(false);
+        idlingResource.increment();
         navigateToInventory();
-        idlingResource.setIdle(true);
+        idlingResource.decrement();
 //        IdlingRegistry.getInstance().unregister(myIdlingResource);
 //        onView(withId(R.id.add_delete_item_button)).perform(click());
 //        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
