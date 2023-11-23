@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,6 +126,10 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             serial_number_text.setText(item.getSerialNumber());
             comment_text.setText(item.getComment());
             submit_button.setText("Update");
+            imageUris = item.getImageUris();
+            castStringToUri();
+            imageAdapter.notifyDataSetChanged();
+            justifyListViewHeightBasedOnChildren();
             for (String tag : tags) {
                 View tagView = LayoutInflater.from(this).inflate(R.layout.tag_item_layout, tags_container, false);
                 TextView tagTextView = tagView.findViewById(R.id.tag_text);
