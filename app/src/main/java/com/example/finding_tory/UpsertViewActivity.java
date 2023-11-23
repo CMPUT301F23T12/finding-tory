@@ -55,6 +55,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private ListView imageListView;
     private ImageAdapter imageAdapter;
     private ArrayList<String> imageUris = new ArrayList<>();
+    private ArrayList<Uri> trueImageUris = new ArrayList<>();
     private ArrayList<String> tags = new ArrayList<>();
     private String username;
     private Inventory inventory;
@@ -89,10 +90,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         imageListView = findViewById(R.id.image_listview);
 
         //convert the URI strings to actual URI'S
-        ArrayList<Uri> trueImageUris = new ArrayList<>();
-        for (int i = 0; i < imageUris.size(); i++) {
-            trueImageUris.add(Uri.parse(imageUris.get(i)));
-        }
+        castStringToUri();
         imageAdapter = new ImageAdapter(this, trueImageUris);
         imageListView.setAdapter(imageAdapter);
 
@@ -138,6 +136,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 });
                 tags_container.addView(tagView);
             }
+            castStringToUri();
             imageAdapter.notifyDataSetChanged();
         }
 
@@ -364,6 +363,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             Uri uri = data.getData();
             if (uri != null) {
                 imageUris.add(uri.toString());
+                castStringToUri();
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
@@ -371,6 +371,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             Uri uri = data.getData();
             if (uri != null) {
                 imageUris.add(uri.toString());
+                castStringToUri();
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
@@ -402,5 +403,15 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         par.height = totalHeight + (imageListView.getDividerHeight() * (imageAdapter.getCount() - 1));
         imageListView.setLayoutParams(par);
         imageListView.requestLayout();
+    }
+    /**
+     * takes the item's stored string representations of uri's and turns them into actual uri's
+     * called whenever the list of images is updated (image is added or deleted)
+     */
+    private void castStringToUri() {
+        trueImageUris.clear(); // clear the true Uris to update it with the new list
+        for (int i = 0; i < imageUris.size(); i++) {
+            trueImageUris.add(Uri.parse(imageUris.get(i)));
+        }
     }
 }
