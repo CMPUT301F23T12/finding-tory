@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.anything;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.util.Log;
 
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.IdlingRegistry;
@@ -50,6 +51,7 @@ public class InventoryUITest {
         catch (Exception e) {
             
         }
+
         onView(withId(R.id.add_delete_item_button)).perform(click());
 
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Apple Macbook Pro 2022"));
@@ -182,6 +184,7 @@ public class InventoryUITest {
     }
 
     public void navigateToInventory() {;
+        login();
         onData(anything())
                 .inAdapterView(withId(R.id.ledger_listview))
                 .atPosition(0)
@@ -277,7 +280,6 @@ public class InventoryUITest {
 
     @Test
     public void addTestData2() throws InterruptedException {
-        login();
         Thread.sleep(2000);
         navigateToInventory();
 
