@@ -100,8 +100,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         // if no data is sent through intent, then user wants to add an item
         if (extras != null) {
             item = (Item) (extras.getSerializable("selectedItem"));
-
-            // TODO: add image uris for existing list items
             inventory = (Inventory) extras.getSerializable("inventory");
             username = (String) extras.getSerializable("username");
             // if item != null then we are editing an item
@@ -198,7 +196,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             @Override
             public void onClick(View view) {
                 chooseImageDialog();
-                //TODO: add functionality to remove image
             }
         });
 
