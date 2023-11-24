@@ -1,6 +1,7 @@
 package com.example.finding_tory;
 
 import android.app.DatePickerDialog;
+import android.app.Instrumentation;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -14,7 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +35,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private Button add_tags_button;
     private Button submit_button;
     private Button cancel_button;
+    private ImageButton scan_barcode_button;
     private TextView view_title;
     private LinearLayout tags_container;
     private EditText description_text;
@@ -59,6 +65,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         add_tags_button = findViewById(R.id.add_tags_button);
         submit_button = findViewById(R.id.add_button);
         cancel_button = findViewById(R.id.cancel_button);
+        scan_barcode_button = findViewById(R.id.scan_barcode_button);
         view_title = findViewById(R.id.upsert_title);
         tags_container = findViewById(R.id.tags_container);
         description_text = findViewById(R.id.description_edittext);
@@ -129,6 +136,16 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
                 DatePickerDialogFragment.setArguments(bundle);
                 DatePickerDialogFragment.show(getSupportFragmentManager(), "DATE PICK");
+            }
+        });
+
+        /**
+         * User scans a barcode to fill out serial number field
+         */
+        scan_barcode_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scanBarcode();
             }
         });
 
@@ -233,6 +250,24 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             });
         }
     }
+
+
+    /**
+     * Launches activity to scan barcode of a product
+     */
+    public void scanBarcode() {
+        ScanOptions options = new ScanOptions();
+        options.setOrientationLocked(true);
+        options.setCaptureActivity(CaptureAct.class);
+        barcodeLauncher.launch(options);
+    }
+
+    // retrieves data from barcode scanner and displays it to serial number field
+    ActivityResultLauncher<ScanOptions> barcodeLauncher= registerForActivityResult(new ScanContract(), result -> {
+        if (result.getContents() != null) {
+            serial_number_text.setText(result.getContents());
+        }
+    });
 
     /**
      * Gets the date from the dater picker and formats it to be displayed to user

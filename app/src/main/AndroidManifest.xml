@@ -49,6 +49,11 @@
             android:exported="false">
         </activity>
 
+        <activity
+            android:name=".CaptureAct"
+            android:screenOrientation="portrait"
+            android:theme="@style/zxing_CaptureTheme" />
+
     </application>
 
 </manifest>
