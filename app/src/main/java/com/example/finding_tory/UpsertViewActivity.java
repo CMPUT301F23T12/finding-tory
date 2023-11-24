@@ -425,6 +425,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         imageUris.remove(position);
         castStringToUri();
         imageAdapter.notifyDataSetChanged();
+        justifyListViewHeightBasedOnChildren();
         position += 1;
         Toast.makeText(this, "Image " + position + " deleted", Toast.LENGTH_SHORT).show();
     }
