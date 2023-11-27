@@ -41,6 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
+        android:id="@+id/ll_profile_stats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/text_userid"
@@ -58,7 +59,7 @@
             android:textStyle="bold"
             android:textAlignment="center"
             android:layout_marginBottom="8dp"
-            android:text="Profile Statistics" />
+            android:text="@string/profile_statistics_title" />
 
         <TextView
             android:id="@+id/text_num_inventories"
@@ -85,5 +86,25 @@
             android:text="Total value: $5000" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/edit_profile_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/ll_profile_stats"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/change_password_button"
+        android:layout_marginTop="32dp"
+        android:text="@string/edit_profile_btn_text" />
+
+    <Button
+        android:id="@+id/change_password_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/ll_profile_stats"
+        app:layout_constraintStart_toEndOf="@+id/edit_profile_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:text="@string/change_password_btn_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
