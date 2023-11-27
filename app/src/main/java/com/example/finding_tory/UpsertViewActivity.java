@@ -264,7 +264,16 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     // retrieves data from barcode scanner and displays it to serial number field
     ActivityResultLauncher<ScanOptions> barcodeLauncher= registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
-            //TODO: use barcode product number to get and fill info about product
+            TestBarcodeContainer testBarcode = new TestBarcodeContainer();
+            Barcode barcode = testBarcode.getBarcodeInfo(result.getContents());
+            if (barcode != null) {
+                description_text.setText(barcode.getDescription());
+                make_text.setText(barcode.getMake());
+                model_text.setText(barcode.getModel());
+                estimated_cost_text.setText(barcode.getCost());
+            } else {
+                Toast.makeText(UpsertViewActivity.this, "Invalid Barcode Scanned.", Toast.LENGTH_SHORT).show();
+            }
         }
     });
 
