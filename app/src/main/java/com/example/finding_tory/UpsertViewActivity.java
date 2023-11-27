@@ -1,7 +1,6 @@
 package com.example.finding_tory;
 
 import android.app.DatePickerDialog;
-import android.app.Instrumentation;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -265,7 +264,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     // retrieves data from barcode scanner and displays it to serial number field
     ActivityResultLauncher<ScanOptions> barcodeLauncher= registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
-            serial_number_text.setText(result.getContents());
+            //TODO: use barcode product number to get and fill info about product
         }
     });
 
