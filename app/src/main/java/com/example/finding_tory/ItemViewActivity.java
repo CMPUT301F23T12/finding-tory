@@ -2,11 +2,13 @@ package com.example.finding_tory;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -198,6 +200,13 @@ public class ItemViewActivity extends AppCompatActivity {
 
         TextView item_serial_number = findViewById(R.id.item_serial_number_text);
         item_serial_number.setText(passedItem.getSerialNumber());
+
+        //if the item does not have an empty list of images, set the image view of the item to the first picture of the item
+        if (passedItem.getImageUris() != null) {
+            ImageView image = findViewById(R.id.item_image);
+            image.setImageURI(Uri.parse(passedItem.getImageUris().get(0)));
+        }
+
 
         LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
         tagsContainer.removeAllViews();
