@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
@@ -32,6 +33,7 @@ public class ItemViewActivity extends AppCompatActivity {
     private String username;
     private Inventory selectedInventory;
     private Item selectedItem;
+    int picture_index;
     int position;
 
     /**
@@ -124,7 +126,7 @@ public class ItemViewActivity extends AppCompatActivity {
         leftPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: Will Implement Later
+                updateImage(-1, selectedItem);
             }
         });
 
@@ -132,7 +134,7 @@ public class ItemViewActivity extends AppCompatActivity {
         rightPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: Will Implement Later
+                updateImage(1, selectedItem);
             }
         });
     }
@@ -205,8 +207,8 @@ public class ItemViewActivity extends AppCompatActivity {
         if (passedItem.getImageUris() != null) {
             ImageView image = findViewById(R.id.item_image);
             image.setImageURI(Uri.parse(passedItem.getImageUris().get(0)));
+            picture_index = 0;
         }
-
 
         LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
         tagsContainer.removeAllViews();
@@ -220,6 +222,30 @@ public class ItemViewActivity extends AppCompatActivity {
             removeTagButton.setVisibility(View.GONE);
             tagsContainer.addView(tagView); // Add the tag view to the container
 
+        }
+    }
+
+    /**
+     * Updates the image displayed for the item, called when the left or right buttons for image are pressed
+     *
+     * @param direction (int): either -1 to signify left or 1 to signify right
+     *        item (Item): the item that we are currently viewing
+     */
+    private void updateImage(int direction, Item item) {
+        if (item.getImageUris() == null) { //no images exist
+            Toast.makeText(this, "No images to show", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (picture_index == 0 && direction == -1) { //if we are on leftmost image and trying to go left, do nothing
+            Toast.makeText(this, "This is the first image for this item", Toast.LENGTH_SHORT).show();
+        } else if (picture_index == item.getImageUris().size()-1 && direction == 1) { //if we are on leftmost image and trying to go left, do nothing
+            Toast.makeText(this, "This is the final image for this item", Toast.LENGTH_SHORT).show();
+        }
+        else { //update the image
+            picture_index += direction;
+            ImageView image = findViewById(R.id.item_image);
+            image.setImageURI(Uri.parse(item.getImageUris().get(picture_index)));
         }
     }
 }
