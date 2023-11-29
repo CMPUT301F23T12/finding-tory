@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * A container class to hold barcodes that will be used for testing
  */
 public class TestBarcodeContainer {
-    public static ArrayList<Barcode> barcodes = new ArrayList<>();
+    private static ArrayList<Barcode> barcodes = new ArrayList<>();
 
     /**
      * Constructs a TestBarcodeContainer with all test barcodes data added
