@@ -25,6 +25,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -270,6 +273,26 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      */
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
+            // Upload images to Firebase Storage
+            // This code could be in a method where you handle image uploads
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("images");
+            String itemId = item.getDescription() + "-" + item.getPurchaseDate() + "-" + item.getEstimatedValue();
+
+            for (int i = 0; i < imageUris.size();i++) {
+                UploadTask uploadTask = storageRef.child(itemId).child("image.jpg").putFile(Uri.parse(imageUris.get(i)));
+
+                uploadTask.addOnSuccessListener(taskSnapshot -> {
+                    storageRef.child(itemId).child("image.jpg").getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        // TODO: store the download URL in Firestore
+                        Toast.makeText(UpsertViewActivity.this, "Image added!", Toast.LENGTH_SHORT).show();
+                    });
+                }).addOnFailureListener(exception -> {
+                    Log.e("FirebaseStorage", "Upload failed: " + exception.getMessage());
+                    exception.printStackTrace();
+                });
+            }
+
             FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item).addOnSuccessListener(aVoid -> {
                 // Item added successfully
                 Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();

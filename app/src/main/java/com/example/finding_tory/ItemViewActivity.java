@@ -204,7 +204,7 @@ public class ItemViewActivity extends AppCompatActivity {
         item_serial_number.setText(passedItem.getSerialNumber());
 
         //if the item does not have an empty list of images, set the image view of the item to the first picture of the item
-        if (passedItem.getImageUris() != null) {
+        if (passedItem.getImageUris() != null && passedItem.getImageUris().size() > 0) {
             ImageView image = findViewById(R.id.item_image);
             image.setImageURI(Uri.parse(passedItem.getImageUris().get(0)));
             picture_index = 0;
