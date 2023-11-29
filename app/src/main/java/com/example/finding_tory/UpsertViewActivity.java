@@ -274,17 +274,19 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
             // Upload images to Firebase Storage
-            // This code could be in a method where you handle image uploads
             StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("images");
-            String itemId = item.getDescription() + "-" + item.getPurchaseDate() + "-" + item.getEstimatedValue();
+            String itemId = item.getDescription() + "-" + item.getPurchaseDate() + "-" + item.getEstimatedValue(); //assumes the desc-date-value is unique to this item
 
             for (int i = 0; i < imageUris.size();i++) {
-                UploadTask uploadTask = storageRef.child(itemId).child("image.jpg").putFile(Uri.parse(imageUris.get(i)));
+                int temp = i+1;
+                String pathString = "image-" + temp + ".jpg";
+                UploadTask uploadTask = storageRef.child(itemId).child(pathString).putFile(Uri.parse(imageUris.get(i)));
 
                 uploadTask.addOnSuccessListener(taskSnapshot -> {
-                    storageRef.child(itemId).child("image.jpg").getDownloadUrl().addOnSuccessListener(uri -> {
+                    storageRef.child(itemId).child(pathString).getDownloadUrl().addOnSuccessListener(uri -> {
                         String downloadUrl = uri.toString();
                         // TODO: store the download URL in Firestore
+                        Log.e("FirebaseStorage", "Upload success: " + downloadUrl);
                         Toast.makeText(UpsertViewActivity.this, "Image added!", Toast.LENGTH_SHORT).show();
                     });
                 }).addOnFailureListener(exception -> {
