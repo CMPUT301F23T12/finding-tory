@@ -22,7 +22,7 @@ public class Item implements Serializable {
     private float estimatedValue;
     private String comment;
     private ArrayList<String> itemTags;
-    private ArrayList<String> imageUris;
+    private ArrayList<String> imageLinks;
 
     /**
      * No-args constructor, required for deserialization from Firestore.
@@ -43,7 +43,7 @@ public class Item implements Serializable {
      * @param comment        A comment about the item.
      * @param itemTags       A list of tags associated with the item.
      */
-    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags, ArrayList<String> imageUris) {
+    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags, ArrayList<String> imageLinks) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -51,7 +51,7 @@ public class Item implements Serializable {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
-        this.imageUris = imageUris;
+        this.imageLinks = imageLinks;
         this.setItemTags(itemTags);
     }
 
@@ -69,7 +69,7 @@ public class Item implements Serializable {
         this.estimatedValue = copy.getEstimatedValue();
         this.comment = copy.getComment();
         this.itemTags = copy.getItemTags();
-        this.imageUris = copy.getImageUris();
+        this.imageLinks = copy.getImageLinks();
     }
 
     /**
@@ -265,24 +265,24 @@ public class Item implements Serializable {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
-    public ArrayList<String> getImageUris() {
-        return imageUris;
+    public ArrayList<String> getImageLinks() {
+        return imageLinks;
     }
 
-    public void setImageUris(ArrayList<String> imageUris) {
-        this.imageUris = imageUris;
+    public void setImageLinks(ArrayList<String> imageLinks) {
+        this.imageLinks = imageLinks;
     }
 
-    public void addImageUri(Uri uri) {
-        imageUris.add(uri.toString());
+    public void addImageLink(String link) {
+        imageLinks.add(link);
     }
 
-    public void deleteImageUri(int index) {
-        imageUris.remove(index);
+    public void deleteImageLink(int index) {
+        imageLinks.remove(index);
     }
 
-    public String getUri(int index) {
-        return imageUris.get(index);
+    public String getLink(int index) {
+        return imageLinks.get(index);
     }
 
     /**

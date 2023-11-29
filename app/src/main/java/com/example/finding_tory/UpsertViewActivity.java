@@ -127,8 +127,8 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             serial_number_text.setText(item.getSerialNumber());
             comment_text.setText(item.getComment());
             submit_button.setText("Update");
-            if (item.getImageUris() != null) {
-                imageUris = item.getImageUris();
+            if (item.getImageLinks() != null) {
+                imageUris = item.getImageLinks();
             }
             castStringToUri();
             imageAdapter.notifyDataSetChanged();

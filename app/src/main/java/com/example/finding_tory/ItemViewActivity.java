@@ -204,9 +204,9 @@ public class ItemViewActivity extends AppCompatActivity {
         item_serial_number.setText(passedItem.getSerialNumber());
 
         //if the item does not have an empty list of images, set the image view of the item to the first picture of the item
-        if (passedItem.getImageUris() != null && passedItem.getImageUris().size() > 0) {
+        if (passedItem.getImageLinks() != null && passedItem.getImageLinks().size() > 0) {
             ImageView image = findViewById(R.id.item_image);
-            image.setImageURI(Uri.parse(passedItem.getImageUris().get(0)));
+            image.setImageURI(Uri.parse(passedItem.getImageLinks().get(0)));
             picture_index = 0;
         }
 
@@ -232,20 +232,20 @@ public class ItemViewActivity extends AppCompatActivity {
      *        item (Item): the item that we are currently viewing
      */
     private void updateImage(int direction, Item item) {
-        if (item.getImageUris() == null) { //no images exist
+        if (item.getImageLinks() == null) { //no images exist
             Toast.makeText(this, "No images to show", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (picture_index == 0 && direction == -1) { //if we are on leftmost image and trying to go left, do nothing
             Toast.makeText(this, "This is the first image for this item", Toast.LENGTH_SHORT).show();
-        } else if (picture_index == item.getImageUris().size()-1 && direction == 1) { //if we are on leftmost image and trying to go left, do nothing
+        } else if (picture_index == item.getImageLinks().size()-1 && direction == 1) { //if we are on leftmost image and trying to go left, do nothing
             Toast.makeText(this, "This is the final image for this item", Toast.LENGTH_SHORT).show();
         }
         else { //update the image
             picture_index += direction;
             ImageView image = findViewById(R.id.item_image);
-            image.setImageURI(Uri.parse(item.getImageUris().get(picture_index)));
+            image.setImageURI(Uri.parse(item.getImageLinks().get(picture_index)));
         }
     }
 }
