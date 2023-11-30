@@ -20,29 +20,24 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is responsible for updating/inserting items in an inventory
@@ -52,6 +47,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private Button upload_image_button;
     private Button submit_button;
     private Button cancel_button;
+    private ImageButton scan_barcode_button;
     private TextView view_title;
     private LinearLayout tags_container;
     private EditText description_text;
@@ -86,6 +82,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         submit_button = findViewById(R.id.add_button);
         upload_image_button = findViewById(R.id.upload_images_button);
         cancel_button = findViewById(R.id.cancel_button);
+        scan_barcode_button = findViewById(R.id.scan_barcode_button);
         view_title = findViewById(R.id.upsert_title);
         tags_container = findViewById(R.id.tags_container);
         description_text = findViewById(R.id.description_edittext);
@@ -180,6 +177,16 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
                 DatePickerDialogFragment.setArguments(bundle);
                 DatePickerDialogFragment.show(getSupportFragmentManager(), "DATE PICK");
+            }
+        });
+
+        /**
+         * User scans a barcode to fill out serial number field
+         */
+        scan_barcode_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scanBarcode();
             }
         });
 
@@ -326,6 +333,33 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             });
         }
     }
+
+
+    /**
+     * Launches activity to scan barcode of a product
+     */
+    public void scanBarcode() {
+        ScanOptions options = new ScanOptions();
+        options.setOrientationLocked(true);
+        options.setCaptureActivity(CaptureAct.class);
+        barcodeLauncher.launch(options);
+    }
+
+    // retrieves data from barcode scanner and displays it to serial number field
+    ActivityResultLauncher<ScanOptions> barcodeLauncher= registerForActivityResult(new ScanContract(), result -> {
+        if (result.getContents() != null) {
+            TestBarcodeContainer testBarcode = new TestBarcodeContainer();
+            Barcode barcode = testBarcode.getBarcodeInfo(result.getContents());
+            if (barcode != null) {
+                description_text.setText(barcode.getDescription());
+                make_text.setText(barcode.getMake());
+                model_text.setText(barcode.getModel());
+                estimated_cost_text.setText(barcode.getCost());
+            } else {
+                Toast.makeText(UpsertViewActivity.this, "Invalid Barcode Scanned.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    });
 
     /**
      * Gets the date from the dater picker and formats it to be displayed to user
