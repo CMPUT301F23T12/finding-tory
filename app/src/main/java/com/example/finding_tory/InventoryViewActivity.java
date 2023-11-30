@@ -18,6 +18,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -202,7 +203,22 @@ public class InventoryViewActivity extends AppCompatActivity {
                     tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
                     greyBack.setVisibility(View.VISIBLE);
                 } else {
-                    // add filter functionality
+                    final View greyBack = findViewById(R.id.fadeBackground);
+                    FilterFragment filterDialog = new FilterFragment();
+                    filterDialog.setFilterDialogListener(new FilterFragment.FilterDialogListener() {
+                        @Override
+                        public void onFilterDismissed() {
+                            greyBack.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onFilterConfirmed(Date filterStartDate, Date filterEndDate) {
+                            // inventoryAdapter.filterByDateRange(filterStartDate, filterEndDate);
+                            // inventoryAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    filterDialog.show(getSupportFragmentManager(), "FILTER_ITEMS");
+                    greyBack.setVisibility(View.VISIBLE);
                 }
             }
         });

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textViewFilterTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filter Items"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+<!--    <LinearLayout-->
+<!--        android:id="@+id/temp"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/textViewFilterTitle"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:paddingBottom="16dp">-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/date_title"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:paddingEnd="5dp"-->
+<!--            android:text="Purchase Date"-->
+<!--            android:textSize="18sp"-->
+<!--            android:textStyle="bold" />-->
+
+<!--        <EditText-->
+<!--            android:id="@+id/date_edittext"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:clickable="true"-->
+<!--            android:cursorVisible="false"-->
+<!--            android:focusable="false"-->
+<!--            android:hint="YYYY-MM-DD"-->
+<!--            android:inputType="date" />-->
+
+<!--    </LinearLayout>-->
+
+    <TextView
+        android:id="@+id/selectedDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selected Date Range"
+        android:layout_below="@id/textViewFilterTitle"
+        android:textAlignment="center"
+        android:textColor="@color/black" />
+
+    <Button
+        android:id="@+id/datePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectedDate"
+        android:text="Open Dialog"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/editTextMake"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/datePicker"
+        android:hint="Make" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tagsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextMake"
+        android:orientation="horizontal"
+        android:scrollbars="vertical" />
+
+    <LinearLayout
+        android:id="@+id/llDialogButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tagsRecyclerView"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- Cancel button -->
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:text="Cancel" />
+
+        <!-- Delete button -->
+        <Button
+            android:id="@+id/btnFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:text="Filter"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</RelativeLayout>
