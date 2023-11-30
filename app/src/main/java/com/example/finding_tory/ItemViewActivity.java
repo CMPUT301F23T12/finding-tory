@@ -208,10 +208,14 @@ public class ItemViewActivity extends AppCompatActivity {
 
         //if the item does not have an empty list of images, set the image view of the item to the first picture of the item
         if (passedItem.getImageLinks() != null && passedItem.getImageLinks().size() > 0) {
+            findViewById(R.id.image_slider_placeholder).setVisibility(View.VISIBLE);
             ImageView image = findViewById(R.id.item_image);
             picture_index = 0;
             Picasso.get().load(passedItem.getImageLinks().get(picture_index)).into(image);
 
+        }
+        else {
+            findViewById(R.id.image_slider_placeholder).setVisibility(View.GONE);
         }
 
         LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
@@ -236,7 +240,6 @@ public class ItemViewActivity extends AppCompatActivity {
      *        item (Item): the item that we are currently viewing
      */
     private void updateImage(int direction, Item item) {
-        Log.e("image stuff", "direction: " + direction + " image links: " + item.getImageLinks());
         if (item.getImageLinks() == null || item.getImageLinks().size() == 0 ) { //no images exist
             Toast.makeText(this, "No images to show", Toast.LENGTH_SHORT).show();
             return;

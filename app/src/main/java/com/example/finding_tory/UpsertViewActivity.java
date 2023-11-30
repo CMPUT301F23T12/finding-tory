@@ -100,9 +100,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         imageAdapter = new ImageAdapter(this, imageUris);
         imageListView.setAdapter(imageAdapter);
         imageAdapter.setOnDeleteButtonClickListener(this);
-        //
-        //
-        //
 
         Bundle extras = getIntent().getExtras();
         item = null;
@@ -133,9 +130,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             serial_number_text.setText(item.getSerialNumber());
             comment_text.setText(item.getComment());
             submit_button.setText("Update");
-            //
-            //
-            //
 
             imageUris = item.getImageLinks();
             imageAdapter = new ImageAdapter(this, imageUris);
@@ -143,9 +137,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             imageAdapter.notifyDataSetChanged();
             justifyListViewHeightBasedOnChildren();
             imageAdapter.setOnDeleteButtonClickListener(this);
-            //
-            //
-            //
+
             for (String tag : tags) {
                 View tagView = LayoutInflater.from(this).inflate(R.layout.tag_item_layout, tags_container, false);
                 TextView tagTextView = tagView.findViewById(R.id.tag_text);
@@ -157,8 +149,8 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 });
                 tags_container.addView(tagView);
             }
-            imageAdapter.notifyDataSetChanged();
-            justifyListViewHeightBasedOnChildren();
+//            imageAdapter.notifyDataSetChanged();
+//            justifyListViewHeightBasedOnChildren();
         }
 
         /**
@@ -288,6 +280,8 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                                 Log.e("FirebaseStorage", "Image upload failed: " + exception.getMessage());
                                 exception.printStackTrace();
                             });
+                        } else {
+                            imageLinks.add(imageUris.get(i));
                         }
                     }
 
@@ -473,7 +467,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      * having the list scrollable
      */
     public void justifyListViewHeightBasedOnChildren() {
-        Log.e("image stuff", "image adapter:" + imageAdapter.getCount());
         if (imageAdapter == null) {
             Log.e("image stuff", "returning");
             return;
@@ -485,7 +478,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             listItem.measure(0, 0);
             totalHeight += listItem.getMeasuredHeight();
         }
-        Log.e("image stuff", "total height: " + totalHeight);
 
         // changing layout of list view to reflect new height
         ViewGroup.LayoutParams par = imageListView.getLayoutParams();
