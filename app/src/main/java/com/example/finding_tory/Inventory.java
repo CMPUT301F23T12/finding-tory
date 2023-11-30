@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents an inventory containing a collection of items. This class provides functionalities to manage
@@ -16,6 +19,7 @@ public class Inventory implements Serializable {
 
     private String inventoryName;
     private ArrayList<Item> items;
+    private ArrayList<Item> displayItems;
     private double inventoryEstimatedValue;
     private ArrayList<String> allTags;
     private String sortType = "Description";
@@ -33,6 +37,7 @@ public class Inventory implements Serializable {
     public Inventory(String name) {
         this.inventoryName = name;
         this.items = new ArrayList<>();
+        this.displayItems = new ArrayList<>();
         this.inventoryEstimatedValue = 0;
         this.allTags = new ArrayList<>();
     }
@@ -108,6 +113,7 @@ public class Inventory implements Serializable {
      */
     public void setItems(ArrayList<Item> items) {
         this.items = items;
+        this.displayItems = items;
         calculateValue();
         this.allTags = new ArrayList<>();
         for (Item item : items) {
@@ -148,6 +154,7 @@ public class Inventory implements Serializable {
      */
     public void addItem(Item item) {
         this.items.add(item);
+        this.displayItems.add(item);
         for (String s : item.getItemTags()) {
             if (!this.allTags.contains(capitalizeFirstLetter(s))) {
                 this.allTags.add(capitalizeFirstLetter(s));
@@ -167,6 +174,7 @@ public class Inventory implements Serializable {
             this.allTags.remove(capitalizeFirstLetter(tag));
         }
         this.items.remove(item);
+        this.displayItems.remove(item);
         this.inventoryEstimatedValue -= item.getEstimatedValue();
     }
 
@@ -176,11 +184,12 @@ public class Inventory implements Serializable {
      * @param i The index of the item to remove.
      */
     public void removeItemByIndex(int i) {
-        for (String tag : this.items.get(i).getItemTags()) {
+        for (String tag : this.displayItems.get(i).getItemTags()) {
             this.allTags.remove(capitalizeFirstLetter(tag));
         }
-        this.inventoryEstimatedValue -= this.items.get(i).getEstimatedValue();
-        this.items.remove(i);
+        this.inventoryEstimatedValue -= this.displayItems.get(i).getEstimatedValue();
+        this.items.remove(this.displayItems.get(i));
+        this.displayItems.remove(i);
     }
 
     /**
@@ -229,6 +238,31 @@ public class Inventory implements Serializable {
         this.sortOrder = sortOrder;
     }
 
+    public ArrayList<Item> getDisplayedItems() {
+        return displayItems;
+    }
+
+    public void filterItemsByDateRange(Date startDate, Date endDate, String filterDescription, String filterMake) {
+        ArrayList<Item> filteredItems = new ArrayList<>();
+        for (Item item : items) {
+            Date itemDate = item.getPurchaseDate();
+            if (startDate == null || (!itemDate.before(startDate) && !itemDate.after(endDate))) {
+                if (filterDescription.equals("") || item.getDescription().contains(filterDescription)) {
+                    if (filterMake.equals("") || item.getDescription().contains(filterMake)) {
+                        filteredItems.add(item);
+                    }
+                }
+            }
+        }
+        updateDisplayedItems(filteredItems);
+    }
+
+    public void updateDisplayedItems(ArrayList<Item> newDisplayedItems) {
+        this.displayItems.clear();
+        this.displayItems.addAll(newDisplayedItems);
+        this.sortItems();
+    }
+
     public Boolean sortItems() {
         Comparator<Item> comparator;
         switch (this.sortType) {
@@ -253,7 +287,7 @@ public class Inventory implements Serializable {
         if ("Descending".equals(this.sortOrder)) {
             comparator = comparator.reversed();
         }
-        Collections.sort(items, comparator);
+        Collections.sort(displayItems, comparator);
         return true;
     }
 }

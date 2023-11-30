@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,8 @@ import java.util.Locale;
 
 public class FilterFragment extends DialogFragment {
     TextView selectedDate;
+    EditText filteredDescription;
+    EditText filteredMake;
     Button datePicker;
     Date dateStart;
     Date dateEnd;
@@ -27,7 +30,7 @@ public class FilterFragment extends DialogFragment {
     public interface FilterDialogListener {
         void onFilterDismissed();
 
-        void onFilterConfirmed(Date filterStartDate, Date filterEndDate);
+        void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake);
     }
 
     private FilterFragment.FilterDialogListener listener;
@@ -46,6 +49,8 @@ public class FilterFragment extends DialogFragment {
 
         selectedDate = view.findViewById(R.id.selectedDate);
         datePicker = view.findViewById(R.id.datePicker);
+        filteredMake = view.findViewById(R.id.editTextMake);
+        filteredDescription = view.findViewById(R.id.editTextDescription);
 
         datePicker.setOnClickListener(v -> DatePickerDialog());
         // Add action buttons
@@ -53,7 +58,7 @@ public class FilterFragment extends DialogFragment {
         view.findViewById(R.id.btnFilter).setOnClickListener(v -> {
 
             if (listener != null) {
-                listener.onFilterConfirmed(dateStart, dateEnd);
+                listener.onFilterConfirmed(dateStart, dateEnd, filteredDescription.getText().toString(), filteredMake.getText().toString());
             }
             dismiss();
         });

@@ -62,7 +62,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
-        inventoryAdapter = new InventoryAdapter(this, inventory.getItems());
+        inventoryAdapter = new InventoryAdapter(this, inventory.getDisplayedItems());
         inventoryListView.setAdapter(inventoryAdapter);
 
         // initialize and cache the TextViews for the totals
@@ -212,9 +212,9 @@ public class InventoryViewActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFilterConfirmed(Date filterStartDate, Date filterEndDate) {
-                            // inventoryAdapter.filterByDateRange(filterStartDate, filterEndDate);
-                            // inventoryAdapter.notifyDataSetChanged();
+                        public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
+                            inventory.filterItemsByDateRange(filterStartDate, filterEndDate, filterDescription, filterMake);
+                            inventoryAdapter.notifyDataSetChanged();
                         }
                     });
                     filterDialog.show(getSupportFragmentManager(), "FILTER_ITEMS");
@@ -302,7 +302,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             if (Objects.equals(data.getStringExtra("action"), "delete")) {
                 int position = data.getIntExtra("pos", -1);
                 if (position >= 0) {
-                    FirestoreDB.deleteItemDB(username, inventory, inventory.getItems().get(position));
+                    FirestoreDB.deleteItemDB(username, inventory, inventory.getDisplayedItems().get(position));
                     inventory.removeItemByIndex(position);
                 }
             } else {

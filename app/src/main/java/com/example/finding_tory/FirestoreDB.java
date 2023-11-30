@@ -75,11 +75,9 @@ public class FirestoreDB {
         // existingItem is not used as of right now but might need in future if we chose to use itemID as the key
         if (!FirestoreDB.isDebugMode()) {
 //            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(existingItem.getDescription()).delete();
+            // Handle failure
             FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(updatedItem.getDescription()).set(updatedItem).addOnSuccessListener(aVoid -> {
-            }).addOnFailureListener(e -> {
-                // Handle failure
-                e.printStackTrace();
-            });
+            }).addOnFailureListener(Throwable::printStackTrace);
         }
     }
 

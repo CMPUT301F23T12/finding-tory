@@ -11,57 +11,41 @@
         android:text="Filter Items"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-<!--    <LinearLayout-->
-<!--        android:id="@+id/temp"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@id/textViewFilterTitle"-->
-<!--        android:orientation="horizontal"-->
-<!--        android:paddingBottom="16dp">-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/date_title"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:paddingEnd="5dp"-->
-<!--            android:text="Purchase Date"-->
-<!--            android:textSize="18sp"-->
-<!--            android:textStyle="bold" />-->
-
-<!--        <EditText-->
-<!--            android:id="@+id/date_edittext"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:clickable="true"-->
-<!--            android:cursorVisible="false"-->
-<!--            android:focusable="false"-->
-<!--            android:hint="YYYY-MM-DD"-->
-<!--            android:inputType="date" />-->
-
-<!--    </LinearLayout>-->
-
-    <TextView
-        android:id="@+id/selectedDate"
+    <LinearLayout
+        android:id="@+id/selectedDateContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selected Date Range"
         android:layout_below="@id/textViewFilterTitle"
-        android:textAlignment="center"
-        android:textColor="@color/black" />
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/datePicker"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/datePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open Date Selector" />
+
+        <TextView
+            android:id="@+id/selectedDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MMM DD, YYYY"
+            android:textAlignment="center"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/editTextDescription"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/selectedDate"
-        android:text="Open Dialog"
-        android:textSize="20sp" />
+        android:layout_below="@id/selectedDateContainer"
+        android:hint="Description" />
 
     <EditText
         android:id="@+id/editTextMake"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/datePicker"
+        android:layout_below="@id/editTextDescription"
         android:hint="Make" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -80,7 +64,6 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <!-- Cancel button -->
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
@@ -89,7 +72,6 @@
             android:backgroundTint="@android:color/holo_blue_dark"
             android:text="Cancel" />
 
-        <!-- Delete button -->
         <Button
             android:id="@+id/btnFilter"
             android:layout_width="wrap_content"
