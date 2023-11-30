@@ -1,7 +1,5 @@
 package com.example.finding_tory;
 
-import android.net.Uri;
-
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -25,16 +25,24 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is responsible for updating/inserting items in an inventory
@@ -59,7 +67,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private ListView imageListView;
     private ImageAdapter imageAdapter;
     private ArrayList<String> imageUris = new ArrayList<>();
-    private ArrayList<Uri> trueImageUris = new ArrayList<>();
+    private ArrayList<String> imageLinks = new ArrayList<>();
     private ArrayList<String> tags = new ArrayList<>();
     private String username;
     private Inventory inventory;
@@ -92,11 +100,12 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
         // sets image adapter to view image uploaded list
         imageListView = findViewById(R.id.image_listview);
-        //convert the URI strings to actual URI'S
-        castStringToUri();
-        imageAdapter = new ImageAdapter(this, trueImageUris);
+        imageAdapter = new ImageAdapter(this, imageUris);
         imageListView.setAdapter(imageAdapter);
         imageAdapter.setOnDeleteButtonClickListener(this);
+        //
+        //
+        //
 
         Bundle extras = getIntent().getExtras();
         item = null;
@@ -127,12 +136,19 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             serial_number_text.setText(item.getSerialNumber());
             comment_text.setText(item.getComment());
             submit_button.setText("Update");
-            if (item.getImageLinks() != null) {
-                imageUris = item.getImageLinks();
-            }
-            castStringToUri();
+            //
+            //
+            //
+
+            imageUris = item.getImageLinks();
+            imageAdapter = new ImageAdapter(this, imageUris);
+            imageListView.setAdapter(imageAdapter);
             imageAdapter.notifyDataSetChanged();
             justifyListViewHeightBasedOnChildren();
+            imageAdapter.setOnDeleteButtonClickListener(this);
+            //
+            //
+            //
             for (String tag : tags) {
                 View tagView = LayoutInflater.from(this).inflate(R.layout.tag_item_layout, tags_container, false);
                 TextView tagTextView = tagView.findViewById(R.id.tag_text);
@@ -144,8 +160,8 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 });
                 tags_container.addView(tagView);
             }
-            castStringToUri();
             imageAdapter.notifyDataSetChanged();
+            justifyListViewHeightBasedOnChildren();
         }
 
         /**
@@ -238,6 +254,36 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     float estimated_cost = Float.parseFloat(estimated_cost_text.getText().toString());
                     String serial_number = serial_number_text.getText().toString();
                     String comment = comment_text.getText().toString();
+
+                    // set the image URLs and upload images to Firebase Storage
+                    StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("images");
+                    String itemId = description + "-" + dateFormatted + "-" + estimated_cost; //assumes the desc-date-value is unique to this item
+
+                    for (int i = 0; i < imageUris.size(); i++) {
+                        int temp = i + 1;
+                        boolean is_uploaded = imageUris.get(i).startsWith("http");
+                        if (!is_uploaded){ // only upload images that have not already been uploaded, unless the
+                            String date = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(new Date());
+                            String pathString =  date + temp + ".jpg";
+                            UploadTask uploadTask = storageRef.child(itemId).child(pathString).putFile(Uri.parse(imageUris.get(i)));
+
+                            Date finalDateFormatted = dateFormatted;
+                            uploadTask.addOnSuccessListener(taskSnapshot -> {
+                                storageRef.child(itemId).child(pathString).getDownloadUrl().addOnSuccessListener(uri -> {
+                                    String downloadUrl = uri.toString();
+                                    imageLinks.add(downloadUrl);
+                                    // since this code is run asynchronously, the item must be edited and updated when the download links are available
+                                    Item upsert_item = new Item(finalDateFormatted, description, make, model, estimated_cost, serial_number, comment, tags, imageLinks);
+                                    FirestoreDB.editItemFromFirestore(username, inventory, item, upsert_item);
+                                    intent.putExtra("editedItem", upsert_item);
+                                });
+                            }).addOnFailureListener(exception -> {
+                                Log.e("FirebaseStorage", "Image upload failed: " + exception.getMessage());
+                                exception.printStackTrace();
+                            });
+                        }
+                    }
+
                     Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags, imageUris);
 
                     if (isAdd) {
@@ -273,27 +319,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      */
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
-            // Upload images to Firebase Storage
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("images");
-            String itemId = item.getDescription() + "-" + item.getPurchaseDate() + "-" + item.getEstimatedValue(); //assumes the desc-date-value is unique to this item
-
-            for (int i = 0; i < imageUris.size();i++) {
-                int temp = i+1;
-                String pathString = "image-" + temp + ".jpg";
-                UploadTask uploadTask = storageRef.child(itemId).child(pathString).putFile(Uri.parse(imageUris.get(i)));
-
-                uploadTask.addOnSuccessListener(taskSnapshot -> {
-                    storageRef.child(itemId).child(pathString).getDownloadUrl().addOnSuccessListener(uri -> {
-                        String downloadUrl = uri.toString();
-                        // TODO: store the download URL in Firestore
-                        Log.e("FirebaseStorage", "Upload success: " + downloadUrl);
-                        Toast.makeText(UpsertViewActivity.this, "Image added!", Toast.LENGTH_SHORT).show();
-                    });
-                }).addOnFailureListener(exception -> {
-                    Log.e("FirebaseStorage", "Upload failed: " + exception.getMessage());
-                    exception.printStackTrace();
-                });
-            }
 
             FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item).addOnSuccessListener(aVoid -> {
                 // Item added successfully
@@ -392,7 +417,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             Uri uri = data.getData();
             if (uri != null) {
                 imageUris.add(uri.toString());
-                castStringToUri();
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
@@ -400,7 +424,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             Uri uri = data.getData();
             if (uri != null) {
                 imageUris.add(uri.toString());
-                castStringToUri();
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
@@ -416,7 +439,9 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      * having the list scrollable
      */
     public void justifyListViewHeightBasedOnChildren() {
+        Log.e("image stuff", "image adapter:" + imageAdapter.getCount());
         if (imageAdapter == null) {
+            Log.e("image stuff", "returning");
             return;
         }
         int totalHeight = 0;
@@ -426,6 +451,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             listItem.measure(0, 0);
             totalHeight += listItem.getMeasuredHeight();
         }
+        Log.e("image stuff", "total height: " + totalHeight);
 
         // changing layout of list view to reflect new height
         ViewGroup.LayoutParams par = imageListView.getLayoutParams();
@@ -433,16 +459,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         imageListView.setLayoutParams(par);
         imageListView.requestLayout();
     }
-    /**
-     * takes the item's stored string representations of uri's and turns them into actual uri's
-     * called whenever the list of images is updated (image is added or deleted)
-     */
-    private void castStringToUri() {
-        trueImageUris.clear(); // clear the true Uris to update it with the new list
-        for (int i = 0; i < imageUris.size(); i++) {
-            trueImageUris.add(Uri.parse(imageUris.get(i)));
-        }
-    }
+
     /**
      * deletes an image from the listed images
      * called when the user clicks on the delete button of a given image
@@ -450,7 +467,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     @Override
     public void onDeleteButtonClick(int position) {
         imageUris.remove(position);
-        castStringToUri();
         imageAdapter.notifyDataSetChanged();
         justifyListViewHeightBasedOnChildren();
         position += 1;

@@ -2,8 +2,8 @@ package com.example.finding_tory;
 
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -18,8 +18,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -33,6 +35,7 @@ public class ItemViewActivity extends AppCompatActivity {
     private String username;
     private Inventory selectedInventory;
     private Item selectedItem;
+    private ArrayList<String> imageLinks = new ArrayList<>();
     int picture_index;
     int position;
 
@@ -206,8 +209,9 @@ public class ItemViewActivity extends AppCompatActivity {
         //if the item does not have an empty list of images, set the image view of the item to the first picture of the item
         if (passedItem.getImageLinks() != null && passedItem.getImageLinks().size() > 0) {
             ImageView image = findViewById(R.id.item_image);
-            image.setImageURI(Uri.parse(passedItem.getImageLinks().get(0)));
             picture_index = 0;
+            Picasso.get().load(passedItem.getImageLinks().get(picture_index)).into(image);
+
         }
 
         LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
@@ -232,20 +236,14 @@ public class ItemViewActivity extends AppCompatActivity {
      *        item (Item): the item that we are currently viewing
      */
     private void updateImage(int direction, Item item) {
-        if (item.getImageLinks() == null) { //no images exist
+        Log.e("image stuff", "direction: " + direction + " image links: " + item.getImageLinks());
+        if (item.getImageLinks() == null || item.getImageLinks().size() == 0 ) { //no images exist
             Toast.makeText(this, "No images to show", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        if (picture_index == 0 && direction == -1) { //if we are on leftmost image and trying to go left, do nothing
-            Toast.makeText(this, "This is the first image for this item", Toast.LENGTH_SHORT).show();
-        } else if (picture_index == item.getImageLinks().size()-1 && direction == 1) { //if we are on leftmost image and trying to go left, do nothing
-            Toast.makeText(this, "This is the final image for this item", Toast.LENGTH_SHORT).show();
-        }
-        else { //update the image
-            picture_index += direction;
-            ImageView image = findViewById(R.id.item_image);
-            image.setImageURI(Uri.parse(item.getImageLinks().get(picture_index)));
-        }
+        ImageView image = findViewById(R.id.item_image);
+        picture_index += direction+item.getImageLinks().size(); // ensures that picture_index is always positive; mod will account for it
+        picture_index %= item.getImageLinks().size();
+        Picasso.get().load(item.getImageLinks().get(picture_index)).into(image);
     }
 }
