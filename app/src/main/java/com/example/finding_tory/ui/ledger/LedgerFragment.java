@@ -1,5 +1,7 @@
 package com.example.finding_tory.ui.ledger;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,10 +13,14 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.finding_tory.ActivityCodes;
 import com.example.finding_tory.FirestoreDB;
 import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
+import com.example.finding_tory.Item;
 import com.example.finding_tory.LedgerAdapter;
+import com.example.finding_tory.UpsertInventoryViewActivity;
+import com.example.finding_tory.UpsertViewActivity;
 import com.example.finding_tory.databinding.FragmentLedgerBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -98,7 +104,10 @@ public class LedgerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // TODO allow creation of new, unrelated inventories
-                Snackbar.make(view, "Create an inventory (Coming soon!)", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Intent editItemIntent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
+                editItemIntent.putExtra("username", username);
+                startActivityForResult(editItemIntent, ActivityCodes.ADD_INVENTORY.getRequestCode());
+//                Snackbar.make(view, "Create an inventory (Coming soon!)", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
@@ -124,9 +133,15 @@ public class LedgerFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            fetchUserInventories();
-            ledgerAdapter.notifyDataSetChanged();
+        // adding new item to list once user submits new item
+        if (requestCode == ActivityCodes.ADD_INVENTORY.getRequestCode()) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                Inventory selectedInventory = (Inventory) data.getSerializableExtra("inventory_to_add");
+                assert selectedInventory != null;
+                inventories.add(selectedInventory);
+                ledgerAdapter.notifyDataSetChanged();
+            }
         }
     }
 
