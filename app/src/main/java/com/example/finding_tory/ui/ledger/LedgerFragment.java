@@ -18,6 +18,7 @@ import com.example.finding_tory.FirestoreDB;
 import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
 import com.example.finding_tory.Item;
+import com.example.finding_tory.Ledger;
 import com.example.finding_tory.LedgerAdapter;
 import com.example.finding_tory.UpsertInventoryViewActivity;
 import com.example.finding_tory.UpsertViewActivity;
@@ -38,7 +39,7 @@ public class LedgerFragment extends Fragment {
     private FragmentLedgerBinding binding;
 
     // TODO use a Ledger instead of an ArrayList of Inventories
-    private ArrayList<Inventory> inventories = new ArrayList<>();
+    private Ledger ledger = Ledger.getInstance();
     private String username;
     private ListView ledgerListView;
     private LedgerAdapter ledgerAdapter;
@@ -73,7 +74,7 @@ public class LedgerFragment extends Fragment {
 
         // map the listview to the ledger's list of items via custom ledger adapter
         ledgerListView = binding.ledgerListview;
-        ledgerAdapter = new LedgerAdapter(root.getContext(), inventories);
+        ledgerAdapter = new LedgerAdapter(root.getContext(), ledger.getInventories());
         ledgerListView.setAdapter(ledgerAdapter);
 
         // Retrieve from fragment arguments
@@ -89,7 +90,7 @@ public class LedgerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), InventoryViewActivity.class);
-                intent.putExtra("inventoryName", inventories.get(position).getInventoryName());
+                intent.putExtra("inventoryName", ledger.getInventories().get(position).getInventoryName());
                 intent.putExtra("username", username);
                 startActivityForResult(intent, 1);
                 // getActivity().startActivity(intent);  // launch the InventoryViewActivity
@@ -100,7 +101,7 @@ public class LedgerFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
-                intent.putExtra("inventoryName", inventories.get(position));
+                intent.putExtra("inventoryName", ledger.getInventories().get(position));
                 intent.putExtra("username", username);
                 startActivityForResult(intent, 1);
                 return true;
@@ -146,7 +147,7 @@ public class LedgerFragment extends Fragment {
                 assert data != null;
                 Inventory selectedInventory = (Inventory) data.getSerializableExtra("inventory_to_add");
                 assert selectedInventory != null;
-                inventories.add(selectedInventory);
+                ledger.getInventories().add(selectedInventory);
                 ledgerAdapter.notifyDataSetChanged();
             }
         }
@@ -167,15 +168,15 @@ public class LedgerFragment extends Fragment {
      */
     private void fetchUserInventories() {
 
-        inventories = new ArrayList<>();
+        ledger.setInventories(new ArrayList<>());
         FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     // Add the inventories to the ledger view
                     Inventory inv = document.toObject(Inventory.class);
-                    inventories.add(inv);
+                    ledger.getInventories().add(inv);
                 }
-                ledgerAdapter = new LedgerAdapter(root.getContext(), inventories);
+                ledgerAdapter = new LedgerAdapter(root.getContext(), ledger.getInventories());
                 ledgerListView.setAdapter(ledgerAdapter);
             } else {
                 // TODO Handle the error

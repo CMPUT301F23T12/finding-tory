@@ -3,7 +3,7 @@ package com.example.finding_tory;
 import java.util.ArrayList;
 
 public class Ledger {
-    private final Ledger instance = new Ledger(new ArrayList<Inventory>(), new User());
+    private static final Ledger instance = new Ledger(new ArrayList<Inventory>(), new User());
 
     private ArrayList<Inventory> inventories;
     private User user;
@@ -13,7 +13,7 @@ public class Ledger {
         this.user = user;
     }
 
-    public Ledger getInstance() {
+    public static Ledger getInstance() {
         return instance;
     }
 
