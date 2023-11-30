@@ -79,9 +79,6 @@ public class LedgerFragment extends Fragment {
         // Retrieve from fragment arguments
         if (getArguments() != null) {
             username = getArguments().getString("username");
-            if (username != null) {
-                fetchUserInventories();
-            }
         }
 
         // cache the add button
@@ -99,6 +96,17 @@ public class LedgerFragment extends Fragment {
             }
         });
 
+        ledgerListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
+                intent.putExtra("inventoryName", inventories.get(position));
+                intent.putExtra("username", username);
+                startActivityForResult(intent, 1);
+                return true;
+            }
+        });
+
         // allow new inventories to be added
         binding.addInventoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +115,6 @@ public class LedgerFragment extends Fragment {
                 Intent editItemIntent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
                 editItemIntent.putExtra("username", username);
                 startActivityForResult(editItemIntent, ActivityCodes.ADD_INVENTORY.getRequestCode());
-//                Snackbar.make(view, "Create an inventory (Coming soon!)", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
         });
 
@@ -146,9 +153,20 @@ public class LedgerFragment extends Fragment {
     }
 
     /**
+     * When this fragment is first launched or resumed after going back from
+     * InventoryViewActivity it updates the inventories for any changes
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchUserInventories(); // Refresh data when the fragment becomes visible
+    }
+
+    /**
      * Fetches the user's inventories from Firestore and updates the UI with the retrieved data.
      */
     private void fetchUserInventories() {
+
         inventories = new ArrayList<>();
         FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
