@@ -288,9 +288,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item selectedItem = (Item) data.getSerializableExtra("item_to_add");
                 assert selectedItem != null;
                 inventory.addItem(selectedItem);
-                if (inventory.sortItems()) {
-                    inventoryAdapter.notifyDataSetChanged();
-                }
+                inventory.sortItems();
                 inventoryAdapter.notifyDataSetChanged();
                 updateTotals();
             }

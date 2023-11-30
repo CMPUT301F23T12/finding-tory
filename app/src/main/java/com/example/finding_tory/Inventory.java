@@ -244,11 +244,25 @@ public class Inventory implements Serializable {
 
     public void filterItemsByDateRange(Date startDate, Date endDate, String filterDescription, String filterMake) {
         ArrayList<Item> filteredItems = new ArrayList<>();
+        boolean yesDate = false;
+        boolean yesDescription = false;
+        boolean yesMake = false;
+
+        if (startDate != null || endDate != null) {
+            yesDate = true;
+        }
+        if (!Objects.equals(filterDescription, "")) {
+            yesDescription = true;
+        }
+        if (!Objects.equals(filterMake, "")) {
+            yesMake = true;
+        }
+
         for (Item item : items) {
             Date itemDate = item.getPurchaseDate();
             if (startDate == null || (!itemDate.before(startDate) && !itemDate.after(endDate))) {
                 if (filterDescription.equals("") || item.getDescription().contains(filterDescription)) {
-                    if (filterMake.equals("") || item.getDescription().contains(filterMake)) {
+                    if (filterMake.equals("") || item.getMake().contains(filterMake)) {
                         filteredItems.add(item);
                     }
                 }
