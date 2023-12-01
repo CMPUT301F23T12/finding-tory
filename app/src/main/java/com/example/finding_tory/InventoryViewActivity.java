@@ -35,6 +35,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     private ListView inventoryListView;
     private InventoryAdapter inventoryAdapter;
     private boolean state_deletion = false;
+    private boolean state_filter = false;
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
     private FloatingActionButton addItemButton;
@@ -213,7 +214,9 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                         @Override
                         public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
+                            state_filter = filterStartDate != null || filterEndDate != null || !filterDescription.equals("") || !filterMake.equals("");
                             inventory.filterItemsByDateRange(filterStartDate, filterEndDate, filterDescription, filterMake);
+                            updateTotals();
                             inventoryAdapter.notifyDataSetChanged();
                         }
                     });
@@ -316,8 +319,13 @@ public class InventoryViewActivity extends AppCompatActivity {
      * Rewrites the TextView elements displaying the inventory totals to reflect new values.
      */
     public void updateTotals() {
-        totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
-        totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
+        if (!state_filter) {
+            totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
+            totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
+        } else {
+            totalItemsTextView.setText(String.format(Locale.CANADA, "Filtering %d of %d", inventory.getDisplayedItems().size(), inventory.getCount()));
+            totalValueTextView.setText(String.format(Locale.CANADA, "Showing: $%.2f", inventory.getDisplayedEstimatedValue()));
+        }
         FirestoreDB.getInventoriesRef(username).document(inventory.getInventoryName()).set(inventory);
     }
 

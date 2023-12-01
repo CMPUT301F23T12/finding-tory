@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -275,6 +274,14 @@ public class Inventory implements Serializable {
         this.displayItems.clear();
         this.displayItems.addAll(newDisplayedItems);
         this.sortItems();
+    }
+
+    public double getDisplayedEstimatedValue() {
+        double sum = 0;
+        for (Item it : this.displayItems) {
+            sum += it.getEstimatedValue();
+        }
+        return sum;
     }
 
     public Boolean sortItems() {
