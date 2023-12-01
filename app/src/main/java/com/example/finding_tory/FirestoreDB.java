@@ -60,7 +60,7 @@ public class FirestoreDB {
      * @param item      The Item to be deleted.
      */
     public static void deleteItemDB(String username, Inventory inventory, Item item) {
-        FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).delete();
+        FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getId()).delete();
     }
 
     /**
