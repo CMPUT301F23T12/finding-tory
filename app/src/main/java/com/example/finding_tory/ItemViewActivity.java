@@ -213,6 +213,10 @@ public class ItemViewActivity extends AppCompatActivity {
                 findViewById(R.id.button_right_picture_item).setVisibility(View.GONE);
                 findViewById(R.id.button_left_picture_item).setVisibility(View.GONE);
             }
+            else {
+                findViewById(R.id.button_right_picture_item).setVisibility(View.VISIBLE);
+                findViewById(R.id.button_left_picture_item).setVisibility(View.VISIBLE);
+            }
         }
         else { // if there's no images, no need to show the image section
             findViewById(R.id.image_slider_placeholder).setVisibility(View.GONE);
