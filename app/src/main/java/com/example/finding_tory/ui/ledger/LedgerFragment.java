@@ -1,5 +1,7 @@
 package com.example.finding_tory.ui.ledger;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,10 +13,15 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.finding_tory.ActivityCodes;
 import com.example.finding_tory.FirestoreDB;
 import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
+import com.example.finding_tory.Item;
+import com.example.finding_tory.Ledger;
 import com.example.finding_tory.LedgerAdapter;
+import com.example.finding_tory.UpsertInventoryViewActivity;
+import com.example.finding_tory.UpsertViewActivity;
 import com.example.finding_tory.databinding.FragmentLedgerBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -32,7 +39,7 @@ public class LedgerFragment extends Fragment {
     private FragmentLedgerBinding binding;
 
     // TODO use a Ledger instead of an ArrayList of Inventories
-    private ArrayList<Inventory> inventories = new ArrayList<>();
+    private Ledger ledger = Ledger.getInstance();
     private String username;
     private ListView ledgerListView;
     private LedgerAdapter ledgerAdapter;
@@ -67,15 +74,12 @@ public class LedgerFragment extends Fragment {
 
         // map the listview to the ledger's list of items via custom ledger adapter
         ledgerListView = binding.ledgerListview;
-        ledgerAdapter = new LedgerAdapter(root.getContext(), inventories);
+        ledgerAdapter = new LedgerAdapter(root.getContext(), ledger.getInventories());
         ledgerListView.setAdapter(ledgerAdapter);
 
         // Retrieve from fragment arguments
         if (getArguments() != null) {
             username = getArguments().getString("username");
-            if (username != null) {
-                fetchUserInventories();
-            }
         }
 
         // cache the add button
@@ -86,10 +90,21 @@ public class LedgerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), InventoryViewActivity.class);
-                intent.putExtra("inventoryName", inventories.get(position).getInventoryName());
+                intent.putExtra("inventoryName", ledger.getInventories().get(position).getInventoryName());
                 intent.putExtra("username", username);
                 startActivityForResult(intent, 1);
                 // getActivity().startActivity(intent);  // launch the InventoryViewActivity
+            }
+        });
+
+        ledgerListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
+                intent.putExtra("inventoryName", ledger.getInventories().get(position));
+                intent.putExtra("username", username);
+                startActivityForResult(intent, 1);
+                return true;
             }
         });
 
@@ -98,7 +113,9 @@ public class LedgerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // TODO allow creation of new, unrelated inventories
-                Snackbar.make(view, "Create an inventory (Coming soon!)", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                Intent editItemIntent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
+                editItemIntent.putExtra("username", username);
+                startActivityForResult(editItemIntent, ActivityCodes.ADD_INVENTORY.getRequestCode());
             }
         });
 
@@ -124,25 +141,42 @@ public class LedgerFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            fetchUserInventories();
-            ledgerAdapter.notifyDataSetChanged();
+        // adding new item to list once user submits new item
+        if (requestCode == ActivityCodes.ADD_INVENTORY.getRequestCode()) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                Inventory selectedInventory = (Inventory) data.getSerializableExtra("inventory_to_add");
+                assert selectedInventory != null;
+                ledger.getInventories().add(selectedInventory);
+                ledgerAdapter.notifyDataSetChanged();
+            }
         }
+    }
+
+    /**
+     * When this fragment is first launched or resumed after going back from
+     * InventoryViewActivity it updates the inventories for any changes
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchUserInventories(); // Refresh data when the fragment becomes visible
     }
 
     /**
      * Fetches the user's inventories from Firestore and updates the UI with the retrieved data.
      */
     private void fetchUserInventories() {
-        inventories = new ArrayList<>();
+
+        ledger.setInventories(new ArrayList<>());
         FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     // Add the inventories to the ledger view
                     Inventory inv = document.toObject(Inventory.class);
-                    inventories.add(inv);
+                    ledger.getInventories().add(inv);
                 }
-                ledgerAdapter = new LedgerAdapter(root.getContext(), inventories);
+                ledgerAdapter = new LedgerAdapter(root.getContext(), ledger.getInventories());
                 ledgerListView.setAdapter(ledgerAdapter);
             } else {
                 // TODO Handle the error

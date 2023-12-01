@@ -12,6 +12,7 @@ import java.util.Date;
  * estimated value, comments, and tags. This class is designed to be serializable to facilitate easy storage and retrieval.
  */
 public class Item implements Serializable {
+    private String id;
     private Date purchaseDate;
     private String description;
     private String make;
@@ -229,6 +230,14 @@ public class Item implements Serializable {
             this.addItemTag(s);
         }
         this.SortItemTag();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
