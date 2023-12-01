@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -52,33 +54,35 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
-        if (view == null)
+        if (view == null) {
             view = LayoutInflater.from(context).inflate(R.layout.item_content, parent, false);
-
-        // find TextView elements that we wish to update
-        Item item = items.get(position);
-        TextView descriptionTextView = view.findViewById(R.id.description_text);
-        TextView valueTextView = view.findViewById(R.id.value_text);
-        TextView tagsTextView = view.findViewById(R.id.tags_text);
-        CheckBox checkBox = view.findViewById(R.id.item_checkbox);
-        checkBox.setChecked(selectedItems.get(position, false));
-
-        // modify TextViews with current item information
-        descriptionTextView.setText(item.getDescription());
-        valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getEstimatedValue()));
-
-        StringBuilder tag_to_display = new StringBuilder();
-        for (String tag : item.getItemTags()) {
-            tag_to_display.append(tag).append(" ");
         }
 
-        checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleSelection(position);
-            }
-        });
-        tagsTextView.setText(item.getTagsString());
+        Item item = items.get(position);
+
+        TextView descriptionTextView = view.findViewById(R.id.description_text);
+        TextView valueTextView = view.findViewById(R.id.value_text);
+        LinearLayout tagsContainer = view.findViewById(R.id.item_tag_container); // Your container for tags
+        CheckBox checkBox = view.findViewById(R.id.item_checkbox);
+
+        descriptionTextView.setText(item.getDescription());
+        valueTextView.setText(String.format(Locale.CANADA, "Value: $%.2f", item.getEstimatedValue()));
+        checkBox.setChecked(selectedItems.get(position, false));
+
+        checkBox.setOnClickListener(v -> toggleSelection(position));
+
+        tagsContainer.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        for (String tag : item.getItemTags()) {
+            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setText(tag);
+
+            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            removeTagButton.setVisibility(View.GONE);
+
+            tagsContainer.addView(tagView);
+        }
 
         return view;
     }
