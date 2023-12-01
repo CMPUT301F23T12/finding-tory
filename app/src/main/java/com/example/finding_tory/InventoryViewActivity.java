@@ -309,6 +309,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             } else {
                 Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
                 inventory.set(pos, returnedItem);
+                FirestoreDB.editItemFromFirestore(username, inventory, returnedItem, returnedItem);
             }
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();

@@ -142,7 +142,14 @@ public class Inventory implements Serializable {
      * @param item  The new item to set in the inventory.
      */
     public void set(int index, Item item) {
-        items.set(index, item);
+        items.remove(displayItems.get(index));
+        displayItems.set(index, item);
+        items.add(displayItems.get(index));
+        for (String s : item.getItemTags()) {
+            if (!this.allTags.contains(capitalizeFirstLetter(s))) {
+                this.allTags.add(capitalizeFirstLetter(s));
+            }
+        }
         calculateValue();
     }
 
