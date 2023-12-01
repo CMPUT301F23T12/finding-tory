@@ -44,10 +44,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        String storedUsername = loadData();
-        if (!storedUsername.isEmpty()) {
-            loginUser(storedUsername, "", true);
-        }
+//        String storedUsername = loadData();
+//        if (!storedUsername.isEmpty()) {
+//        loginUser(storedUsername, "", true);
+//        }
 
         // initialize and cache the EditTexts for user info
         usernameEditText = findViewById(R.id.edit_text_username);
@@ -84,21 +84,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void saveData(String usrname) {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        editor.putString(STORED_USER, usrname);
-        editor.apply();
-    }
-
-    public String loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        System.out.println("retrieved: " + sharedPreferences.getString(STORED_USER, ""));
-        // TODO able to store the data, but logout isn't working
-        return sharedPreferences.getString(STORED_USER, "");
-    }
-
     /**
      * Login the user with the provided username and password.
      * Communicates with FirestoreDB to authenticate the user and, upon success,
@@ -112,17 +97,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (!queryDocumentSnapshots.isEmpty()) {
-                    DocumentSnapshot userSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-
-                    // Retrieve the user object from the Firestore document
-//                    User user = userSnapshot.toObject(User.class);
-
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
                     if (enteredPassword.equals(storedPassword) || bypass) {
-                        Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
-                        intent.putExtra("username", username);
-                        startActivity(intent);
-                        saveData(username);
+                        Intent resultIntent = getIntent();
+                        resultIntent.putExtra("username", username);
+                        setResult(RESULT_OK, resultIntent);
+//                        saveData(username);
+                        finish();
                     } else {
                         Snackbar.make(usernameEditText, "Invalid password. Please try again.", Snackbar.LENGTH_LONG).show();
                     }

@@ -1,5 +1,7 @@
 package com.example.finding_tory;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -17,6 +19,8 @@ import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
 import com.example.finding_tory.ui.ledger.LedgerFragment;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.Objects;
+
 /**
  * LedgerViewActivity is an AppCompatActivity that manages the main user interface for the application.
  * It sets up a DrawerLayout with a NavigationView for navigating between different sections of the app like ledger and profile.
@@ -27,6 +31,10 @@ public class LedgerViewActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityLedgerViewBinding binding;
+    private static final String SHARED_PREFS = "sharedPrefs";
+    private static final String SHARED_INDEX = "text";
+
+    private String AUTH_USER = "";
 
     /**
      * Initializes the activity, sets up the navigation drawer and navigation components.
@@ -37,9 +45,38 @@ public class LedgerViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Get user and pass to LedgerFragment
-        String username = (String) getIntent().getSerializableExtra("username");
-        LedgerFragment ledgerFragment = LedgerFragment.newInstance(username);
+        if (AUTH_USER.equals("")) {
+            AUTH_USER = loadData();
+            if (AUTH_USER.equals("")) {
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivityForResult(intent, 1);
+            }
+        }
+        if (!AUTH_USER.equals("")) {
+            startCooking();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK && data != null) {
+                AUTH_USER = data.getStringExtra("username");
+                if (!AUTH_USER.equals("")) {
+                    saveData(AUTH_USER, 1);
+                    startCooking();
+                }
+            } else {
+                // Handle the case where no result is returned (e.g., back pressed)
+                finish();
+            }
+        }
+    }
+
+    private void startCooking() {
+        LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
 
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -62,6 +99,7 @@ public class LedgerViewActivity extends AppCompatActivity {
         logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                saveData("", 1);
                 finish();
             }
         });
@@ -75,6 +113,19 @@ public class LedgerViewActivity extends AppCompatActivity {
             }
         };
         getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    public void saveData(String usrname, int action) {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(SHARED_INDEX, usrname);
+        editor.apply();
+    }
+
+    public String loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        return sharedPreferences.getString(SHARED_INDEX, "");
     }
 
     /**
