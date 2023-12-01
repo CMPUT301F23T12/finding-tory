@@ -90,7 +90,7 @@ public class LedgerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), InventoryViewActivity.class);
-                intent.putExtra("inventoryName", ledger.getInventories().get(position).getInventoryName());
+                intent.putExtra("inventory", ledger.getInventories().get(position));
                 intent.putExtra("username", username);
                 startActivityForResult(intent, 1);
                 // getActivity().startActivity(intent);  // launch the InventoryViewActivity
@@ -101,7 +101,7 @@ public class LedgerFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
-                intent.putExtra("inventoryName", ledger.getInventories().get(position));
+                intent.putExtra("inventory", ledger.getInventories().get(position));
                 intent.putExtra("username", username);
                 startActivityForResult(intent, 1);
                 return true;

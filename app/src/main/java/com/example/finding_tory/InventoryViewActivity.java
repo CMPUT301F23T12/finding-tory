@@ -53,11 +53,11 @@ public class InventoryViewActivity extends AppCompatActivity {
         // TODO get an actual inventory from the db
         // get the inventory that's been passed by the ledger view parent activity
         Intent intent = getIntent();
-        String inventoryName = (String) intent.getSerializableExtra("inventoryName");
+        Inventory inventory = (Inventory) intent.getSerializableExtra("inventory");
         username = (String) intent.getSerializableExtra("username");
-        populateInventoryItems(inventoryName);
+        populateInventoryItems(inventory);
         assert (inventory != null);
-        setTitle(inventoryName);
+        setTitle(inventory.getInventoryName());
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
@@ -310,11 +310,10 @@ public class InventoryViewActivity extends AppCompatActivity {
     /**
      * Queries for user's items in the selected inventory and add to the current inventory
      *
-     * @param inventoryName The inventory name to retrieve from Firestore
+     * @param inventory The inventory name to retrieve from Firestore
      */
-    public void populateInventoryItems(String inventoryName) {
-        inventory = new Inventory(inventoryName);
-        FirestoreDB.getItemsRef(username, inventoryName).get().addOnSuccessListener(queryDocumentSnapshots -> {
+    public void populateInventoryItems(Inventory inventory) {
+        FirestoreDB.getItemsRef(username, inventory).get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                 Item item = documentSnapshot.toObject(Item.class);
                 inventory.addItem(item);
