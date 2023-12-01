@@ -69,13 +69,11 @@ public class FirestoreDB {
      * @param username     The username identifying the specific user.
      * @param inventory    The Inventory containing the item to be edited.
      * @param existingItem The existing item to be edited.
-     * @param updatedItem  The updated item
      */
-    public static void editItemFromFirestore(String username, Inventory inventory, Item existingItem, Item updatedItem) {
+    public static void editItemFromFirestore(String username, Inventory inventory, Item existingItem) {
         // Must delete existingItem for cases where user updates the description
         if (!FirestoreDB.isDebugMode()) {
-            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(existingItem.getDescription()).delete();
-            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(updatedItem.getDescription()).set(updatedItem).addOnSuccessListener(aVoid -> {
+            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(existingItem.getId()).set(existingItem).addOnSuccessListener(aVoid -> {
             }).addOnFailureListener(e -> {
                 // Handle failure
                 e.printStackTrace();
