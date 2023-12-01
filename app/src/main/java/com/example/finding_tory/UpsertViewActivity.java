@@ -210,8 +210,9 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     String serial_number = serial_number_text.getText().toString();
                     String comment = comment_text.getText().toString();
                     Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
-                    intent.putExtra("item_to_add", upsert_item);
+
                     if (isAdd) {
+                        intent.putExtra("item_to_add", upsert_item);
                         addItemToFirestore(upsert_item);
                     } else {
                         item.setDescription(description);
