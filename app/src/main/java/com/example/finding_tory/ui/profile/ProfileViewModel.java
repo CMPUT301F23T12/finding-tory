@@ -1,36 +1,47 @@
 package com.example.finding_tory.ui.profile;
+package com.example.finding_tory;
 
-import androidx.lifecycle.LiveData;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-/**
- * ProfileViewModel is a ViewModel associated with the ProfileFragment.
- * It manages the data for the ProfileFragment, particularly the text data to be displayed.
- *
- * The ViewModel uses LiveData to ensure that the UI components can observe changes in the data,
- * enabling the application to handle data updates in a lifecycle-aware manner.
- */
+
 public class ProfileViewModel extends ViewModel {
+    private MutableLiveData<User> userData = new MutableLiveData<>();
+    private MutableLiveData<String> userFetchError = new MutableLiveData<>();
 
-    private final MutableLiveData<String> mText;
 
-    /**
-     * Constructor for ProfileViewModel.
-     * Initializes the MutableLiveData object and sets its value.
-     */
     public ProfileViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("Test User");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String currentUserId = currentUser.getUid();
+            FirebaseFirestore db = FirestoreDB.getDb();
+            db.collection("users").document(currentUserId).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    User user = documentSnapshot.toObject(User.class);
+                    userData.setValue(user);
+                } else {
+                    userFetchError.setValue("No user data found.");
+                }
+            }).addOnFailureListener(e -> {
+                userFetchError.setValue("Error fetching user data: " + e.getMessage());
+            });
+        } else {
+            userFetchError.setValue("User not logged in.");
+        }
     }
 
-    /**
-     * Provides the text data as an observable LiveData object.
-     * This allows UI components, such as fragments, to observe the data and update accordingly.
-     *
-     * @return LiveData object containing String data.
-     */
-    public LiveData<String> getText() {
-        return mText;
+
+    public MutableLiveData<User> getUserData() {
+        return userData;
+    }
+
+
+    public MutableLiveData<String> getUserFetchError() {
+        return userFetchError;
     }
 }
+

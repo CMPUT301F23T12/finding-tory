@@ -1,16 +1,20 @@
 package com.example.finding_tory.ui.profile;
 
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+
 import com.example.finding_tory.databinding.FragmentProfileBinding;
+
 
 /**
  * ProfileFragment is a subclass of Fragment that represents the user profile section in the application.
@@ -21,6 +25,8 @@ import com.example.finding_tory.databinding.FragmentProfileBinding;
  */
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
+    private ProfileViewModel profileViewModel;
+
 
     /**
      * Inflates the fragment layout, initializes the ViewModel, and sets up data binding.
@@ -33,24 +39,36 @@ public class ProfileFragment extends Fragment {
      */
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ProfileViewModel profileViewModel =
-                new ViewModelProvider(this).get(ProfileViewModel.class);
-
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textProfileName;
-        profileViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+        profileViewModel.getUserData().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                binding.textProfileName.setText(user.getName());
+                // Populate other profile data views...
+            }
+        });
+
+
+        profileViewModel.getUserFetchError().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                // Handle the error. For example, show a Toast or a Snackbar
+                Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+                // You might want to navigate the user to a login screen or error page.
+            }
+        });
+
+
         return root;
     }
 
-    /**
-     * Called when the view hierarchy associated with the fragment is being destroyed.
-     * It cleans up the binding to prevent memory leaks.
-     */
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
 }
+
