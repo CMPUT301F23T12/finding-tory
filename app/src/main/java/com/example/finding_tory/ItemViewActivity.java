@@ -3,7 +3,6 @@ package com.example.finding_tory;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -17,11 +16,10 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -35,7 +33,6 @@ public class ItemViewActivity extends AppCompatActivity {
     private String username;
     private Inventory selectedInventory;
     private Item selectedItem;
-    private ArrayList<String> imageLinks = new ArrayList<>();
     int picture_index;
     int position;
 
@@ -128,7 +125,7 @@ public class ItemViewActivity extends AppCompatActivity {
         final Button leftPictureButton = findViewById(R.id.button_left_picture_item);
         leftPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view) { // update the displayed image to the previous image in the list
                 updateImage(-1, selectedItem);
             }
         });
@@ -136,7 +133,7 @@ public class ItemViewActivity extends AppCompatActivity {
         final Button rightPictureButton = findViewById(R.id.button_right_picture_item);
         rightPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view) { // update the displayed image to the next image in the list
                 updateImage(1, selectedItem);
             }
         });
@@ -211,10 +208,13 @@ public class ItemViewActivity extends AppCompatActivity {
             findViewById(R.id.image_slider_placeholder).setVisibility(View.VISIBLE);
             ImageView image = findViewById(R.id.item_image);
             picture_index = 0;
-            Picasso.get().load(passedItem.getImageLinks().get(picture_index)).into(image);
-
+            Glide.with(this).load(passedItem.getImageLinks().get(picture_index)).into(image);
+            if (passedItem.getImageLinks().size() == 1) { // if there only one image, no need for switch buttons
+                findViewById(R.id.button_right_picture_item).setVisibility(View.GONE);
+                findViewById(R.id.button_left_picture_item).setVisibility(View.GONE);
+            }
         }
-        else {
+        else { // if there's no images, no need to show the image section
             findViewById(R.id.image_slider_placeholder).setVisibility(View.GONE);
         }
 
@@ -240,13 +240,14 @@ public class ItemViewActivity extends AppCompatActivity {
      *        item (Item): the item that we are currently viewing
      */
     private void updateImage(int direction, Item item) {
-        if (item.getImageLinks() == null || item.getImageLinks().size() == 0 ) { //no images exist
+        if (item.getImageLinks() == null || item.getImageLinks().size() == 0 ) { // return if no images exist
             Toast.makeText(this, "No images to show", Toast.LENGTH_SHORT).show();
             return;
         }
+        // load the image and index of the the current image, calculate the next index of image and display
         ImageView image = findViewById(R.id.item_image);
         picture_index += direction+item.getImageLinks().size(); // ensures that picture_index is always positive; mod will account for it
         picture_index %= item.getImageLinks().size();
-        Picasso.get().load(item.getImageLinks().get(picture_index)).into(image);
+        Glide.with(this).load(item.getImageLinks().get(picture_index)).into(image);
     }
 }

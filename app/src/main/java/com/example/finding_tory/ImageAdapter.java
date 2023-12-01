@@ -1,7 +1,6 @@
 package com.example.finding_tory;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -37,9 +36,12 @@ public class ImageAdapter extends ArrayAdapter<String> {
         }
 
         // find Imageview and TextView elements that we wish to update
-        String link = links.get(position);
         ImageView image = view.findViewById(R.id.image_view);
-        Picasso.get().load(link).into(image);
+
+        // get the download link, then get the image from the download link and display
+        String link = links.get(position);
+        Glide.with(context).load(link).into(image);
+
         TextView imageTitle = view.findViewById(R.id.image_title);
         imageTitle.setText("image-" + (position + 1));
 

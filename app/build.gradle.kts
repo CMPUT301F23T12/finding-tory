@@ -54,6 +54,8 @@ dependencies {
     implementation("androidx.navigation:navigation-ui:2.7.4")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.github.bumptech.glide:glide:4.11.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
