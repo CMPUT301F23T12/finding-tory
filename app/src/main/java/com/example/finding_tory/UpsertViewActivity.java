@@ -202,6 +202,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
+
                     String description = description_text.getText().toString();
                     String make = make_text.getText().toString();
                     String model = model_text.getText().toString();
@@ -209,14 +210,21 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     String serial_number = serial_number_text.getText().toString();
                     String comment = comment_text.getText().toString();
                     Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags);
-
+                    intent.putExtra("item_to_add", upsert_item);
                     if (isAdd) {
-                        intent.putExtra("item_to_add", upsert_item);
                         addItemToFirestore(upsert_item);
                     } else {
-//                        editItemFromFirestore(item, upsert_item);
-                        FirestoreDB.editItemFromFirestore(username, inventory, item, upsert_item);
-                        intent.putExtra("editedItem", upsert_item);
+                        item.setDescription(description);
+                        item.setMake(make);
+                        item.setModel(model);
+                        item.setEstimatedValue(estimated_cost);
+                        item.setSerialNumber(serial_number);
+                        item.setComment(comment);
+                        item.setItemTags(tags);
+
+                        System.out.println(item.getId());
+                        FirestoreDB.editItemFromFirestore(username, inventory, item);
+                        intent.putExtra("editedItem", item);
                     }
                     setResult(RESULT_OK, intent); // sends item back to parent activity
                     finish();
@@ -243,13 +251,21 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      */
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
-            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(item.getDescription()).set(item).addOnSuccessListener(aVoid -> {
-                // Item added successfully
-                Toast.makeText(UpsertViewActivity.this, "Item added successfully!", Toast.LENGTH_SHORT).show();
+            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).add(item).addOnSuccessListener(documentReference -> {
+                // Get the generated ID and store it in the item
+                String generatedId = documentReference.getId();
+                item.setId(generatedId); // Assuming Item has a setId method
+
+                // Update the item in Firestore with its ID
+                FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(generatedId).set(item);
+
+                Toast.makeText(UpsertViewActivity.this, "Item added successfully added!", Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> {
+                // Handle failure
+                e.printStackTrace();
             });
         }
     }
-
 
     /**
      * Launches activity to scan barcode of a product
@@ -262,7 +278,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     }
 
     // retrieves data from barcode scanner and displays it to serial number field
-    ActivityResultLauncher<ScanOptions> barcodeLauncher= registerForActivityResult(new ScanContract(), result -> {
+    ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
             TestBarcodeContainer testBarcode = new TestBarcodeContainer();
             Barcode barcode = testBarcode.getBarcodeInfo(result.getContents());
