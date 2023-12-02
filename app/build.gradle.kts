@@ -38,6 +38,7 @@ android {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
+    implementation("com.google.android.gms:play-services-vision:20.1.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     compileOnly(files("${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"))
     implementation("com.github.dhaval2404:imagepicker:2.1")

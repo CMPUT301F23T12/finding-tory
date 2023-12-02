@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -32,6 +38,7 @@ import com.google.firebase.storage.UploadTask;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,6 +55,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private Button submit_button;
     private Button cancel_button;
     private ImageButton scan_barcode_button;
+    private ImageButton scan_serial_button;
     private TextView view_title;
     private LinearLayout tags_container;
     private EditText description_text;
@@ -83,6 +91,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         upload_image_button = findViewById(R.id.upload_images_button);
         cancel_button = findViewById(R.id.cancel_button);
         scan_barcode_button = findViewById(R.id.scan_barcode_button);
+        scan_serial_button = findViewById(R.id.serial_number_scanner);
         view_title = findViewById(R.id.upsert_title);
         tags_container = findViewById(R.id.tags_container);
         description_text = findViewById(R.id.description_edittext);
@@ -179,6 +188,13 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             @Override
             public void onClick(View view) {
                 scanBarcode();
+            }
+        });
+
+        scan_serial_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scanSerialNumber();
             }
         });
 
@@ -359,6 +375,17 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         barcodeLauncher.launch(options);
     }
 
+    /**
+     * Launches activity to take a picture, crop it, and serial number from the cropped image
+     */
+    public void scanSerialNumber() {
+//        ImagePicker.with(UpsertViewActivity.this)
+//                .cameraOnly()
+//                .crop(16f, 3f)
+//                .start(ActivityCodes.SCAN_SERIAL_NUMBER.getRequestCode());
+//
+    }
+
     // retrieves data from barcode scanner and displays it to serial number field
     ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
@@ -475,7 +502,18 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+        } else if (resultCode == Activity.RESULT_OK && requestCode == ActivityCodes.SCAN_SERIAL_NUMBER.getRequestCode()) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                try {
+                    textDetector(uri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
         }
     }
@@ -515,5 +553,26 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         justifyListViewHeightBasedOnChildren();
         position += 1;
         Toast.makeText(this, "Image " + position + " deleted", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     *  reads all the text from an image
+     *  called once the user sends a cropped picture of just the serial number
+     */
+    public void textDetector(Uri uri) throws IOException {
+        // initialize the tools
+        TextRecognizer serial_number_reader = new TextRecognizer.Builder(this).build();
+        Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+        Frame frame = new Frame.Builder().setBitmap(image).build();
+        StringBuilder serialNum = new StringBuilder();
+
+        // read the text from the bitmap image using the text recognizer - construct a string from it
+        SparseArray<TextBlock> temp_arr = serial_number_reader.detect(frame);
+        for (int i = 0; i <temp_arr.size(); i++) {
+            TextBlock t_char = temp_arr.get(i);
+            String chr = t_char.getValue();
+            serialNum.append(chr);
+        }
+        serial_number_text.setText(serialNum);
     }
 }
