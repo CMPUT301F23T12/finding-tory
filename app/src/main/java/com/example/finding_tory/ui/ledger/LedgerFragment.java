@@ -158,8 +158,6 @@ public class LedgerFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 assert data != null;
                 Inventory deleteInventory = (Inventory) data.getSerializableExtra("inventory_to_delete");
-
-                assert deleteInventory != null;
                 if (deleteInventory != null) {
                     ledger.deleteInventory(deleteInventory);
                 }
