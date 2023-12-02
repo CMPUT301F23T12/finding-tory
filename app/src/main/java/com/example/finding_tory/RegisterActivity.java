@@ -97,7 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             User user = new User(username, name, password);
             Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
-            intent.putExtra("user", user);
+            intent.putExtra("username", user.getUsername());
             startActivity(intent);
             Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
         }
