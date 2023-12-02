@@ -12,6 +12,7 @@ import java.util.Date;
  * estimated value, comments, and tags. This class is designed to be serializable to facilitate easy storage and retrieval.
  */
 public class Item implements Serializable {
+    private String id;
     private Date purchaseDate;
     private String description;
     private String make;
@@ -20,7 +21,7 @@ public class Item implements Serializable {
     private float estimatedValue;
     private String comment;
     private ArrayList<String> itemTags;
-    // TODO: Add ArrayList of Images
+    private ArrayList<String> imageLinks;
 
     /**
      * No-args constructor, required for deserialization from Firestore.
@@ -41,7 +42,7 @@ public class Item implements Serializable {
      * @param comment        A comment about the item.
      * @param itemTags       A list of tags associated with the item.
      */
-    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags) {
+    public Item(Date purchaseDate, String description, String make, String model, float estimatedValue, String serialNumber, String comment, ArrayList<String> itemTags, ArrayList<String> imageLinks) {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.make = make;
@@ -49,6 +50,7 @@ public class Item implements Serializable {
         this.serialNumber = serialNumber;
         this.estimatedValue = estimatedValue;
         this.comment = comment;
+        this.imageLinks = imageLinks;
         this.setItemTags(itemTags);
     }
 
@@ -66,6 +68,7 @@ public class Item implements Serializable {
         this.estimatedValue = copy.getEstimatedValue();
         this.comment = copy.getComment();
         this.itemTags = copy.getItemTags();
+        this.imageLinks = copy.getImageLinks();
     }
 
     /**
@@ -238,6 +241,14 @@ public class Item implements Serializable {
         this.SortItemTag();
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     /**
      * Sort the tags in alphanumeric order
      */
@@ -268,6 +279,26 @@ public class Item implements Serializable {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
+    public ArrayList<String> getImageLinks() {
+        return imageLinks;
+    }
+
+    public void setImageLinks(ArrayList<String> imageLinks) {
+        this.imageLinks = imageLinks;
+    }
+
+    public void addImageLink(String link) {
+        imageLinks.add(link);
+    }
+
+    public void deleteImageLink(int index) {
+        imageLinks.remove(index);
+    }
+
+    public String getLink(int index) {
+        return imageLinks.get(index);
     }
 
     /**

@@ -6,7 +6,7 @@ package com.example.finding_tory;
  * This enum provides a standardized way of identifying and handling different activity requests.
  */
 public enum ActivityCodes {
-    ADD_ITEM(0), EDIT_ITEM(1), DELETE_ITEM(2), CANCEL_ITEM(3), VIEW_ITEM(4), REGISTER_USER(5), LOGIN_USER(6);
+    ADD_ITEM(0), EDIT_ITEM(1), DELETE_ITEM(2), CANCEL_ITEM(3), VIEW_ITEM(4), CAMERA_PHOTO(5), GALLERY_PHOTO(6), ADD_INVENTORY(7), REGISTER_USER(8), LOGIN_USER(9);
 
     private int requestCode;
 
