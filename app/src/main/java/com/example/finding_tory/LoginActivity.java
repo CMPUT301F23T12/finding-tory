@@ -82,6 +82,13 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Handles the result of activities that were started for a result.
+     *
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode  The result code returned by the activity.
+     * @param data        The data returned by the activity.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

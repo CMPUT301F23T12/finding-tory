@@ -26,19 +26,13 @@ public class FilterFragment extends DialogFragment {
     Button datePicker;
     Date dateStart;
     Date dateEnd;
+    private FilterFragment.FilterDialogListener listener;
 
     public interface FilterDialogListener {
         void onFilterDismissed();
 
         void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake);
     }
-
-    private FilterFragment.FilterDialogListener listener;
-
-    public void setFilterDialogListener(FilterFragment.FilterDialogListener listener) {
-        this.listener = listener;
-    }
-
 
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -66,6 +60,19 @@ public class FilterFragment extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Sets the listener for the filter dialog interactions.
+     *
+     * @param listener The FilterFragment.FilterDialogListener instance that will handle dialog callbacks.
+     */
+    public void setFilterDialogListener(FilterFragment.FilterDialogListener listener) {
+        this.listener = listener;
+    }
+
+    /**
+     * Initializes and displays a MaterialDatePicker dialog for selecting a date range.
+     * The selected dates are formatted and displayed in a TextView.
+     */
     private void DatePickerDialog() {
         // Creating a MaterialDatePicker builder for selecting a date range
         MaterialDatePicker.Builder<androidx.core.util.Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
@@ -95,7 +102,11 @@ public class FilterFragment extends DialogFragment {
         datePicker.show(getParentFragmentManager(), "DATE_PICKER");
     }
 
-
+    /**
+     * Handles the dismissal of the dialog interface.
+     *
+     * @param dialog The dialog interface that was dismissed.
+     */
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);

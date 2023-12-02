@@ -17,14 +17,11 @@ import com.example.finding_tory.ActivityCodes;
 import com.example.finding_tory.FirestoreDB;
 import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
-import com.example.finding_tory.Item;
 import com.example.finding_tory.Ledger;
 import com.example.finding_tory.LedgerAdapter;
 import com.example.finding_tory.UpsertInventoryViewActivity;
-import com.example.finding_tory.UpsertViewActivity;
 import com.example.finding_tory.databinding.FragmentLedgerBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;

@@ -16,8 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -217,7 +215,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                         @Override
                         public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
                             state_filter = filterStartDate != null || filterEndDate != null || !filterDescription.equals("") || !filterMake.equals("");
-                            inventory.filterItemsByDateRange(filterStartDate, filterEndDate, filterDescription, filterMake);
+                            inventory.filterItems(filterStartDate, filterEndDate, filterDescription, filterMake);
                             updateTotals();
                             inventoryAdapter.notifyDataSetChanged();
                         }

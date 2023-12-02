@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Represents an inventory containing a collection of items. This class provides functionalities to manage
@@ -77,10 +76,20 @@ public class Inventory implements Serializable {
         return items.size();
     }
 
+    /**
+     * Retrieves the ID of this inventory.
+     *
+     * @return A string representing the unique identifier of this object.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Sets the ID of this inventory.
+     *
+     * @param id The string representing the unique identifier of this object.
+     */
     public void setId(String id) {
         this.id = id;
     }
@@ -246,11 +255,25 @@ public class Inventory implements Serializable {
         this.sortOrder = sortOrder;
     }
 
+    /**
+     * Retrieves the list of currently displayed items.
+     *
+     * @return ArrayList of Item objects that are currently displayed.
+     */
     public ArrayList<Item> getDisplayedItems() {
         return displayItems;
     }
 
-    public void filterItemsByDateRange(Date startDate, Date endDate, String filterDescription, String filterMake) {
+
+    /**
+     * Filters the items based on the specified date range, description, and make.
+     *
+     * @param startDate         The start date of the range to filter items. If null, the start date is not considered.
+     * @param endDate           The end date of the range to filter items.
+     * @param filterDescription The description to filter by. If empty, the description is not considered.
+     * @param filterMake        The make to filter by. If empty, the make is not considered.
+     */
+    public void filterItems(Date startDate, Date endDate, String filterDescription, String filterMake) {
         ArrayList<Item> filteredItems = new ArrayList<>();
 
         for (Item item : items) {
@@ -266,12 +289,22 @@ public class Inventory implements Serializable {
         updateDisplayedItems(filteredItems);
     }
 
+    /**
+     * Updates the list of displayed items with a new set of items.
+     *
+     * @param newDisplayedItems The new list of items to display.
+     */
     public void updateDisplayedItems(ArrayList<Item> newDisplayedItems) {
         this.displayItems.clear();
         this.displayItems.addAll(newDisplayedItems);
         this.sortItems();
     }
 
+    /**
+     * Calculates the total estimated value of all displayed items.
+     *
+     * @return The sum of the estimated values of each item in the displayed items list.
+     */
     public double getDisplayedEstimatedValue() {
         double sum = 0;
         for (Item it : this.displayItems) {
@@ -280,6 +313,11 @@ public class Inventory implements Serializable {
         return sum;
     }
 
+    /**
+     * Sorts the displayed items based on the current sort criteria.
+     *
+     * @return A Boolean indicating if the sorting was successful. Returns false if an invalid sort type is specified.
+     */
     public Boolean sortItems() {
         Comparator<Item> comparator;
         switch (this.sortType) {

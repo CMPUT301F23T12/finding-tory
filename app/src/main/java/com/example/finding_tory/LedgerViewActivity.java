@@ -55,10 +55,17 @@ public class LedgerViewActivity extends AppCompatActivity {
             startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
         }
         if (!AUTH_USER.equals("")) {
-            startCooking();
+            setupLedgerView();
         }
     }
 
+    /**
+     * Handles the result of activities that were started for a result.
+     *
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode  The result code returned by the activity.
+     * @param data        The data returned by the activity.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -68,7 +75,7 @@ public class LedgerViewActivity extends AppCompatActivity {
                 AUTH_USER = data.getStringExtra("username");
                 if (!AUTH_USER.equals("")) {
                     saveData(AUTH_USER);
-                    startCooking();
+                    setupLedgerView();
                 }
             } else {
                 // Handle when the back is pressed
@@ -77,7 +84,11 @@ public class LedgerViewActivity extends AppCompatActivity {
         }
     }
 
-    private void startCooking() {
+    /**
+     * Sets up the ledger's UI, navigation, and event listeners.
+     * It also initializes the LedgerFragment with the provided user info.
+     */
+    private void setupLedgerView() {
         LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
 
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -101,7 +112,6 @@ public class LedgerViewActivity extends AppCompatActivity {
                 saveData("");
                 Intent intent = new Intent(currentViewContext, LoginActivity.class);
                 startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
-                System.out.println("loign activity started");
             }
         });
 
@@ -116,6 +126,11 @@ public class LedgerViewActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
+    /**
+     * Saves the user's username to the internal storage for future reference.
+     *
+     * @param usrname The username to be saved.
+     */
     public void saveData(String usrname) {
         try {
             internalStorageManager.saveUsername(usrname);
@@ -124,6 +139,11 @@ public class LedgerViewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Loads the user's username from the internal storage.
+     *
+     * @return The user's saved username, or an empty string if it couldn't be loaded.
+     */
     public String loadData() {
         try {
             return internalStorageManager.getUsername();
