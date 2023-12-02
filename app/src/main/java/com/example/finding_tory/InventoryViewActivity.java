@@ -62,7 +62,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         populateInventoryItems();
         assert (inventory != null);
         setTitle(inventory.getInventoryName());
-        
+
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
         inventoryAdapter = new InventoryAdapter(this, inventory.getDisplayedItems());
@@ -311,7 +311,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             } else {
                 Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
                 inventory.set(pos, returnedItem);
-                FirestoreDB.editItemFromFirestore(username, inventory, returnedItem, returnedItem);
+                FirestoreDB.editItemFromFirestore(username, inventory, returnedItem);
             }
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();
@@ -335,7 +335,6 @@ public class InventoryViewActivity extends AppCompatActivity {
 
     /**
      * Queries for user's items in the selected inventory and add to the current inventory
-     *
      */
     public void populateInventoryItems() {
         FirestoreDB.getItemsRef(username, inventory).get().addOnSuccessListener(queryDocumentSnapshots -> {
@@ -343,6 +342,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item item = documentSnapshot.toObject(Item.class);
                 inventory.addItem(item);
             }
+            inventory.sortItems();
             updateTotals();
             inventoryAdapter.notifyDataSetChanged();
         }).addOnFailureListener(e -> {

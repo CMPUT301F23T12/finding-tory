@@ -45,6 +45,10 @@ public class LedgerViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         currentViewContext = this;
         internalStorageManager = new InternalStorageManager(this);
+
+        binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         AUTH_USER = loadData();
         if (AUTH_USER.equals("")) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -76,9 +80,6 @@ public class LedgerViewActivity extends AppCompatActivity {
     private void startCooking() {
         LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
 
-        binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -100,6 +101,7 @@ public class LedgerViewActivity extends AppCompatActivity {
                 saveData("");
                 Intent intent = new Intent(currentViewContext, LoginActivity.class);
                 startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
+                System.out.println("loign activity started");
             }
         });
 

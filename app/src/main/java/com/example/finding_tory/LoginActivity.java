@@ -13,13 +13,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
-
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 
 /**
@@ -46,8 +41,11 @@ public class LoginActivity extends AppCompatActivity {
 
         // initialize Firebase Storage
         FirebaseApp.initializeApp(this);
-        // initialize Picasso for loading images from the internet
-        Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
+        // Check if Picasso singleton instance exists
+        if (Picasso.get() == null) {
+            // initialize Picasso for loading images from the internet
+            Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
+        }
 
         // initialize and cache the EditTexts for user info
         usernameEditText = findViewById(R.id.edit_text_username);
@@ -75,9 +73,9 @@ public class LoginActivity extends AppCompatActivity {
 
                 // TODO remove mock credentials
                 if (username.equals("") && password.equals("")) {
-                    loginUser("abc", "123", false);
+                    loginUser("abc", "123");
                 } else {
-                    loginUser(username, password, false);
+                    loginUser(username, password);
                     //Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
                 }
             }
@@ -107,17 +105,16 @@ public class LoginActivity extends AppCompatActivity {
      * @param username        The username entered by the user.
      * @param enteredPassword The password entered by the user.
      */
-    public void loginUser(final String username, final String enteredPassword, boolean bypass) {
+    public void loginUser(final String username, final String enteredPassword) {
         FirestoreDB.getUsersRef().whereEqualTo("username", username).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (!queryDocumentSnapshots.isEmpty()) {
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
-                    if (enteredPassword.equals(storedPassword) || bypass) {
+                    if (enteredPassword.equals(storedPassword)) {
                         Intent resultIntent = getIntent();
                         resultIntent.putExtra("username", username);
                         setResult(RESULT_OK, resultIntent);
-//                        saveData(username);
                         finish();
                     } else {
                         Snackbar.make(usernameEditText, "Invalid password. Please try again.", Snackbar.LENGTH_LONG).show();

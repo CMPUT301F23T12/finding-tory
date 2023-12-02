@@ -86,12 +86,6 @@ public class Inventory implements Serializable {
     }
 
     /**
-     * Gets the total value of all the Items in the inventory.
-     *
-     * @return sum of all item values
-     */
-
-    /**
      * Sets the name of the inventory object.
      *
      * @param name new name to rename to
@@ -119,8 +113,8 @@ public class Inventory implements Serializable {
      * @param items new ArrayList of Items to store
      */
     public void setItems(ArrayList<Item> items) {
-        this.items = items;
-        this.displayItems = items;
+        this.items = new ArrayList<>(items);
+        this.displayItems = new ArrayList<>(items);
         calculateValue();
         this.allTags = new ArrayList<>();
         for (Item item : items) {
@@ -258,19 +252,6 @@ public class Inventory implements Serializable {
 
     public void filterItemsByDateRange(Date startDate, Date endDate, String filterDescription, String filterMake) {
         ArrayList<Item> filteredItems = new ArrayList<>();
-        boolean yesDate = false;
-        boolean yesDescription = false;
-        boolean yesMake = false;
-
-        if (startDate != null || endDate != null) {
-            yesDate = true;
-        }
-        if (!Objects.equals(filterDescription, "")) {
-            yesDescription = true;
-        }
-        if (!Objects.equals(filterMake, "")) {
-            yesMake = true;
-        }
 
         for (Item item : items) {
             Date itemDate = item.getPurchaseDate();

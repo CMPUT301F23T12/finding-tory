@@ -304,7 +304,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                         item.setComment(comment);
                         item.setItemTags(tags);
 
-                        System.out.println(item.getId());
                         FirestoreDB.editItemFromFirestore(username, inventory, item);
                         intent.putExtra("editedItem", item);
                     }
