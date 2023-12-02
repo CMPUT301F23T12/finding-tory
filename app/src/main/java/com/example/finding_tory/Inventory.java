@@ -13,7 +13,7 @@ import java.util.Comparator;
  * items in the inventory.
  */
 public class Inventory implements Serializable {
-
+    private String id;
     private String inventoryName;
     private ArrayList<Item> items;
     private double inventoryEstimatedValue;
@@ -71,6 +71,14 @@ public class Inventory implements Serializable {
     @PropertyName("itemsCount")
     public int getCount() {
         return items.size();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

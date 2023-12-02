@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,16 +51,16 @@ public class InventoryViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_view);
 
-
         // TODO get an actual inventory from the db
         // get the inventory that's been passed by the ledger view parent activity
         Intent intent = getIntent();
-        String inventoryName = (String) intent.getSerializableExtra("inventoryName");
+        inventory = (Inventory) intent.getSerializableExtra("inventory");
         username = (String) intent.getSerializableExtra("username");
-        populateInventoryItems(inventoryName);
+        inventory.setItems(new ArrayList<>());
+        populateInventoryItems();
         assert (inventory != null);
-        setTitle(inventoryName);
-
+        setTitle(inventory.getInventoryName());
+        
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
         inventoryAdapter = new InventoryAdapter(this, inventory.getItems());
@@ -304,17 +306,15 @@ public class InventoryViewActivity extends AppCompatActivity {
     public void updateTotals() {
         totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
         totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
-        FirestoreDB.getInventoriesRef(username).document(inventory.getInventoryName()).set(inventory);
+        FirestoreDB.getInventoriesRef(username).document(inventory.getId()).set(inventory);
     }
 
     /**
      * Queries for user's items in the selected inventory and add to the current inventory
      *
-     * @param inventoryName The inventory name to retrieve from Firestore
      */
-    public void populateInventoryItems(String inventoryName) {
-        inventory = new Inventory(inventoryName);
-        FirestoreDB.getItemsRef(username, inventoryName).get().addOnSuccessListener(queryDocumentSnapshots -> {
+    public void populateInventoryItems() {
+        FirestoreDB.getItemsRef(username, inventory).get().addOnSuccessListener(queryDocumentSnapshots -> {
             for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                 Item item = documentSnapshot.toObject(Item.class);
                 inventory.addItem(item);

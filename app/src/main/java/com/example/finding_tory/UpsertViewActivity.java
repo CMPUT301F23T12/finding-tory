@@ -333,15 +333,15 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      */
     private void addItemToFirestore(Item item) {
         if (!FirestoreDB.isDebugMode()) {
-            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).add(item).addOnSuccessListener(documentReference -> {
+            FirestoreDB.getItemsRef(username, inventory).add(item).addOnSuccessListener(documentReference -> {
                 // Get the generated ID and store it in the item
                 String generatedId = documentReference.getId();
-                item.setId(generatedId); // Assuming Item has a setId method
+                item.setId(generatedId);
 
                 // Update the item in Firestore with its ID
-                FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(generatedId).set(item);
+                FirestoreDB.getItemsRef(username, inventory).document(generatedId).set(item);
 
-                Toast.makeText(UpsertViewActivity.this, "Item added successfully added!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UpsertViewActivity.this, "Item successfully added!", Toast.LENGTH_SHORT).show();
             }).addOnFailureListener(e -> {
                 // Handle failure
                 e.printStackTrace();
