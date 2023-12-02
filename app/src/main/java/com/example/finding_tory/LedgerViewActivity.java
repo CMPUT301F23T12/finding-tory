@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -15,6 +16,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
 import com.example.finding_tory.ui.ledger.LedgerFragment;
+import com.example.finding_tory.ui.profile.ProfileViewModel;
 import com.google.android.material.navigation.NavigationView;
 
 /**
@@ -40,6 +42,9 @@ public class LedgerViewActivity extends AppCompatActivity {
         // Get user and pass to LedgerFragment
         String username = (String) getIntent().getSerializableExtra("username");
         LedgerFragment ledgerFragment = LedgerFragment.newInstance(username);
+
+        ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        profileViewModel.setUsername(username);
 
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

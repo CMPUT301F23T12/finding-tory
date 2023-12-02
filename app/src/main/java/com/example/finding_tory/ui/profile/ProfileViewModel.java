@@ -10,9 +10,6 @@ import com.example.finding_tory.FirestoreDB;
 import com.example.finding_tory.Inventory;
 import com.example.finding_tory.User;
 import com.example.finding_tory.Item;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 import java.util.Map;
@@ -23,41 +20,30 @@ public class ProfileViewModel extends ViewModel {
     private MutableLiveData<Integer> totalInventories = new MutableLiveData<>();
     private MutableLiveData<Integer> totalItems = new MutableLiveData<>();
     private MutableLiveData<Double> totalValue = new MutableLiveData<>();
+    private String username;
 
     public ProfileViewModel() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            String currentUserId = currentUser.getUid();
-            FirebaseFirestore db = FirestoreDB.getDb();
-            db.collection("users").document(currentUserId)
-                    .addSnapshotListener((documentSnapshot, e) -> {
-                        if (e != null) {
-                            userFetchError.setValue("Listen failed: " + e.getMessage());
-                            return;
-                        }
-                        if (documentSnapshot != null && documentSnapshot.exists()) {
-                            User user = documentSnapshot.toObject(User.class);
-                            userData.setValue(user);
-                            // You can now update your total inventories, items, and value
-                            updateInventoryData(currentUserId);
-                        } else {
-                            userFetchError.setValue("No user data found.");
-                        }
-                    });
-        } else {
-            userFetchError.setValue("User not logged in.");
-        }
     }
 
-    private void updateInventoryData(String userId) {
+
+    public void setUsername(String username) {
+        this.username = username;
+        updateInventoryData();
+    }
+
+    private void updateInventoryData() {
+        if (username == null || username.isEmpty()) {
+            userFetchError.setValue("Username not set.");
+            return;
+        }
+
         FirebaseFirestore db = FirestoreDB.getDb();
-        db.collection("users").document(userId).collection("inventories")
+        db.collection("users").document(username).collection("inventories")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    // Assuming Inventory has a proper constructor and getters to handle Firestore data
                     List<Inventory> inventories = queryDocumentSnapshots.toObjects(Inventory.class);
                     totalInventories.setValue(inventories.size());
-                    Log.d("ProfileViewModel", "Total Inventories Updated: " + inventories.size()); // Log statement
+                    Log.d("ProfileViewModel", "Total Inventories Updated: " + inventories.size());
 
                     int itemsCount = 0;
                     double valueSum = 0;
@@ -68,12 +54,13 @@ public class ProfileViewModel extends ViewModel {
                         }
                     }
                     totalItems.setValue(itemsCount);
-                    Log.d("ProfileViewModel", "Total Items Updated: " + itemsCount); // Log statement
+                    Log.d("ProfileViewModel", "Total Items Updated: " + itemsCount);
                     totalValue.setValue(valueSum);
-                    Log.d("ProfileViewModel", "Total Value Updated: $" + valueSum); // Log statement
+                    Log.d("ProfileViewModel", "Total Value Updated: $" + valueSum);
                 })
                 .addOnFailureListener(e -> userFetchError.setValue("Error fetching inventories: " + e.getMessage()));
     }
+
 
 
     public MutableLiveData<User> getUserData() { return userData; }

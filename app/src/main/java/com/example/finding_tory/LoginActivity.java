@@ -100,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (enteredPassword.equals(storedPassword)) {
                         // Start the LedgerViewActivity for the validated user
                         Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
-                        intent.putExtra("username", user.getUsername());
+                        intent.putExtra("username", username);
                         startActivity(intent);
                     } else {
                         // Password is incorrect
