@@ -1,7 +1,6 @@
 package com.example.finding_tory;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -19,7 +18,7 @@ import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
 import com.example.finding_tory.ui.ledger.LedgerFragment;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.Objects;
+import java.io.IOException;
 
 /**
  * LedgerViewActivity is an AppCompatActivity that manages the main user interface for the application.
@@ -31,10 +30,9 @@ public class LedgerViewActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityLedgerViewBinding binding;
-    private static final String SHARED_PREFS = "sharedPrefs";
-    private static final String SHARED_INDEX = "text";
-
+    private InternalStorageManager internalStorageManager;
     private String AUTH_USER = "";
+    private LedgerViewActivity currentViewContext;
 
     /**
      * Initializes the activity, sets up the navigation drawer and navigation components.
@@ -45,12 +43,12 @@ public class LedgerViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentViewContext = this;
+        internalStorageManager = new InternalStorageManager(this);
+        AUTH_USER = loadData();
         if (AUTH_USER.equals("")) {
-            AUTH_USER = loadData();
-            if (AUTH_USER.equals("")) {
-                Intent intent = new Intent(this, LoginActivity.class);
-                startActivityForResult(intent, 1);
-            }
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
         }
         if (!AUTH_USER.equals("")) {
             startCooking();
@@ -61,15 +59,15 @@ public class LedgerViewActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1) {
+        if (requestCode == ActivityCodes.LOGIN_USER.getRequestCode()) {
             if (resultCode == RESULT_OK && data != null) {
                 AUTH_USER = data.getStringExtra("username");
                 if (!AUTH_USER.equals("")) {
-                    saveData(AUTH_USER, 1);
+                    saveData(AUTH_USER);
                     startCooking();
                 }
             } else {
-                // Handle the case where no result is returned (e.g., back pressed)
+                // Handle when the back is pressed
                 finish();
             }
         }
@@ -99,8 +97,9 @@ public class LedgerViewActivity extends AppCompatActivity {
         logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveData("", 1);
-                finish();
+                saveData("");
+                Intent intent = new Intent(currentViewContext, LoginActivity.class);
+                startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
             }
         });
 
@@ -115,17 +114,21 @@ public class LedgerViewActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
-    public void saveData(String usrname, int action) {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    public void saveData(String usrname) {
+        try {
+            internalStorageManager.saveUsername(usrname);
+        } catch (IOException ignored) {
 
-        editor.putString(SHARED_INDEX, usrname);
-        editor.apply();
+        }
     }
 
     public String loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        return sharedPreferences.getString(SHARED_INDEX, "");
+        try {
+            return internalStorageManager.getUsername();
+            // Use the username
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     /**

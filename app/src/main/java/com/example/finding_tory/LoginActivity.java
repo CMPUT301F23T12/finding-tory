@@ -29,8 +29,6 @@ import android.widget.Toast;
 public class LoginActivity extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText passwordEditText;
-    private static final String SHARED_PREFS = "sharedPrefs";
-    private static final String STORED_USER = "text";
 
     /**
      * Initializes the activity, sets up the user interface, and prepares event listeners for buttons.
@@ -44,11 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-//        String storedUsername = loadData();
-//        if (!storedUsername.isEmpty()) {
-//        loginUser(storedUsername, "", true);
-//        }
-
         // initialize and cache the EditTexts for user info
         usernameEditText = findViewById(R.id.edit_text_username);
         passwordEditText = findViewById(R.id.edit_text_password);
@@ -60,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, ActivityCodes.REGISTER_USER.getRequestCode());
             }
         });
 
@@ -82,6 +75,21 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ActivityCodes.REGISTER_USER.getRequestCode()) {
+            if (resultCode == RESULT_OK && data != null) {
+                String LOGGEDIN_USER = data.getStringExtra("username");
+                Intent resultIntent = getIntent();
+                resultIntent.putExtra("username", LOGGEDIN_USER);
+                setResult(RESULT_OK, resultIntent);
+            }
+            finish();
+        }
     }
 
     /**
