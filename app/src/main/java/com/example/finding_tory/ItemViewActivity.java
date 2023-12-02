@@ -7,13 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -30,6 +33,7 @@ public class ItemViewActivity extends AppCompatActivity {
     private String username;
     private Inventory selectedInventory;
     private Item selectedItem;
+    int picture_index;
     int position;
 
     /**
@@ -121,16 +125,16 @@ public class ItemViewActivity extends AppCompatActivity {
         final Button leftPictureButton = findViewById(R.id.button_left_picture_item);
         leftPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                // TODO: Will Implement Later
+            public void onClick(View view) { // update the displayed image to the previous image in the list
+                updateImage(-1, selectedItem);
             }
         });
 
         final Button rightPictureButton = findViewById(R.id.button_right_picture_item);
         rightPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                // TODO: Will Implement Later
+            public void onClick(View view) { // update the displayed image to the next image in the list
+                updateImage(1, selectedItem);
             }
         });
     }
@@ -199,6 +203,21 @@ public class ItemViewActivity extends AppCompatActivity {
         TextView item_serial_number = findViewById(R.id.item_serial_number_text);
         item_serial_number.setText(passedItem.getSerialNumber());
 
+        //if the item does not have an empty list of images, set the image view of the item to the first picture of the item
+        if (passedItem.getImageLinks() != null && passedItem.getImageLinks().size() > 0) {
+            findViewById(R.id.image_slider_placeholder).setVisibility(View.VISIBLE);
+            ImageView image = findViewById(R.id.item_image);
+            picture_index = 0;
+            Glide.with(this).load(passedItem.getImageLinks().get(picture_index)).into(image);
+            if (passedItem.getImageLinks().size() == 1) { // if there only one image, no need for switch buttons
+                findViewById(R.id.button_right_picture_item).setVisibility(View.GONE);
+                findViewById(R.id.button_left_picture_item).setVisibility(View.GONE);
+            }
+        }
+        else { // if there's no images, no need to show the image section
+            findViewById(R.id.image_slider_placeholder).setVisibility(View.GONE);
+        }
+
         LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
         tagsContainer.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -212,5 +231,23 @@ public class ItemViewActivity extends AppCompatActivity {
             tagsContainer.addView(tagView); // Add the tag view to the container
 
         }
+    }
+
+    /**
+     * Updates the image displayed for the item, called when the left or right buttons for image are pressed
+     *
+     * @param direction (int): either -1 to signify left or 1 to signify right
+     *        item (Item): the item that we are currently viewing
+     */
+    private void updateImage(int direction, Item item) {
+        if (item.getImageLinks() == null || item.getImageLinks().size() == 0 ) { // return if no images exist
+            Toast.makeText(this, "No images to show", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // load the image and index of the the current image, calculate the next index of image and display
+        ImageView image = findViewById(R.id.item_image);
+        picture_index += direction+item.getImageLinks().size(); // ensures that picture_index is always positive; mod will account for it
+        picture_index %= item.getImageLinks().size();
+        Glide.with(this).load(item.getImageLinks().get(picture_index)).into(image);
     }
 }
