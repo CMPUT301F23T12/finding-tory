@@ -212,6 +212,9 @@ public class ItemViewActivity extends AppCompatActivity {
             if (passedItem.getImageLinks().size() == 1) { // if there only one image, no need for switch buttons
                 findViewById(R.id.button_right_picture_item).setVisibility(View.GONE);
                 findViewById(R.id.button_left_picture_item).setVisibility(View.GONE);
+            } else {
+                findViewById(R.id.button_right_picture_item).setVisibility(View.VISIBLE);
+                findViewById(R.id.button_left_picture_item).setVisibility(View.VISIBLE);
             }
         }
         else { // if there's no images, no need to show the image section
