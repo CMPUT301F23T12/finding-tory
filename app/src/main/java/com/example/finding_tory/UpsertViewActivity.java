@@ -122,7 +122,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             submit_button.setText("Add");
             date_purchased_text.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         } else {
-            Log.e("Images", "item to edit id: " + item.getId());
             view_title.setText("Edit Item Information");
             description_text.setText(item.getDescription());
             make_text.setText(item.getMake());
@@ -307,7 +306,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                                 item.setComment(comment);
                                 item.setItemTags(tags);
 
-                                Log.e("Images", "editted item id: " + item.getId());
                                 FirestoreDB.editItemFromFirestore(username, inventory, item);
                                 intent.putExtra("editedItem", item);
                                 setResult(RESULT_OK, intent); // sends item back to parent activity
@@ -510,7 +508,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      */
     public void justifyListViewHeightBasedOnChildren() {
         if (imageAdapter == null) {
-            Log.e("image stuff", "returning");
             return;
         }
         int totalHeight = 0;
