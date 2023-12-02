@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 
 /**
@@ -151,28 +153,21 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
      */
     private void deleteInventoryFromFirestore(Inventory inventory) {
         if (!FirestoreDB.isDebugMode()) {
-//            FirestoreDB.getItemsRef(username, inventory).get().addOnCompleteListener(task -> {
-//                if (task.isSuccessful()) {
-//                    for (QueryDocumentSnapshot document : task.getResult()) {
-//                        FirestoreDB.getItemsRef(username, inventory).document(document.getId()).delete();
-//                    }
-//
-//                    // After deleting all items, delete the inventory
-//                    FirestoreDB.getInventoriesRef(username).document(inventory.getId()).delete().addOnSuccessListener(aVoid -> {
-//                        Toast.makeText(UpsertInventoryViewActivity.this, "Inventory and all items deleted successfully!", Toast.LENGTH_SHORT).show();
-//                        Intent intent = new Intent();
-//                        intent.putExtra("inventory_to_delete", inventory);
-//                        setResult(RESULT_OK, intent);
-//                        finish();
-//                    });
-//                }
-//            });
-            FirestoreDB.getInventoriesRef(username).document(inventory.getId()).delete().addOnSuccessListener(aVoid -> {
-                Toast.makeText(UpsertInventoryViewActivity.this, "Inventory and all items deleted successfully!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent();
-                intent.putExtra("inventory_to_delete", inventory);
-                setResult(RESULT_OK, intent);
-                finish();
+            FirestoreDB.getItemsRef(username, inventory).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        FirestoreDB.getItemsRef(username, inventory).document(document.getId()).delete();
+                    }
+
+                    // After deleting all items, delete the inventory
+                    FirestoreDB.getInventoriesRef(username).document(inventory.getId()).delete().addOnSuccessListener(aVoid -> {
+                        Toast.makeText(UpsertInventoryViewActivity.this, "Inventory and all items deleted successfully!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent();
+                        intent.putExtra("inventory_to_delete", inventory);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    });
+                }
             });
         }
     }

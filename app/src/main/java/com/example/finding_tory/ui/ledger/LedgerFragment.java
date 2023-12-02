@@ -103,7 +103,7 @@ public class LedgerFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
                 intent.putExtra("inventory", ledger.getInventories().get(position));
                 intent.putExtra("username", username);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, ActivityCodes.DELETE_INVENTORY.getRequestCode());
                 return true;
             }
         });
@@ -146,11 +146,26 @@ public class LedgerFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 assert data != null;
                 Inventory selectedInventory = (Inventory) data.getSerializableExtra("inventory_to_add");
+
                 assert selectedInventory != null;
-                ledger.getInventories().add(selectedInventory);
-                ledgerAdapter.notifyDataSetChanged();
+
+                if (selectedInventory != null) {
+                    ledger.getInventories().add(selectedInventory);
+                }
+
+            }
+        } else if (requestCode == ActivityCodes.DELETE_INVENTORY.getRequestCode()) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                Inventory deleteInventory = (Inventory) data.getSerializableExtra("inventory_to_delete");
+
+                assert deleteInventory != null;
+                if (deleteInventory != null) {
+                    ledger.deleteInventory(deleteInventory);
+                }
             }
         }
+        ledgerAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -167,7 +182,6 @@ public class LedgerFragment extends Fragment {
      * Fetches the user's inventories from Firestore and updates the UI with the retrieved data.
      */
     private void fetchUserInventories() {
-
         ledger.setInventories(new ArrayList<>());
         FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

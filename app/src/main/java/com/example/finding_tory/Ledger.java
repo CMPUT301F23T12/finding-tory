@@ -32,4 +32,8 @@ public class Ledger {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public void deleteInventory(Inventory inventory) {
+        inventories.remove(inventory);
+    }
 }
