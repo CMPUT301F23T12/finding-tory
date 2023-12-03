@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This class is responsible for updating/inserting items in an inventory
@@ -240,6 +241,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
          * view item if user wants to edit item
          */
         submit_button.setOnClickListener(new View.OnClickListener() {
+            //TODO: refactor
             @Override
             public void onClick(View view) {
                 // checks for error and makes sure required input is filled
@@ -276,6 +278,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     String itemId = description + "-" + dateFormatted + "-" + estimated_cost; //assumes the desc-date-value is unique to this item
 
                     Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags, imageUris);
+                    CountDownLatch latch = new CountDownLatch(imageUris.size());
 
                     for (int i = 0; i < imageUris.size(); i++) {
                         int temp = i + 1;
@@ -290,42 +293,44 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                                 storageRef.child(itemId).child(pathString).getDownloadUrl().addOnSuccessListener(uri -> {
                                     String downloadUrl = uri.toString();
                                     imageLinks.add(downloadUrl);
-                                    // since this code is run asynchronously, the item must be edited and updated when the download links are available
-                                    if (isAdd) {
-                                        FirestoreDB.editItemFromFirestore(username, inventory, upsert_item);
-                                    } else {
-                                        FirestoreDB.editItemFromFirestore(username, inventory, item);
-                                        intent.putExtra("editedItem", item);
-                                    }
+                                    latch.countDown();
                                 });
                             }).addOnFailureListener(exception -> {
-                                Log.e("FirebaseStorage", "Image upload failed: " + exception.getMessage());
                                 exception.printStackTrace();
+                                latch.countDown();
                             });
                         } else {
                             imageLinks.add(imageUris.get(i));
+                            latch.countDown();
                         }
                     }
 
+                    new Thread(() -> {
+                        try {
+                            latch.await(); // Wait for all uploads to complete
+                            // image links contain URLs
+                            if (isAdd) {
+                                upsert_item.setImageLinks(imageLinks);
+                                addItemToFirestore(upsert_item);
+                            } else {
+                                item.setImageLinks(imageLinks);
+                                item.setDescription(description);
+                                item.setMake(make);
+                                item.setModel(model);
+                                item.setEstimatedValue(estimated_cost);
+                                item.setSerialNumber(serial_number);
+                                item.setComment(comment);
+                                item.setItemTags(tags);
 
-                    if (isAdd) {
-                        addItemToFirestore(upsert_item);
-                        intent.putExtra("item_to_add", upsert_item);
-                    } else {
-                        item.setDescription(description);
-                        item.setMake(make);
-                        item.setModel(model);
-                        item.setEstimatedValue(estimated_cost);
-                        item.setSerialNumber(serial_number);
-                        item.setComment(comment);
-                        item.setItemTags(tags);
-
-                        System.out.println(item.getId());
-                        FirestoreDB.editItemFromFirestore(username, inventory, item);
-                        intent.putExtra("editedItem", item);
-                    }
-                    setResult(RESULT_OK, intent); // sends item back to parent activity
-                    finish();
+                                FirestoreDB.editItemFromFirestore(username, inventory, item);
+                                intent.putExtra("editedItem", item);
+                                setResult(RESULT_OK, intent); // sends item back to parent activity
+                                finish();
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
                 }
             }
         });
@@ -348,21 +353,38 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      * @param item The item to be added to Firestore.
      */
     private void addItemToFirestore(Item item) {
+        CountDownLatch latch = new CountDownLatch(1);
         if (!FirestoreDB.isDebugMode()) {
-            FirestoreDB.getItemsRef(username, inventory.getInventoryName()).add(item).addOnSuccessListener(documentReference -> {
+            FirestoreDB.getItemsRef(username, inventory).add(item).addOnSuccessListener(documentReference -> {
                 // Get the generated ID and store it in the item
                 String generatedId = documentReference.getId();
-                item.setId(generatedId); // Assuming Item has a setId method
+                item.setId(generatedId);
 
                 // Update the item in Firestore with its ID
-                FirestoreDB.getItemsRef(username, inventory.getInventoryName()).document(generatedId).set(item);
-
-                Toast.makeText(UpsertViewActivity.this, "Item added successfully added!", Toast.LENGTH_SHORT).show();
+                FirestoreDB.getItemsRef(username, inventory).document(generatedId).set(item);
+                Toast.makeText(UpsertViewActivity.this, "Item successfully added!", Toast.LENGTH_SHORT).show();
+                latch.countDown();
             }).addOnFailureListener(e -> {
                 // Handle failure
                 e.printStackTrace();
+                latch.countDown();
             });
         }
+
+        new Thread(() -> {
+            try {
+                // Wait for item to be added to Firestore
+                latch.await();
+
+                // Update intent and finish activity here
+                Intent intent = new Intent();
+                intent.putExtra("item_to_add", item);
+                setResult(RESULT_OK, intent);
+                finish();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     /**
@@ -379,11 +401,10 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      * Launches activity to take a picture, crop it, and serial number from the cropped image
      */
     public void scanSerialNumber() {
-//        ImagePicker.with(UpsertViewActivity.this)
-//                .cameraOnly()
-//                .crop(16f, 3f)
-//                .start(ActivityCodes.SCAN_SERIAL_NUMBER.getRequestCode());
-//
+        ImagePicker.with(UpsertViewActivity.this)
+                .cameraOnly()
+                .crop(16f, 3f)
+                .start(ActivityCodes.SCAN_SERIAL_NUMBER.getRequestCode());
     }
 
     // retrieves data from barcode scanner and displays it to serial number field
@@ -524,7 +545,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      */
     public void justifyListViewHeightBasedOnChildren() {
         if (imageAdapter == null) {
-            Log.e("image stuff", "returning");
             return;
         }
         int totalHeight = 0;

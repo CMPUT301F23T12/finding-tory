@@ -1,5 +1,6 @@
 package com.example.finding_tory.ui.ledger;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
@@ -90,7 +91,7 @@ public class LedgerFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), InventoryViewActivity.class);
-                intent.putExtra("inventoryName", ledger.getInventories().get(position).getInventoryName());
+                intent.putExtra("inventory", ledger.getInventories().get(position));
                 intent.putExtra("username", username);
                 startActivityForResult(intent, 1);
                 // getActivity().startActivity(intent);  // launch the InventoryViewActivity
@@ -101,9 +102,9 @@ public class LedgerFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
-                intent.putExtra("inventoryName", ledger.getInventories().get(position));
+                intent.putExtra("inventory", ledger.getInventories().get(position));
                 intent.putExtra("username", username);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, ActivityCodes.DELETE_INVENTORY.getRequestCode());
                 return true;
             }
         });
@@ -146,11 +147,24 @@ public class LedgerFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 assert data != null;
                 Inventory selectedInventory = (Inventory) data.getSerializableExtra("inventory_to_add");
+
                 assert selectedInventory != null;
-                ledger.getInventories().add(selectedInventory);
-                ledgerAdapter.notifyDataSetChanged();
+
+                if (selectedInventory != null) {
+                    ledger.getInventories().add(selectedInventory);
+                }
+
+            }
+        } else if (requestCode == ActivityCodes.DELETE_INVENTORY.getRequestCode()) {
+            if (resultCode == RESULT_OK) {
+                assert data != null;
+                Inventory deleteInventory = (Inventory) data.getSerializableExtra("inventory_to_delete");
+                if (deleteInventory != null) {
+                    ledger.deleteInventory(deleteInventory);
+                }
             }
         }
+        ledgerAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -167,7 +181,6 @@ public class LedgerFragment extends Fragment {
      * Fetches the user's inventories from Firestore and updates the UI with the retrieved data.
      */
     private void fetchUserInventories() {
-
         ledger.setInventories(new ArrayList<>());
         FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
