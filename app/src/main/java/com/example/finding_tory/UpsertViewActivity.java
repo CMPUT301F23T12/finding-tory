@@ -288,7 +288,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                             String pathString =  date + temp + ".jpg";
                             UploadTask uploadTask = storageRef.child(itemId).child(pathString).putFile(Uri.parse(imageUris.get(i)));
 
-                            Date finalDateFormatted = dateFormatted;
                             uploadTask.addOnSuccessListener(taskSnapshot -> {
                                 storageRef.child(itemId).child(pathString).getDownloadUrl().addOnSuccessListener(uri -> {
                                     String downloadUrl = uri.toString();
@@ -332,6 +331,14 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                         }
                     }).start();
                 }
+                if (imageUris.size()>0) {
+                    if (isAdd) {
+                        Toast.makeText(UpsertViewActivity.this, "Item being added...", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(UpsertViewActivity.this, "Item being updated!", Toast.LENGTH_LONG).show();
+                    }
+                }
+                submit_button.setEnabled(false);
             }
         });
 
