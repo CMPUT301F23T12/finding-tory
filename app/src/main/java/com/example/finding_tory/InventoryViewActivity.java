@@ -78,10 +78,6 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (state_deletion) {
                     final View greyBack = findViewById(R.id.fadeBackground);
-                    Intent intent = new Intent();
-                    intent.putExtra("inventory_to_delete", inventory);
-                    setResult(RESULT_OK, intent);
-                    finish();
                     DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
                     deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
                         @Override
