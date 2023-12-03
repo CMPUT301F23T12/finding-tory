@@ -282,7 +282,9 @@ public class Inventory implements Serializable {
             if (filteredStartDate == null || (!itemDate.before(filteredStartDate) && !itemDate.after(filteredEndDate))) {
                 if (filteredDescription.equals("") || item.getDescription().contains(filteredDescription)) {
                     if (filteredMake.equals("") || item.getMake().contains(filteredMake)) {
-                        filteredItems.add(item);
+                        if (item.getItemTags().containsAll(filteredTags)) {
+                            filteredItems.add(item);
+                        }
                     }
                 }
             }
@@ -298,11 +300,12 @@ public class Inventory implements Serializable {
      * @param filterDescription The description to filter by. If empty, the description is not considered.
      * @param filterMake        The make to filter by. If empty, the make is not considered.
      */
-    public void setFilter(Date startDate, Date endDate, String filterDescription, String filterMake) {
+    public void setFilter(Date startDate, Date endDate, String filterDescription, String filterMake, ArrayList<String> filterTags) {
         this.filteredStartDate = startDate;
         this.filteredEndDate = endDate;
         this.filteredDescription = filterDescription;
         this.filteredMake = filterMake;
+        this.filteredTags = filterTags;
     }
 
     /**
