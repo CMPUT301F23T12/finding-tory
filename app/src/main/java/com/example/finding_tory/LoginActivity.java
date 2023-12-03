@@ -17,6 +17,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 
 /**
  * LoginActivity is an AppCompatActivity that provides a user interface for login and new account registration.
@@ -70,15 +72,12 @@ public class LoginActivity extends AppCompatActivity {
                 String password = String.valueOf(passwordEditText.getText());
                 passwordEditText.setText("");  // when we return we need to re-enter password
 
-                // For ease of testing, login will login to the testing abc account
-                loginUser("test", "123");
-                // TODO: DO NOT DELETE
-//                if (!(username.equals("") && password.equals(""))) {
-//                     loginUser(username, password);
-//                } else {
-//                    Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
-//                    return;
-//                }
+                if ((username.equals("") && password.equals("")) {
+                     loginUser("cq4", "123");
+                } else {
+                    loginUser(username, password);
+                    // Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -104,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     // User with the provided username exists, get the stored password from the query result
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
-                    if (enteredPassword.equals(storedPassword)) {
+                    if (BCrypt.checkpw(enteredPassword, storedPassword)) {
                         // Start the LedgerViewActivity for the validated user
                         Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
                         intent.putExtra("username", user.getUsername());
