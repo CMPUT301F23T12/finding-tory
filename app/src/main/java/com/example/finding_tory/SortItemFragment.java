@@ -13,6 +13,9 @@ import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 /**
  * SortItemFragment is a DialogFragment that allows users to choose sorting criteria.
  * It provides a customizable dialog with sorting options, and it communicates the user's
@@ -79,7 +82,7 @@ public class SortItemFragment extends DialogFragment {
             }
         });
 
-        return builder.create();
+        return dialog;
     }
 
     /**
