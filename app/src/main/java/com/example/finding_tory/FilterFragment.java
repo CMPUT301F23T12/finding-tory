@@ -42,8 +42,6 @@ public class FilterFragment extends DialogFragment {
     public interface FilterDialogListener {
         void onFilterDismissed();
 
-        void resetFilter();
-
         void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake);
     }
 
@@ -75,13 +73,9 @@ public class FilterFragment extends DialogFragment {
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnResetFilter).setOnClickListener(v -> {
             if (listener != null) {
-                listener.resetFilter();
-                selectedDate.setText("MMM DD, YYYY");
-                dateStart = null;
-                dateEnd = null;
-                filteredDescription.setText("");
-                filteredMake.setText("");
+                listener.onFilterConfirmed(null, null, "", "");
             }
+            dismiss();
         });
 
         view.findViewById(R.id.btnFilter).setOnClickListener(v -> {
