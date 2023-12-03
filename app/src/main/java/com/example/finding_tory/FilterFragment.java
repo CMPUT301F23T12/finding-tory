@@ -19,8 +19,6 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -108,6 +106,17 @@ public class FilterFragment extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Sets the parameters for a filter based on various attributes. It assigns the start and end dates for filtering,
+     * along with specific attributes such as make and description.
+     *
+     * @param filterStartDate   The start date for the filter, used to determine the beginning of the filtering period.
+     * @param filterEndDate     The end date for the filter, used to determine the end of the filtering period.
+     * @param filterDescription A String representing the description to be used as part of the filter criteria.
+     * @param filterMake        A String representing the make (or brand) to be used as part of the filter criteria.
+     * @param allPassedInTags   An ArrayList of Strings representing all available tags.
+     * @param selectTags        An ArrayList of Strings representing the selected tags to be used in the filter.
+     */
     public void populateFilterParams(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> allPassedInTags, ArrayList<String> selectTags) {
         this.dateStart = filterStartDate;
         this.dateEnd = filterEndDate;

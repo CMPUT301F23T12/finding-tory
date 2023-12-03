@@ -1,7 +1,5 @@
 package com.example.finding_tory;
 
-import android.util.Pair;
-
 import com.google.firebase.firestore.PropertyName;
 
 import java.io.Serializable;
