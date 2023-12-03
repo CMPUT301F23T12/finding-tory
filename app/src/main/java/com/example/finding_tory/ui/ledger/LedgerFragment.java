@@ -1,5 +1,6 @@
 package com.example.finding_tory.ui.ledger;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
@@ -156,6 +157,7 @@ public class LedgerFragment extends Fragment {
             }
         } else if (requestCode == ActivityCodes.DELETE_INVENTORY.getRequestCode()) {
             if (resultCode == RESULT_OK) {
+                assert data != null;
                 Inventory deleteInventory = (Inventory) data.getSerializableExtra("inventory_to_delete");
                 if (deleteInventory != null) {
                     ledger.deleteInventory(deleteInventory);
