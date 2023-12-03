@@ -105,7 +105,8 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
                         Intent intent = new Intent();
                         intent.putExtra("inventory_to_delete", inventory);
                         setResult(RESULT_OK, intent);
-                        finish();                    }
+                        finish();
+                    }
                 });
                 deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
             }

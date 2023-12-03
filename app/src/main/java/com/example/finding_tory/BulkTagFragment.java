@@ -64,10 +64,6 @@ public class BulkTagFragment extends DialogFragment {
         assert inventory != null;
         allTags = inventory.getAllTags();
         selectedTags = (ArrayList<String>) getArguments().getSerializable("tags");
-        System.out.println("hi");
-        for (String x : selectedTags) {
-            System.out.println(x);
-        }
         // Initialize RecyclerView and Adapter
         tagsRecyclerView = (RecyclerView) view.findViewById(R.id.tagsRecyclerView);
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());

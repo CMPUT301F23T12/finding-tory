@@ -196,9 +196,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                     for (Item item : inventoryAdapter.getSelectedItems()) {
                         current_tags.addAll(item.getItemTags());
                     }
-                    for (String x : current_tags) {
-                        System.out.println(x);
-                    }
 
                     BulkTagFragment tagDialog = new BulkTagFragment();
                     Bundle args = new Bundle();

@@ -79,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     loginUser(username, password);
                     //Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
+                }
             }
         });
     }
