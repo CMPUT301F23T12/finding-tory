@@ -60,7 +60,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventory = (Inventory) intent.getSerializableExtra("inventory");
         username = (String) intent.getSerializableExtra("username");
         inventory.setItems(new ArrayList<>());
-        inventory.setFilter(null, null, "", "");
+        inventory.setFilter(null, null, "", "", new ArrayList<String>());
 
         populateInventoryItems();
         assert (inventory != null);
@@ -91,7 +91,7 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
                 String temp = editable.toString();
                 state_filter = !temp.equals("");
-                inventory.setFilter(inventory.filteredStartDate, inventory.filteredEndDate, temp, inventory.filteredMake);
+                inventory.setFilter(inventory.filteredStartDate, inventory.filteredEndDate, temp, inventory.filteredMake, inventory.filteredTags);
                 inventory.filterItems();
                 updateTotals(false);
             }
@@ -228,7 +228,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     FilterFragment filterDialog = new FilterFragment();
-                    filterDialog.populateFilterParams(inventory.filteredStartDate, inventory.filteredEndDate, inventory.filteredDescription, inventory.filteredMake);
+                    filterDialog.populateFilterParams(inventory.filteredStartDate, inventory.filteredEndDate, inventory.filteredDescription, inventory.filteredMake, inventory.getAllTags(), inventory.filteredTags);
                     filterDialog.setFilterDialogListener(new FilterFragment.FilterDialogListener() {
                         @Override
                         public void onFilterDismissed() {
@@ -236,9 +236,9 @@ public class InventoryViewActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
-                            state_filter = filterStartDate != null || filterEndDate != null || !filterDescription.equals("") || !filterMake.equals("");
-                            inventory.setFilter(filterStartDate, filterEndDate, filterDescription, filterMake);
+                        public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> filterTags) {
+                            state_filter = filterStartDate != null || filterEndDate != null || !filterDescription.equals("") || !filterMake.equals("") || !(filterTags.size() == 0);
+                            inventory.setFilter(filterStartDate, filterEndDate, filterDescription, filterMake, filterTags);
                             inventory.filterItems();
                             updateTotals(false);
                         }

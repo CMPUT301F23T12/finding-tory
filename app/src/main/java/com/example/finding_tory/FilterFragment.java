@@ -12,10 +12,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -38,11 +43,15 @@ public class FilterFragment extends DialogFragment {
     String filteredMakeTxt;
     String filteredDescriptionTxt;
     private FilterFragment.FilterDialogListener listener;
+    private RecyclerView tagsRecyclerView;
+    private TagAdapter tagAdapter;
+    private ArrayList<String> allTags;
+    private ArrayList<String> selectedTags = new ArrayList<>();
 
     public interface FilterDialogListener {
         void onFilterDismissed();
 
-        void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake);
+        void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> filterTags);
     }
 
     @NonNull
@@ -56,6 +65,15 @@ public class FilterFragment extends DialogFragment {
         datePicker = view.findViewById(R.id.datePicker);
         filteredMake = view.findViewById(R.id.editTextMake);
         filteredDescription = view.findViewById(R.id.editTextDescription);
+
+        tagsRecyclerView = (RecyclerView) view.findViewById(R.id.tagsRecyclerView);
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
+        layoutManager.setFlexDirection(FlexDirection.ROW);
+        layoutManager.setJustifyContent(JustifyContent.SPACE_AROUND);
+        tagsRecyclerView.setLayoutManager(layoutManager);
+
+        tagAdapter = new TagAdapter(allTags, selectedTags, false);
+        tagsRecyclerView.setAdapter(tagAdapter);
 
         if (dateStart != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -73,14 +91,14 @@ public class FilterFragment extends DialogFragment {
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnResetFilter).setOnClickListener(v -> {
             if (listener != null) {
-                listener.onFilterConfirmed(null, null, "", "");
+                listener.onFilterConfirmed(null, null, "", "", new ArrayList<String>());
             }
             dismiss();
         });
 
         view.findViewById(R.id.btnFilter).setOnClickListener(v -> {
             if (listener != null) {
-                listener.onFilterConfirmed(dateStart, dateEnd, filteredDescription.getText().toString(), filteredMake.getText().toString());
+                listener.onFilterConfirmed(dateStart, dateEnd, filteredDescription.getText().toString(), filteredMake.getText().toString(), selectedTags);
             }
             dismiss();
         });
@@ -88,11 +106,24 @@ public class FilterFragment extends DialogFragment {
         return builder.create();
     }
 
-    public void populateFilterParams(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
+    /**
+     * Sets the parameters for a filter based on various attributes. It assigns the start and end dates for filtering,
+     * along with specific attributes such as make and description.
+     *
+     * @param filterStartDate   The start date for the filter, used to determine the beginning of the filtering period.
+     * @param filterEndDate     The end date for the filter, used to determine the end of the filtering period.
+     * @param filterDescription A String representing the description to be used as part of the filter criteria.
+     * @param filterMake        A String representing the make (or brand) to be used as part of the filter criteria.
+     * @param allPassedInTags   An ArrayList of Strings representing all available tags.
+     * @param selectTags        An ArrayList of Strings representing the selected tags to be used in the filter.
+     */
+    public void populateFilterParams(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> allPassedInTags, ArrayList<String> selectTags) {
         this.dateStart = filterStartDate;
         this.dateEnd = filterEndDate;
         this.filteredMakeTxt = filterMake;
         this.filteredDescriptionTxt = filterDescription;
+        this.allTags = allPassedInTags;
+        this.selectedTags = selectTags;
     }
 
     /**

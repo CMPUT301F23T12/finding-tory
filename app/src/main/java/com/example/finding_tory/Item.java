@@ -289,18 +289,6 @@ public class Item implements Serializable {
         this.imageLinks = imageLinks;
     }
 
-    public void addImageLink(String link) {
-        imageLinks.add(link);
-    }
-
-    public void deleteImageLink(int index) {
-        imageLinks.remove(index);
-    }
-
-    public String getLink(int index) {
-        return imageLinks.get(index);
-    }
-
     /**
      * Checks inputs to ensure that the data being entered is valid
      *
