@@ -75,7 +75,7 @@ public class BulkTagFragment extends DialogFragment {
         layoutManager.setJustifyContent(JustifyContent.SPACE_AROUND);
         tagsRecyclerView.setLayoutManager(layoutManager);
 
-        tagAdapter = new TagAdapter(allTags, selectedTags);
+        tagAdapter = new TagAdapter(allTags, selectedTags, false);
         tagsRecyclerView.setAdapter(tagAdapter);
 
         EditText tags_entered = view.findViewById(R.id.add_tags_edittext);
