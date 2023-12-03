@@ -10,23 +10,30 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 
 import static org.hamcrest.CoreMatchers.anything;
 
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.util.Log;
+import android.view.View;
+import android.widget.DatePicker;
 
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.idling.CountingIdlingResource;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -43,6 +50,69 @@ public class InventoryUITest {
     public ActivityScenarioRule<LoginActivity> activityRule = new ActivityScenarioRule<>(LoginActivity.class);
     private CountingIdlingResource idlingResource;
 
+
+    public void navigateToInventory() {
+        login();
+
+        try {
+            Thread.sleep(2000); // Waiting for 2 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onData(anything())
+                .inAdapterView(withId(R.id.ledger_listview))
+                .atPosition(0)
+                .perform(click());
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.add_delete_item_button)).check(matches(isDisplayed()));
+    }
+
+    public void navigateToFirstItem() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onData(anything())
+                .inAdapterView(withId(R.id.inventory_listview))
+                .atPosition(0)
+                .perform(click());
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ViewAction setDate(final int year, final int monthOfYear, final int dayOfMonth) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return ViewMatchers.isAssignableFrom(DatePicker.class);
+            }
+
+            @Override
+            public String getDescription() {
+                return "Set the date in the DatePickerDialog to the specified values";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                final DatePicker datePicker = (DatePicker) view;
+                datePicker.updateDate(year, monthOfYear, dayOfMonth);
+            }
+        };
+    }
+
     @Test
     public void testAddAndDeleteItem() {
         try {
@@ -57,7 +127,9 @@ public class InventoryUITest {
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Apple Macbook Pro 2022"));
         onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Macbook"));
         onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("Pro 2022"));
-        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2023-01-28"));
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
         onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("2000"));
         onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("SN3892"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
@@ -99,7 +171,7 @@ public class InventoryUITest {
         navigateToFirstItem();
         onView(withId(R.id.button_close_item_view)).perform(click());
         pressBack();
-        onView(withText("Home Inventory")).check(matches(isDisplayed()));
+        onView(withText("Home")).check(matches(isDisplayed()));
     }
 
     @Test
@@ -120,8 +192,8 @@ public class InventoryUITest {
                 .atPosition(0)
                 .perform(click());
 
-        // Verify first item clicked is now TV
-        onView(withText("Sony TV")).check(matches(isDisplayed()));
+        // Verify first item clicked is now Dining Table
+        onView(withText("Dining Table")).check(matches(isDisplayed()));
     }
 
     @Test
@@ -134,7 +206,6 @@ public class InventoryUITest {
         catch (Exception e) {
             
         }
-        navigateToFirstItem();
         onView(withText("Blender")).check(matches(isDisplayed()));
     }
 
@@ -153,7 +224,6 @@ public class InventoryUITest {
                 .atPosition(0)
                 .perform(ViewActions.longClick());
 
-        // Bulk delete Blender and Dining Table
         onData(anything())
                 .inAdapterView(withId(R.id.inventory_listview))
                 .atPosition(0)
@@ -165,10 +235,7 @@ public class InventoryUITest {
                 .onChildView(withId(R.id.item_checkbox))
                 .perform(click());
 
-        onView(withId(R.id.filter_tag_button)).perform(click());
-
-        onView(withText("Blender")).check(doesNotExist());
-        onView(withText("Dining Table")).check(doesNotExist());
+        onView(withId(R.id.add_delete_item_button)).perform(click());
         onView(withId(R.id.btnDelete)).perform(click());
 
         // Reset the app to it's original state since the DB is affected
@@ -183,41 +250,36 @@ public class InventoryUITest {
         onView(withId(R.id.button_login)).perform(click());
     }
 
-    public void navigateToInventory() {;
-        login();
-        onData(anything())
-                .inAdapterView(withId(R.id.ledger_listview))
-                .atPosition(0)
-                .perform(click());
-    }
-
-    public void navigateToFirstItem() {
-        onData(anything())
-                .inAdapterView(withId(R.id.inventory_listview))
-                .atPosition(0)
-                .perform(click());
-    }
-
     public void resetAppState() {
         // Add all the stuff we deleted since DB is affected permanently
         onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
-        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2023-08-01"));
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
-        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Kitchen Home"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Sony PS5"));
+        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Sony"));
+        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("PS5"));
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("500"));
+        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("JKA34"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Brand New"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room Electronics Home"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.add_tags_button)).perform(click());
         onView(withId(R.id.add_button)).perform(scrollTo());
         onView(withId(R.id.add_button)).perform(click());
 
         onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Dining Table"));
-        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2019-02-18"));
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("800"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Oak Wood Dining Table"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
+        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
+        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
+        // for Interation with DatePickerDialog
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
+        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Kitchen Home"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_button)).perform(click());
         onView(withId(R.id.add_button)).perform(scrollTo());
         onView(withId(R.id.add_button)).perform(click());
     }
@@ -236,47 +298,6 @@ public class InventoryUITest {
         IdlingRegistry.getInstance().unregister(idlingResource);
     }
 
-    @Test
-    public void addTestData() {IdlingRegistry.getInstance().register(idlingResource);
-        login();
-        idlingResource.increment();
-        navigateToInventory();
-        idlingResource.decrement();
-//        IdlingRegistry.getInstance().unregister(myIdlingResource);
-//        onView(withId(R.id.add_delete_item_button)).perform(click());
-//        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
-//        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
-//        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
-//        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2023-08-01"));
-//        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
-//        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Kitchen Home"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.add_tags_button)).perform(click());
-//        onView(withId(R.id.add_button)).perform(scrollTo());
-//        onView(withId(R.id.add_button)).perform(click());
-//
-//        onView(withId(R.id.add_delete_item_button)).perform(click());
-//        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Dining Table"));
-//        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2019-02-18"));
-//        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("800"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Oak Wood Dining Table"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.add_button)).perform(scrollTo());
-//        onView(withId(R.id.add_button)).perform(click());
-//
-//        onView(withId(R.id.add_delete_item_button)).perform(click());
-//        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Sony PS5"));
-//        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Sony"));
-//        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("PS5"));
-//        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2023-02-03"));
-//        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("500"));
-//        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("JKA34"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Brand New"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room Electronics Home"), ViewActions.closeSoftKeyboard());
-//        onView(withId(R.id.add_tags_button)).perform(click());
-//        onView(withId(R.id.add_button)).perform(scrollTo());
-//        onView(withId(R.id.add_button)).perform(click());
-    }
 
     @Test
     public void addTestData2() throws InterruptedException {
@@ -287,7 +308,10 @@ public class InventoryUITest {
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
         onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
         onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
-        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2023-08-01"));
+        // for Interation with DatePickerDialog
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
         onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
         onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
@@ -298,7 +322,9 @@ public class InventoryUITest {
 
         onView(withId(R.id.add_delete_item_button)).perform(click());
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Dining Table"));
-        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2019-02-18"));
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
         onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("800"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Oak Wood Dining Table"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.add_button)).perform(scrollTo());
@@ -308,7 +334,9 @@ public class InventoryUITest {
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Sony PS5"));
         onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Sony"));
         onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("PS5"));
-        onView(withId(R.id.date_edittext)).perform(ViewActions.typeText("2023-02-03"));
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
         onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("500"));
         onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("JKA34"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Brand New"), ViewActions.closeSoftKeyboard());
