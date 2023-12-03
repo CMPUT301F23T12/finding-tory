@@ -113,10 +113,6 @@ public class FilterFragment extends DialogFragment {
         MaterialDatePicker.Builder<androidx.core.util.Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         builder.setTitleText("Select a date range");
 
-//        if (dateStart != null) {
-//            builder.setSelection(new Pair<>(dateStart.getTime(), dateEnd.getTime()));
-//        }
-
         // Building the date picker dialog
         MaterialDatePicker<Pair<Long, Long>> datePickerFrag = builder.build();
         datePickerFrag.addOnPositiveButtonClickListener(selection -> {

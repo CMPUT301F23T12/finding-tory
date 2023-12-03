@@ -273,12 +273,7 @@ public class Inventory implements Serializable {
 
 
     /**
-     * Filters the items based on the specified date range, description, and make.
-     *
-     * @param startDate         The start date of the range to filter items. If null, the start date is not considered.
-     * @param endDate           The end date of the range to filter items.
-     * @param filterDescription The description to filter by. If empty, the description is not considered.
-     * @param filterMake        The make to filter by. If empty, the make is not considered.
+     * Filters the items based on the stored filter data.
      */
     public void filterItems() {
         ArrayList<Item> filteredItems = new ArrayList<>();
@@ -295,15 +290,19 @@ public class Inventory implements Serializable {
         updateDisplayedItems(filteredItems);
     }
 
+    /**
+     * Sets the Filter conditions of the inventory based on the specified date range, description, and make.
+     *
+     * @param startDate         The start date of the range to filter items. If null, the start date is not considered.
+     * @param endDate           The end date of the range to filter items.
+     * @param filterDescription The description to filter by. If empty, the description is not considered.
+     * @param filterMake        The make to filter by. If empty, the make is not considered.
+     */
     public void setFilter(Date startDate, Date endDate, String filterDescription, String filterMake) {
         this.filteredStartDate = startDate;
         this.filteredEndDate = endDate;
         this.filteredDescription = filterDescription;
         this.filteredMake = filterMake;
-//        this.filteredStartDate = null;
-//        this.filteredEndDate = null;
-//        this.filteredDescription = "";
-//        this.filteredMake = "";
     }
 
     /**
