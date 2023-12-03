@@ -38,7 +38,6 @@ public class InventoryViewActivity extends AppCompatActivity {
     private ListView inventoryListView;
     private InventoryAdapter inventoryAdapter;
     private boolean state_deletion = false;
-    private boolean state_filter = false;
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
     private FloatingActionButton addItemButton;
@@ -60,7 +59,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventory = (Inventory) intent.getSerializableExtra("inventory");
         username = (String) intent.getSerializableExtra("username");
         inventory.setItems(new ArrayList<>());
-        inventory.setFilter(null, null, "", "", new ArrayList<String>());
+        inventory.setFilter(new Filter());
 
         populateInventoryItems();
         assert (inventory != null);
@@ -89,9 +88,8 @@ public class InventoryViewActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String temp = editable.toString();
-                state_filter = !temp.equals("");
-                inventory.setFilter(inventory.filteredStartDate, inventory.filteredEndDate, temp, inventory.filteredMake, inventory.filteredTags);
+                String searchString = editable.toString();
+                inventory.getFilter().setDescription(searchString);
                 inventory.filterItems();
                 updateTotals(false);
             }
@@ -228,7 +226,8 @@ public class InventoryViewActivity extends AppCompatActivity {
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     FilterFragment filterDialog = new FilterFragment();
-                    filterDialog.populateFilterParams(inventory.filteredStartDate, inventory.filteredEndDate, inventory.filteredDescription, inventory.filteredMake, inventory.getAllTags(), inventory.filteredTags);
+                    filterDialog.populateFilterParams(inventory.getFilter().getStartDate(), inventory.getFilter().getEndDate(),
+                            inventory.getFilter().getDescription(), inventory.getFilter().getMake(), inventory.getAllTags(), inventory.getFilter().getTags());
                     filterDialog.setFilterDialogListener(new FilterFragment.FilterDialogListener() {
                         @Override
                         public void onFilterDismissed() {
@@ -237,8 +236,8 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                         @Override
                         public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> filterTags) {
-                            state_filter = filterStartDate != null || filterEndDate != null || !filterDescription.equals("") || !filterMake.equals("") || !(filterTags.size() == 0);
-                            inventory.setFilter(filterStartDate, filterEndDate, filterDescription, filterMake, filterTags);
+                            // TODO change FilterFragment to have a Filter object instead of all these attributes
+                            inventory.setFilter(new Filter(filterStartDate, filterEndDate, filterDescription, filterMake, filterTags));
                             inventory.filterItems();
                             updateTotals(false);
                         }
@@ -344,7 +343,7 @@ public class InventoryViewActivity extends AppCompatActivity {
      * Rewrites the TextView elements displaying the inventory totals to reflect new values.
      */
     public void updateTotals(boolean updateDB) {
-        if (!state_filter) {
+        if (inventory.getFilter().isEmpty()) {
             totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
             totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
         } else {
