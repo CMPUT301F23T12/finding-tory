@@ -3,6 +3,8 @@ package com.example.finding_tory;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
@@ -52,6 +54,9 @@ public class SortItemFragment extends DialogFragment {
         // Pass null as the parent view because its going in the dialog layout
         View view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_sort, null);
         builder.setView(view);
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         // Add action buttons
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
