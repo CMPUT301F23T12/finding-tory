@@ -60,7 +60,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         populateInventoryItems();
         assert (inventory != null);
         setTitle(inventory.getInventoryName());
-        
+
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
         inventoryAdapter = new InventoryAdapter(this, inventory.getItems());
@@ -78,8 +78,8 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (state_deletion) {
                     final View greyBack = findViewById(R.id.fadeBackground);
-                    DeleteItemFragment deleteDialog = new DeleteItemFragment();
-                    deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
+                    DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
+                    deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
                         @Override
                         public void onDialogDismissed() {
                             // Make grey background invisible when the dialog is dismissed

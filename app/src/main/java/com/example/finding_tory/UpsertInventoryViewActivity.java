@@ -88,9 +88,26 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
         delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteInventoryFromFirestore(inventory);
-                setResult(RESULT_CANCELED);
-                finish();
+                // Show Delete Confirmation Fragment
+                DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
+
+                // Set the listener to know when the dialog is dismissed
+                deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
+                    @Override
+                    public void onDialogDismissed() {
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }
+
+                    @Override
+                    public void onDeleteConfirmed() {
+                        deleteInventoryFromFirestore(inventory);
+                        Intent intent = new Intent();
+                        intent.putExtra("inventory_to_delete", inventory);
+                        setResult(RESULT_OK, intent);
+                        finish();                    }
+                });
+                deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
             }
         });
     }
@@ -162,10 +179,6 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
                     // After deleting all items, delete the inventory
                     FirestoreDB.getInventoriesRef(username).document(inventory.getId()).delete().addOnSuccessListener(aVoid -> {
                         Toast.makeText(UpsertInventoryViewActivity.this, "Inventory and all items deleted successfully!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent();
-                        intent.putExtra("inventory_to_delete", inventory);
-                        setResult(RESULT_OK, intent);
-                        finish();
                     });
                 }
             });
