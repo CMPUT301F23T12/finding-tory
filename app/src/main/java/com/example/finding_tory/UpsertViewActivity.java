@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -32,12 +38,14 @@ import com.google.firebase.storage.UploadTask;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This class is responsible for updating/inserting items in an inventory
@@ -48,6 +56,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private Button submit_button;
     private Button cancel_button;
     private ImageButton scan_barcode_button;
+    private ImageButton scan_serial_button;
     private TextView view_title;
     private LinearLayout tags_container;
     private EditText description_text;
@@ -83,6 +92,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         upload_image_button = findViewById(R.id.upload_images_button);
         cancel_button = findViewById(R.id.cancel_button);
         scan_barcode_button = findViewById(R.id.scan_barcode_button);
+        scan_serial_button = findViewById(R.id.serial_number_scanner);
         view_title = findViewById(R.id.upsert_title);
         tags_container = findViewById(R.id.tags_container);
         description_text = findViewById(R.id.description_edittext);
@@ -182,6 +192,13 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
             }
         });
 
+        scan_serial_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scanSerialNumber();
+            }
+        });
+
         /**
          * Displays any tags user entered in the search bar (space-separated) adds it to all
          * tags associated with the item
@@ -224,6 +241,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
          * view item if user wants to edit item
          */
         submit_button.setOnClickListener(new View.OnClickListener() {
+            //TODO: refactor
             @Override
             public void onClick(View view) {
                 // checks for error and makes sure required input is filled
@@ -260,6 +278,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     String itemId = description + "-" + dateFormatted + "-" + estimated_cost; //assumes the desc-date-value is unique to this item
 
                     Item upsert_item = new Item(dateFormatted, description, make, model, estimated_cost, serial_number, comment, tags, imageUris);
+                    CountDownLatch latch = new CountDownLatch(imageUris.size());
 
                     for (int i = 0; i < imageUris.size(); i++) {
                         int temp = i + 1;
@@ -269,32 +288,52 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                             String pathString =  date + temp + ".jpg";
                             UploadTask uploadTask = storageRef.child(itemId).child(pathString).putFile(Uri.parse(imageUris.get(i)));
 
-                            Date finalDateFormatted = dateFormatted;
                             uploadTask.addOnSuccessListener(taskSnapshot -> {
                                 storageRef.child(itemId).child(pathString).getDownloadUrl().addOnSuccessListener(uri -> {
                                     String downloadUrl = uri.toString();
                                     imageLinks.add(downloadUrl);
-                                    // since this code is run asynchronously, the item must be edited and updated when the download links are available
-                                    if (isAdd) {
-                                        FirestoreDB.editItemFromFirestore(username, inventory, upsert_item);
-                                    } else {
-                                        FirestoreDB.editItemFromFirestore(username, inventory, item);
-                                        intent.putExtra("editedItem", item);
-                                    }
+                                    latch.countDown();
                                 });
                             }).addOnFailureListener(exception -> {
-                                Log.e("FirebaseStorage", "Image upload failed: " + exception.getMessage());
                                 exception.printStackTrace();
+                                latch.countDown();
                             });
                         } else {
                             imageLinks.add(imageUris.get(i));
+                            latch.countDown();
                         }
                     }
 
+                    new Thread(() -> {
+                        try {
+                            latch.await(); // Wait for all uploads to complete
+                            // image links contain URLs
+                            if (isAdd) {
+                                upsert_item.setImageLinks(imageLinks);
+                                addItemToFirestore(upsert_item);
+                            } else {
+                                item.setImageLinks(imageLinks);
+                                item.setDescription(description);
+                                item.setMake(make);
+                                item.setModel(model);
+                                item.setEstimatedValue(estimated_cost);
+                                item.setSerialNumber(serial_number);
+                                item.setComment(comment);
+                                item.setItemTags(tags);
 
+                                FirestoreDB.editItemFromFirestore(username, inventory, item);
+                                intent.putExtra("editedItem", item);
+                                setResult(RESULT_OK, intent); // sends item back to parent activity
+                                finish();
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                }
+                if (imageUris.size()>0) {
                     if (isAdd) {
-                        addItemToFirestore(upsert_item);
-                        intent.putExtra("item_to_add", upsert_item);
+                        Toast.makeText(UpsertViewActivity.this, "Item being added...", Toast.LENGTH_LONG).show();
                     } else {
                         item.setDescription(description);
                         item.setMake(make);
@@ -306,10 +345,10 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
                         FirestoreDB.editItemFromFirestore(username, inventory, item);
                         intent.putExtra("editedItem", item);
+                        Toast.makeText(UpsertViewActivity.this, "Item being updated!", Toast.LENGTH_LONG).show();
                     }
-                    setResult(RESULT_OK, intent); // sends item back to parent activity
-                    finish();
                 }
+                submit_button.setEnabled(false);
             }
         });
 
@@ -331,6 +370,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      * @param item The item to be added to Firestore.
      */
     private void addItemToFirestore(Item item) {
+        CountDownLatch latch = new CountDownLatch(1);
         if (!FirestoreDB.isDebugMode()) {
             FirestoreDB.getItemsRef(username, inventory).add(item).addOnSuccessListener(documentReference -> {
                 // Get the generated ID and store it in the item
@@ -339,13 +379,29 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
                 // Update the item in Firestore with its ID
                 FirestoreDB.getItemsRef(username, inventory).document(generatedId).set(item);
-
                 Toast.makeText(UpsertViewActivity.this, "Item successfully added!", Toast.LENGTH_SHORT).show();
+                latch.countDown();
             }).addOnFailureListener(e -> {
                 // Handle failure
                 e.printStackTrace();
+                latch.countDown();
             });
         }
+
+        new Thread(() -> {
+            try {
+                // Wait for item to be added to Firestore
+                latch.await();
+
+                // Update intent and finish activity here
+                Intent intent = new Intent();
+                intent.putExtra("item_to_add", item);
+                setResult(RESULT_OK, intent);
+                finish();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     /**
@@ -356,6 +412,16 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         options.setOrientationLocked(true);
         options.setCaptureActivity(CaptureAct.class);
         barcodeLauncher.launch(options);
+    }
+
+    /**
+     * Launches activity to take a picture, crop it, and serial number from the cropped image
+     */
+    public void scanSerialNumber() {
+        ImagePicker.with(UpsertViewActivity.this)
+                .cameraOnly()
+                .crop(16f, 3f)
+                .start(ActivityCodes.SCAN_SERIAL_NUMBER.getRequestCode());
     }
 
     // retrieves data from barcode scanner and displays it to serial number field
@@ -474,7 +540,18 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 imageAdapter.notifyDataSetChanged();
                 justifyListViewHeightBasedOnChildren();
             }
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+        } else if (resultCode == Activity.RESULT_OK && requestCode == ActivityCodes.SCAN_SERIAL_NUMBER.getRequestCode()) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                try {
+                    textDetector(uri);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
         }
     }
@@ -485,7 +562,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
      */
     public void justifyListViewHeightBasedOnChildren() {
         if (imageAdapter == null) {
-            Log.e("image stuff", "returning");
             return;
         }
         int totalHeight = 0;
@@ -514,5 +590,26 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         justifyListViewHeightBasedOnChildren();
         position += 1;
         Toast.makeText(this, "Image " + position + " deleted", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     *  reads all the text from an image
+     *  called once the user sends a cropped picture of just the serial number
+     */
+    public void textDetector(Uri uri) throws IOException {
+        // initialize the tools
+        TextRecognizer serial_number_reader = new TextRecognizer.Builder(this).build();
+        Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+        Frame frame = new Frame.Builder().setBitmap(image).build();
+        StringBuilder serialNum = new StringBuilder();
+
+        // read the text from the bitmap image using the text recognizer - construct a string from it
+        SparseArray<TextBlock> temp_arr = serial_number_reader.detect(frame);
+        for (int i = 0; i <temp_arr.size(); i++) {
+            TextBlock t_char = temp_arr.get(i);
+            String chr = t_char.getValue();
+            serialNum.append(chr);
+        }
+        serial_number_text.setText(serialNum);
     }
 }

@@ -83,11 +83,11 @@ public class ItemViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Show Delete Confirmation Fragment
-                DeleteItemFragment deleteDialog = new DeleteItemFragment();
+                DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
                 final View greyBack = findViewById(R.id.fadeBackground);
                 greyBack.setVisibility(View.VISIBLE);
                 // Set the listener to know when the dialog is dismissed
-                deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
+                deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
                     @Override
                     public void onDialogDismissed() {
                         // Make grey background invisible when the dialog is dismissed
@@ -212,6 +212,9 @@ public class ItemViewActivity extends AppCompatActivity {
             if (passedItem.getImageLinks().size() == 1) { // if there only one image, no need for switch buttons
                 findViewById(R.id.button_right_picture_item).setVisibility(View.GONE);
                 findViewById(R.id.button_left_picture_item).setVisibility(View.GONE);
+            } else {
+                findViewById(R.id.button_right_picture_item).setVisibility(View.VISIBLE);
+                findViewById(R.id.button_left_picture_item).setVisibility(View.VISIBLE);
             }
         }
         else { // if there's no images, no need to show the image section

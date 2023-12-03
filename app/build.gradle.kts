@@ -38,6 +38,7 @@ android {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
+    implementation("com.google.android.gms:play-services-vision:20.1.3")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     compileOnly(files("${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"))
     implementation("com.github.dhaval2404:imagepicker:2.1")
@@ -55,6 +56,7 @@ dependencies {
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("com.github.bumptech.glide:glide:4.11.0")
+    implementation("org.mindrot:jbcrypt:0.4")
     annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

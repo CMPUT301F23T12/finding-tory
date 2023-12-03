@@ -103,8 +103,8 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (state_deletion) {
                     final View greyBack = findViewById(R.id.fadeBackground);
-                    DeleteItemFragment deleteDialog = new DeleteItemFragment();
-                    deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
+                    DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
+                    deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
                         @Override
                         public void onDialogDismissed() {
                             // Make grey background invisible when the dialog is dismissed

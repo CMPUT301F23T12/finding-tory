@@ -16,6 +16,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 
 /**
  * LoginActivity is an AppCompatActivity that provides a user interface for login and new account registration.
@@ -77,7 +79,6 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     loginUser(username, password);
                     //Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
-                }
             }
         });
     }
@@ -118,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (!queryDocumentSnapshots.isEmpty()) {
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
-                    if (enteredPassword.equals(storedPassword)) {
+                    if (BCrypt.checkpw(enteredPassword, storedPassword)) {
                         Intent resultIntent = getIntent();
                         resultIntent.putExtra("username", username);
                         setResult(RESULT_OK, resultIntent);
