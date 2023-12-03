@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // TODO remove mock credentials
                 if (username.equals("") && password.equals("")) {
-                    loginUser("abc", "123");
+                    loginUser("cq4", "123");
                 } else {
                     loginUser(username, password);
                     //Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();

@@ -22,7 +22,8 @@
             android:id="@+id/datePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Open Date Selector" />
+            android:layout_marginEnd="16dp"
+            android:text="Select Date" />
 
         <TextView
             android:id="@+id/selectedDate"
@@ -70,7 +71,17 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:backgroundTint="@android:color/holo_blue_dark"
-            android:text="Cancel" />
+            android:text="Cancel"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnResetFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="@android:color/holo_blue_dark"
+            android:text="Reset"
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/btnFilter"

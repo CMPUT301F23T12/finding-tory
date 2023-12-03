@@ -16,9 +16,18 @@ import androidx.fragment.app.DialogFragment;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * This fragment provides a user interface to filter data based on specified criteria such as date range,
+ * description, and make. It also supports interaction through a listener pattern to communicate
+ * user actions back to the host activity or fragment.
+ * <p>
+ * The FilterDialogListener interface needs to be implemented by the host to receive callback events
+ * for when the filter is confirmed or the dialog is dismissed.
+ */
 public class FilterFragment extends DialogFragment {
     TextView selectedDate;
     EditText filteredDescription;
@@ -26,10 +35,14 @@ public class FilterFragment extends DialogFragment {
     Button datePicker;
     Date dateStart;
     Date dateEnd;
+    String filteredMakeTxt;
+    String filteredDescriptionTxt;
     private FilterFragment.FilterDialogListener listener;
 
     public interface FilterDialogListener {
         void onFilterDismissed();
+
+        void resetFilter();
 
         void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake);
     }
@@ -46,11 +59,32 @@ public class FilterFragment extends DialogFragment {
         filteredMake = view.findViewById(R.id.editTextMake);
         filteredDescription = view.findViewById(R.id.editTextDescription);
 
+        if (dateStart != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+            selectedDate.setText(sdf.format(dateStart) + " - " + sdf.format(dateEnd));
+        }
+        if (filteredDescriptionTxt != null) {
+            filteredDescription.setText(filteredDescriptionTxt);
+        }
+        if (filteredMakeTxt != null) {
+            filteredMake.setText(filteredMakeTxt);
+        }
+
         datePicker.setOnClickListener(v -> DatePickerDialog());
         // Add action buttons
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
-        view.findViewById(R.id.btnFilter).setOnClickListener(v -> {
+        view.findViewById(R.id.btnResetFilter).setOnClickListener(v -> {
+            if (listener != null) {
+                listener.resetFilter();
+                selectedDate.setText("MMM DD, YYYY");
+                dateStart = null;
+                dateEnd = null;
+                filteredDescription.setText("");
+                filteredMake.setText("");
+            }
+        });
 
+        view.findViewById(R.id.btnFilter).setOnClickListener(v -> {
             if (listener != null) {
                 listener.onFilterConfirmed(dateStart, dateEnd, filteredDescription.getText().toString(), filteredMake.getText().toString());
             }
@@ -58,6 +92,13 @@ public class FilterFragment extends DialogFragment {
         });
 
         return builder.create();
+    }
+
+    public void populateFilterParams(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
+        this.dateStart = filterStartDate;
+        this.dateEnd = filterEndDate;
+        this.filteredMakeTxt = filterMake;
+        this.filteredDescriptionTxt = filterDescription;
     }
 
     /**
@@ -78,13 +119,36 @@ public class FilterFragment extends DialogFragment {
         MaterialDatePicker.Builder<androidx.core.util.Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         builder.setTitleText("Select a date range");
 
+//        if (dateStart != null) {
+//            builder.setSelection(new Pair<>(dateStart.getTime(), dateEnd.getTime()));
+//        }
+
         // Building the date picker dialog
-        MaterialDatePicker<Pair<Long, Long>> datePicker = builder.build();
-        datePicker.addOnPositiveButtonClickListener(selection -> {
+        MaterialDatePicker<Pair<Long, Long>> datePickerFrag = builder.build();
+        datePickerFrag.addOnPositiveButtonClickListener(selection -> {
 
             // Retrieving the selected start and end dates
+            Calendar calendar = Calendar.getInstance();
+
+            // Setting the start date to 00:00:00
             dateStart = new Date(selection.first);
+            calendar.setTime(dateStart);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            dateStart = calendar.getTime();
+
+            // Setting the end date to 00:00:00
             dateEnd = new Date(selection.second);
+            calendar.setTime(dateEnd);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            calendar.set(Calendar.MILLISECOND, 0);
+            dateEnd = calendar.getTime();
 
             // Formatting the selected dates as strings
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -99,7 +163,7 @@ public class FilterFragment extends DialogFragment {
         });
 
         // Showing the date picker dialog
-        datePicker.show(getParentFragmentManager(), "DATE_PICKER");
+        datePickerFrag.show(getParentFragmentManager(), "DATE_PICKER");
     }
 
     /**

@@ -57,6 +57,8 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventory = (Inventory) intent.getSerializableExtra("inventory");
         username = (String) intent.getSerializableExtra("username");
         inventory.setItems(new ArrayList<>());
+        inventory.setFilter(null, null, "", "");
+
         populateInventoryItems();
         assert (inventory != null);
         setTitle(inventory.getInventoryName());
@@ -206,6 +208,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     FilterFragment filterDialog = new FilterFragment();
+                    filterDialog.populateFilterParams(inventory.filteredStartDate, inventory.filteredEndDate, inventory.filteredDescription, inventory.filteredMake);
                     filterDialog.setFilterDialogListener(new FilterFragment.FilterDialogListener() {
                         @Override
                         public void onFilterDismissed() {
@@ -213,9 +216,15 @@ public class InventoryViewActivity extends AppCompatActivity {
                         }
 
                         @Override
+                        public void resetFilter() {
+                            inventory.setFilter(null, null, "", "");
+                        }
+
+                        @Override
                         public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
                             state_filter = filterStartDate != null || filterEndDate != null || !filterDescription.equals("") || !filterMake.equals("");
-                            inventory.filterItems(filterStartDate, filterEndDate, filterDescription, filterMake);
+                            inventory.setFilter(filterStartDate, filterEndDate, filterDescription, filterMake);
+                            inventory.filterItems();
                             updateTotals();
                             inventoryAdapter.notifyDataSetChanged();
                         }
@@ -294,6 +303,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 inventory.sortItems();
                 inventoryAdapter.notifyDataSetChanged();
                 updateTotals();
+                inventory.filterItems();
             }
         }
 
@@ -310,6 +320,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
                 inventory.set(pos, returnedItem);
                 FirestoreDB.editItemFromFirestore(username, inventory, returnedItem);
+                inventory.filterItems();
             }
             inventoryAdapter.notifyDataSetChanged();
             updateTotals();

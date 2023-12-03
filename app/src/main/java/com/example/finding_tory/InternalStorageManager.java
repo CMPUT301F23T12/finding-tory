@@ -8,6 +8,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * A class for managing internal storage operations in an Android application.
+ * This class provides functionality to save and retrieve user data, specifically usernames,
+ * to and from internal storage. It utilizes Android's file system to store data in a private mode,
+ * ensuring the data is accessible only to the application.
+ */
 public class InternalStorageManager {
     private static final String FILENAME = "user_data.txt";
     private Context context;

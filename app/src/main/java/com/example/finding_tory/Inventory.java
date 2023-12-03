@@ -1,5 +1,7 @@
 package com.example.finding_tory;
 
+import android.util.Pair;
+
 import com.google.firebase.firestore.PropertyName;
 
 import java.io.Serializable;
@@ -22,6 +24,11 @@ public class Inventory implements Serializable {
     private ArrayList<String> allTags;
     private String sortType = "Description";
     private String sortOrder = "Ascending";
+    public Date filteredStartDate;
+    public Date filteredEndDate;
+    public String filteredDescription;
+    public String filteredMake;
+    public ArrayList<String> filteredTags;
 
     public Inventory() {
     }
@@ -273,20 +280,30 @@ public class Inventory implements Serializable {
      * @param filterDescription The description to filter by. If empty, the description is not considered.
      * @param filterMake        The make to filter by. If empty, the make is not considered.
      */
-    public void filterItems(Date startDate, Date endDate, String filterDescription, String filterMake) {
+    public void filterItems() {
         ArrayList<Item> filteredItems = new ArrayList<>();
-
         for (Item item : items) {
             Date itemDate = item.getPurchaseDate();
-            if (startDate == null || (!itemDate.before(startDate) && !itemDate.after(endDate))) {
-                if (filterDescription.equals("") || item.getDescription().contains(filterDescription)) {
-                    if (filterMake.equals("") || item.getMake().contains(filterMake)) {
+            if (filteredStartDate == null || (!itemDate.before(filteredStartDate) && !itemDate.after(filteredEndDate))) {
+                if (filteredDescription.equals("") || item.getDescription().contains(filteredDescription)) {
+                    if (filteredMake.equals("") || item.getMake().contains(filteredMake)) {
                         filteredItems.add(item);
                     }
                 }
             }
         }
         updateDisplayedItems(filteredItems);
+    }
+
+    public void setFilter(Date startDate, Date endDate, String filterDescription, String filterMake) {
+        this.filteredStartDate = startDate;
+        this.filteredEndDate = endDate;
+        this.filteredDescription = filterDescription;
+        this.filteredMake = filterMake;
+//        this.filteredStartDate = null;
+//        this.filteredEndDate = null;
+//        this.filteredDescription = "";
+//        this.filteredMake = "";
     }
 
     /**
