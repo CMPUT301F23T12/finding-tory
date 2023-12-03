@@ -2,9 +2,12 @@ package com.example.finding_tory;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -16,10 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +38,7 @@ public class InventoryViewActivity extends AppCompatActivity {
     private ListView inventoryListView;
     private InventoryAdapter inventoryAdapter;
     private boolean state_deletion = false;
+    private boolean state_filter = false;
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
     private FloatingActionButton addItemButton;
@@ -57,20 +60,42 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventory = (Inventory) intent.getSerializableExtra("inventory");
         username = (String) intent.getSerializableExtra("username");
         inventory.setItems(new ArrayList<>());
+        inventory.setFilter(null, null, "", "");
+
         populateInventoryItems();
         assert (inventory != null);
         setTitle(inventory.getInventoryName());
 
         // map the listview to the inventory's list of items via custom inventory adapter
         inventoryListView = findViewById(R.id.inventory_listview);
-        inventoryAdapter = new InventoryAdapter(this, inventory.getItems());
+        inventoryAdapter = new InventoryAdapter(this, inventory.getDisplayedItems());
         inventoryListView.setAdapter(inventoryAdapter);
 
         // initialize and cache the TextViews for the totals
         totalItemsTextView = findViewById(R.id.total_items_textview);
         totalValueTextView = findViewById(R.id.total_value_textview);
         addItemButton = findViewById(R.id.add_delete_item_button);
-        updateTotals();
+        updateTotals(false);
+
+        EditText findItemDesc = findViewById(R.id.search_inventory_edittext);
+        findItemDesc.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String temp = editable.toString();
+                state_filter = !temp.equals("");
+                inventory.setFilter(inventory.filteredStartDate, inventory.filteredEndDate, temp, inventory.filteredMake);
+                inventory.filterItems();
+                updateTotals(false);
+            }
+        });
 
         // allows new items to be added
         addItemButton.setOnClickListener(new View.OnClickListener() {
@@ -101,11 +126,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                                 FirestoreDB.deleteItemDB(username, inventory, item);
                             }
 
-                            // Notify the adapter of the data change
-                            inventoryAdapter.notifyDataSetChanged();
-
-                            // Update totals
-                            updateTotals();
+                            updateTotals(true);
                         }
                     });
                     deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
@@ -175,6 +196,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                     for (Item item : inventoryAdapter.getSelectedItems()) {
                         current_tags.addAll(item.getItemTags());
                     }
+
                     BulkTagFragment tagDialog = new BulkTagFragment();
                     Bundle args = new Bundle();
                     args.putSerializable("inventory", inventory);
@@ -204,7 +226,25 @@ public class InventoryViewActivity extends AppCompatActivity {
                     tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
                     greyBack.setVisibility(View.VISIBLE);
                 } else {
-                    // add filter functionality
+                    final View greyBack = findViewById(R.id.fadeBackground);
+                    FilterFragment filterDialog = new FilterFragment();
+                    filterDialog.populateFilterParams(inventory.filteredStartDate, inventory.filteredEndDate, inventory.filteredDescription, inventory.filteredMake);
+                    filterDialog.setFilterDialogListener(new FilterFragment.FilterDialogListener() {
+                        @Override
+                        public void onFilterDismissed() {
+                            greyBack.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake) {
+                            state_filter = filterStartDate != null || filterEndDate != null || !filterDescription.equals("") || !filterMake.equals("");
+                            inventory.setFilter(filterStartDate, filterEndDate, filterDescription, filterMake);
+                            inventory.filterItems();
+                            updateTotals(false);
+                        }
+                    });
+                    filterDialog.show(getSupportFragmentManager(), "FILTER_ITEMS");
+                    greyBack.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -274,11 +314,10 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item selectedItem = (Item) data.getSerializableExtra("item_to_add");
                 assert selectedItem != null;
                 inventory.addItem(selectedItem);
-                if (inventory.sortItems()) {
-                    inventoryAdapter.notifyDataSetChanged();
-                }
+                inventory.sortItems();
                 inventoryAdapter.notifyDataSetChanged();
-                updateTotals();
+                updateTotals(true);
+                inventory.filterItems();
             }
         }
 
@@ -288,30 +327,38 @@ public class InventoryViewActivity extends AppCompatActivity {
             if (Objects.equals(data.getStringExtra("action"), "delete")) {
                 int position = data.getIntExtra("pos", -1);
                 if (position >= 0) {
-                    FirestoreDB.deleteItemDB(username, inventory, inventory.getItems().get(position));
+                    FirestoreDB.deleteItemDB(username, inventory, inventory.getDisplayedItems().get(position));
                     inventory.removeItemByIndex(position);
                 }
             } else {
                 Item returnedItem = (Item) data.getSerializableExtra("returnedItem");
                 inventory.set(pos, returnedItem);
+                FirestoreDB.editItemFromFirestore(username, inventory, returnedItem);
+                inventory.filterItems();
             }
-            inventoryAdapter.notifyDataSetChanged();
-            updateTotals();
+            updateTotals(true);
         }
     }
 
     /**
      * Rewrites the TextView elements displaying the inventory totals to reflect new values.
      */
-    public void updateTotals() {
-        totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
-        totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
-        FirestoreDB.getInventoriesRef(username).document(inventory.getId()).set(inventory);
+    public void updateTotals(boolean updateDB) {
+        if (!state_filter) {
+            totalItemsTextView.setText(String.format(Locale.CANADA, "Total items: %d", inventory.getCount()));
+            totalValueTextView.setText(String.format(Locale.CANADA, "Total Value: $%.2f", inventory.getInventoryEstimatedValue()));
+        } else {
+            totalItemsTextView.setText(String.format(Locale.CANADA, "Filtering %d of %d", inventory.getDisplayedItems().size(), inventory.getCount()));
+            totalValueTextView.setText(String.format(Locale.CANADA, "Showing: $%.2f", inventory.getDisplayedEstimatedValue()));
+        }
+        inventoryAdapter.notifyDataSetChanged();
+        if (updateDB) {
+            FirestoreDB.getInventoriesRef(username).document(inventory.getId()).set(inventory);
+        }
     }
 
     /**
      * Queries for user's items in the selected inventory and add to the current inventory
-     *
      */
     public void populateInventoryItems() {
         FirestoreDB.getItemsRef(username, inventory).get().addOnSuccessListener(queryDocumentSnapshots -> {
@@ -319,8 +366,8 @@ public class InventoryViewActivity extends AppCompatActivity {
                 Item item = documentSnapshot.toObject(Item.class);
                 inventory.addItem(item);
             }
-            updateTotals();
-            inventoryAdapter.notifyDataSetChanged();
+            inventory.sortItems();
+            updateTotals(false);
         }).addOnFailureListener(e -> {
             // TODO
         });

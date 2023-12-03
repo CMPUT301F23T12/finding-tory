@@ -87,10 +87,11 @@ public class RegisterActivity extends AppCompatActivity {
                     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                     User user = new User(username, name, hashedPassword);
                     FirestoreDB.getUsersRef().document(username).set(user).addOnSuccessListener(documentReference -> {
-                        Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
-                        intent.putExtra("username", user.getUsername());
-                        startActivity(intent);
                         Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
+                        Intent resultIntent = getIntent();
+                        resultIntent.putExtra("username", username);
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
                     }).addOnFailureListener(e -> {
                         // Error occurred while adding user
                         Toast.makeText(RegisterActivity.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();

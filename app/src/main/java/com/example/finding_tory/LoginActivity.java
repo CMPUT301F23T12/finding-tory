@@ -13,7 +13,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
@@ -44,12 +43,16 @@ public class LoginActivity extends AppCompatActivity {
 
         // initialize Firebase Storage
         FirebaseApp.initializeApp(this);
-        // initialize Picasso for loading images from the internet
-        Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
+        // Check if Picasso singleton instance exists
+        if (Picasso.get() == null) {
+            // initialize Picasso for loading images from the internet
+            Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
+        }
 
         // initialize and cache the EditTexts for user info
         usernameEditText = findViewById(R.id.edit_text_username);
         passwordEditText = findViewById(R.id.edit_text_password);
+
 
         // initialize registration button, set click listener
         Button registerButton = findViewById(R.id.button_register);
@@ -57,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, ActivityCodes.REGISTER_USER.getRequestCode());
             }
         });
 
@@ -66,20 +69,41 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // launch a new Ledger view activity for this user
-                // TODO validate real user info at login. for now we use mock credentials
                 String username = String.valueOf(usernameEditText.getText());
                 String password = String.valueOf(passwordEditText.getText());
-                passwordEditText.setText("");  // when we return we need to re-enter password
+                passwordEditText.setText("");
 
-                if ((username.equals("") && password.equals("")) {
-                     loginUser("cq4", "123");
+                // TODO remove mock credentials
+                if (username.equals("") && password.equals("")) {
+                    loginUser("cq4", "123");
                 } else {
                     loginUser(username, password);
-                    // Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
+                    //Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
                 }
             }
         });
+    }
+
+    /**
+     * Handles the result of activities that were started for a result.
+     *
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode  The result code returned by the activity.
+     * @param data        The data returned by the activity.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ActivityCodes.REGISTER_USER.getRequestCode()) {
+            if (resultCode == RESULT_OK && data != null) {
+                String LOGGEDIN_USER = data.getStringExtra("username");
+                Intent resultIntent = getIntent();
+                resultIntent.putExtra("username", LOGGEDIN_USER);
+                setResult(RESULT_OK, resultIntent);
+            }
+            finish();
+        }
     }
 
     /**
@@ -91,29 +115,20 @@ public class LoginActivity extends AppCompatActivity {
      * @param enteredPassword The password entered by the user.
      */
     public void loginUser(final String username, final String enteredPassword) {
-        // Retrieve the user object from the Firestore document
         FirestoreDB.getUsersRef().whereEqualTo("username", username).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (!queryDocumentSnapshots.isEmpty()) {
-                    DocumentSnapshot userSnapshot = queryDocumentSnapshots.getDocuments().get(0);
-
-                    // Retrieve the user object from the Firestore document
-                    User user = userSnapshot.toObject(User.class);
-
-                    // User with the provided username exists, get the stored password from the query result
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
                     if (BCrypt.checkpw(enteredPassword, storedPassword)) {
-                        // Start the LedgerViewActivity for the validated user
-                        Intent intent = new Intent(LoginActivity.this, LedgerViewActivity.class);
-                        intent.putExtra("username", user.getUsername());
-                        startActivity(intent);
+                        Intent resultIntent = getIntent();
+                        resultIntent.putExtra("username", username);
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
                     } else {
-                        // Password is incorrect
                         Snackbar.make(usernameEditText, "Invalid password. Please try again.", Snackbar.LENGTH_LONG).show();
                     }
                 } else {
-                    // User with the provided username doesn't exist
                     Snackbar.make(usernameEditText, "User not found. Please try again.", Snackbar.LENGTH_LONG).show();
                 }
             }

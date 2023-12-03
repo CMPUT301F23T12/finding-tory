@@ -1,6 +1,5 @@
 package com.example.finding_tory.ui.ledger;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
@@ -18,14 +17,11 @@ import com.example.finding_tory.ActivityCodes;
 import com.example.finding_tory.FirestoreDB;
 import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
-import com.example.finding_tory.Item;
 import com.example.finding_tory.Ledger;
 import com.example.finding_tory.LedgerAdapter;
 import com.example.finding_tory.UpsertInventoryViewActivity;
-import com.example.finding_tory.UpsertViewActivity;
 import com.example.finding_tory.databinding.FragmentLedgerBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -47,10 +43,10 @@ public class LedgerFragment extends Fragment {
     private View root;
     private FloatingActionButton addInvButton;
 
-    public static LedgerFragment newInstance(String username) {
+    public static LedgerFragment newInstance(String usrname) {
         LedgerFragment fragment = new LedgerFragment();
         Bundle args = new Bundle();
-        args.putSerializable("username", username);
+        args.putSerializable("username", usrname);
         fragment.setArguments(args);
         return fragment;
     }
@@ -149,11 +145,7 @@ public class LedgerFragment extends Fragment {
                 Inventory selectedInventory = (Inventory) data.getSerializableExtra("inventory_to_add");
 
                 assert selectedInventory != null;
-
-                if (selectedInventory != null) {
-                    ledger.getInventories().add(selectedInventory);
-                }
-
+                ledger.getInventories().add(selectedInventory);
             }
         } else if (requestCode == ActivityCodes.DELETE_INVENTORY.getRequestCode()) {
             if (resultCode == RESULT_OK) {
@@ -174,7 +166,9 @@ public class LedgerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        fetchUserInventories(); // Refresh data when the fragment becomes visible
+        if (username != null && !username.equals("")) {
+            fetchUserInventories(); // Refresh data when the fragment becomes visible
+        }
     }
 
     /**

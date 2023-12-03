@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputFilter;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -283,9 +282,9 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     for (int i = 0; i < imageUris.size(); i++) {
                         int temp = i + 1;
                         boolean is_uploaded = imageUris.get(i).startsWith("http");
-                        if (!is_uploaded){ // only upload images that have not already been uploaded, unless the
+                        if (!is_uploaded) { // only upload images that have not already been uploaded, unless the
                             String date = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss").format(new Date());
-                            String pathString =  date + temp + ".jpg";
+                            String pathString = date + temp + ".jpg";
                             UploadTask uploadTask = storageRef.child(itemId).child(pathString).putFile(Uri.parse(imageUris.get(i)));
 
                             uploadTask.addOnSuccessListener(taskSnapshot -> {
@@ -330,15 +329,15 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                             e.printStackTrace();
                         }
                     }).start();
-                }
-                if (imageUris.size()>0) {
-                    if (isAdd) {
-                        Toast.makeText(UpsertViewActivity.this, "Item being added...", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(UpsertViewActivity.this, "Item being updated!", Toast.LENGTH_LONG).show();
+                    if (imageUris.size() > 0) {
+                        if (isAdd) {
+                            Toast.makeText(UpsertViewActivity.this, "Item being added...", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(UpsertViewActivity.this, "Item being updated!", Toast.LENGTH_LONG).show();
+                        }
                     }
+                    submit_button.setEnabled(false);
                 }
-                submit_button.setEnabled(false);
             }
         });
 
@@ -539,9 +538,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                     throw new RuntimeException(e);
                 }
             }
-        }
-
-        else if (resultCode == ImagePicker.RESULT_ERROR) {
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
             Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
         }
     }
@@ -583,8 +580,8 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     }
 
     /**
-     *  reads all the text from an image
-     *  called once the user sends a cropped picture of just the serial number
+     * reads all the text from an image
+     * called once the user sends a cropped picture of just the serial number
      */
     public void textDetector(Uri uri) throws IOException {
         // initialize the tools
@@ -595,7 +592,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
 
         // read the text from the bitmap image using the text recognizer - construct a string from it
         SparseArray<TextBlock> temp_arr = serial_number_reader.detect(frame);
-        for (int i = 0; i <temp_arr.size(); i++) {
+        for (int i = 0; i < temp_arr.size(); i++) {
             TextBlock t_char = temp_arr.get(i);
             String chr = t_char.getValue();
             serialNum.append(chr);

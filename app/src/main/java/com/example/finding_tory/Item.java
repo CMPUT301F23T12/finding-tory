@@ -117,6 +117,15 @@ public class Item implements Serializable {
     }
 
     /**
+     * Gets the date of the item
+     *
+     * @return the item purchase date
+     */
+    public Date getDate() {
+        return purchaseDate;
+    }
+
+    /**
      * Sets the make of the item
      *
      * @param make new make
