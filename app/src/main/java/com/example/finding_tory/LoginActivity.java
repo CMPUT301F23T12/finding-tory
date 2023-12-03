@@ -12,8 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Picasso;
 
 
 /**
@@ -37,6 +39,11 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // initialize Firebase Storage
+        FirebaseApp.initializeApp(this);
+        // initialize Picasso for loading images from the internet
+        Picasso.setSingletonInstance(new Picasso.Builder(getApplicationContext()).build());
 
         // initialize and cache the EditTexts for user info
         usernameEditText = findViewById(R.id.edit_text_username);
