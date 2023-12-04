@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Activity for creating an inventory.
@@ -102,11 +103,19 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
 
                     @Override
                     public void onDeleteConfirmed() {
-                        deleteInventoryFromFirestore(inventory);
-                        Intent intent = new Intent();
-                        intent.putExtra("inventory_to_delete", inventory);
-                        setResult(RESULT_OK, intent);
-                        finish();
+                        CountDownLatch latch = new CountDownLatch(1);  // only 1 thing to delete
+                        deleteInventoryFromFirestore(inventory, latch);
+                        new Thread(() -> {
+                            try {
+                                latch.await(); // wait for inventory deletion to finish
+                                Intent intent = new Intent();
+                                intent.putExtra("inventory_to_delete", inventory);
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
                     }
                 });
                 deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
@@ -169,8 +178,9 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
      * Delete all the items from the inventory and then deletes the inventory.
      *
      * @param inventory The Inventory object to be delete from Firestore.
+     * @param latch     A CountDownLatch used to ensure the db is updated before finishing.
      */
-    private void deleteInventoryFromFirestore(Inventory inventory) {
+    private void deleteInventoryFromFirestore(Inventory inventory, CountDownLatch latch) {
         if (!FirestoreDB.isDebugMode()) {
             FirestoreDB.getItemsRef(username, inventory).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -181,9 +191,12 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
                     // After deleting all items, delete the inventory
                     FirestoreDB.getInventoriesRef(username).document(inventory.getId()).delete().addOnSuccessListener(aVoid -> {
                         Toast.makeText(UpsertInventoryViewActivity.this, "Inventory and all items deleted successfully!", Toast.LENGTH_SHORT).show();
+                        latch.countDown();
                     });
                 }
             });
         }
+        else
+            latch.countDown();
     }
 }
