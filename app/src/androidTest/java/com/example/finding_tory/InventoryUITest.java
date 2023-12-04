@@ -14,12 +14,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.anything;
 
-import android.app.Activity;
-import android.app.Instrumentation;
-
-import androidx.test.espresso.Espresso;
 import androidx.test.espresso.IdlingRegistry;
-import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -109,7 +104,7 @@ public class InventoryUITest {
         }
         onView(withId(R.id.sort_cancel_button)).perform(click());
         onView(withId(R.id.radio_Value)).perform(click());
-        onView(withId(R.id.ascending_descending)).perform(click());
+        onView(withId(R.id.radio_descending)).perform(click());
         onView(withId(R.id.btnSort)).perform(click());
 
         onData(anything())
