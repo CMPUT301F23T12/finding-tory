@@ -79,42 +79,46 @@ public class InventoryUITest {
 
     @Test
     public void login() {
-        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("abc"));
-        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("123"));
+        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("TestUser"));
+        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("password123"));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.button_login)).perform(click());
     }
 
-    @Test
     public void createInventory() {
-        onView((withId(R.id.add_inventory_button))).perform(click());
+        onView(withId(R.id.add_inventory_button)).perform(click());
         onView(withId(R.id.inventoryNameText)).perform(ViewActions.typeText("Home"));
         onView(withId(R.id.submit_button)).perform(click());
+    }
+
+    private void testDeleteInventory() {
         onData(anything())
                 .inAdapterView(withId(R.id.ledger_listview))
                 .atPosition(0)
-                .perform(click());
+                .perform(longClick());
+        onView(withId(R.id.delete_button)).perform(click());
     }
 
-    @Test
-    public void testAddItem() {
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Apple Macbook Pro 2022"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Macbook"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("Pro 2022"));
+    public void testAddItem(String description, String make, String model, String price, String tags) {
+        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText(description));
+        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText(make));
+        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText(model));
         onView(withId(R.id.date_edittext)).perform(click());
         onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
         onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("2000"));
+        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText(price));
         onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("SN3892"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText(tags), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.add_tags_button)).perform(click());
         onView(withId(R.id.add_button)).perform(scrollTo());
         onView(withId(R.id.add_button)).perform(click());
 
-        onView(withText("Apple Macbook Pro 2022")).check(matches(isDisplayed()));
+        onView(withText(description)).check(matches(isDisplayed()));
     }
+
+
 
     @Test
     public void mainTest(){
@@ -129,7 +133,10 @@ public class InventoryUITest {
         awaitDB(2000);
         onView(withId(R.id.add_delete_item_button)).perform(click());
         awaitDB(1000);
-        testAddItem();
+        testAddItem("Sony PS5", "Sony", "PS5", "2000", "Electronics Consoles");
+        Espresso.pressBack();
+        awaitDB(1000);
+        testDeleteInventory();
         FirestoreDB.getUsersRef().document("TestUser").delete();
     }
 
