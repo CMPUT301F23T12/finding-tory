@@ -3,6 +3,8 @@ package com.example.finding_tory;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
@@ -10,6 +12,9 @@ import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * SortItemFragment is a DialogFragment that allows users to choose sorting criteria.
@@ -56,6 +61,8 @@ public class SortItemFragment extends DialogFragment {
         View view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_sort, null);
         builder.setView(view);
 
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         // initialize the RadioGroups in the fragment
         sortTypeRadioGroup = view.findViewById(R.id.radioGroup1);
         sortOrderRadioGroup = view.findViewById(R.id.radioGroup2);
@@ -106,7 +113,7 @@ public class SortItemFragment extends DialogFragment {
             }
         });
 
-        return builder.create();
+        return dialog;
     }
 
     /**

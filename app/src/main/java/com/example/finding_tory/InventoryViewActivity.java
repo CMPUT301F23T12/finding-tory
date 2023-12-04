@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -39,8 +41,8 @@ public class InventoryViewActivity extends AppCompatActivity {
     private boolean state_deletion = false;
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
-    private FloatingActionButton addItemButton;
-    private ImageButton filter_tag_button, sort_cancel_button;
+    private FloatingActionButton add_back_button;
+    private ImageButton filter_tag_button, sort_delete_button;
 
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
@@ -73,7 +75,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         // initialize and cache the TextViews for the totals
         totalItemsTextView = findViewById(R.id.total_items_textview);
         totalValueTextView = findViewById(R.id.total_value_textview);
-        addItemButton = findViewById(R.id.add_delete_item_button);
+        add_back_button = findViewById(R.id.add_delete_item_button);
         updateTotals(false);
 
         EditText findItemDesc = findViewById(R.id.search_inventory_edittext);
@@ -96,39 +98,12 @@ public class InventoryViewActivity extends AppCompatActivity {
         });
 
         // allows new items to be added
-        addItemButton.setOnClickListener(new View.OnClickListener() {
+        add_back_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (state_deletion) {
-                    final View greyBack = findViewById(R.id.fadeBackground);
-                    DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
-                    deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
-                        @Override
-                        public void onDialogDismissed() {
-                            // Make grey background invisible when the dialog is dismissed
-                            inventoryAdapter.clearSelection();
-                            greyBack.setVisibility(View.GONE);
-                            exitSelectionMode();
-                        }
-
-                        @Override
-                        public void onDeleteConfirmed() {
-                            List<Item> selectedItems = inventoryAdapter.getSelectedItems();
-                            // Clear the selection and exit selection mode
-                            inventoryAdapter.clearSelection();
-                            exitSelectionMode();
-
-                            // Remove selected items from the inventory
-                            for (Item item : selectedItems) {
-                                inventory.removeItem(item);
-                                FirestoreDB.deleteItemDB(username, inventory, item);
-                            }
-
-                            updateTotals(true);
-                        }
-                    });
-                    deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
-                    greyBack.setVisibility(View.VISIBLE); // move to the bottom after filter is implemented
+                    inventoryAdapter.clearSelection();
+                    exitSelectionMode();
                 } else {
                     Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
                     editItemIntent.putExtra("username", username);
@@ -138,29 +113,42 @@ public class InventoryViewActivity extends AppCompatActivity {
             }
         });
 
-        // Handles creating new activity for viewing item
-        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Item selectedItem = inventoryAdapter.getItem(position);
-
-                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
-
-                intent.putExtra("selectedItem", selectedItem);
-                intent.putExtra("pos", position);
-                intent.putExtra("inventory", inventory);
-                intent.putExtra("username", username);
-                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
-            }
-        });
-
-        sort_cancel_button = findViewById(R.id.sort_cancel_button);
-        sort_cancel_button.setOnClickListener(new View.OnClickListener() {
+        sort_delete_button = findViewById(R.id.sort_cancel_button);
+        sort_delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (state_deletion) {
-                    inventoryAdapter.clearSelection();
-                    exitSelectionMode();
+                    final View greyBack = findViewById(R.id.fadeBackground);
+                    List<Item> selectedItems = inventoryAdapter.getSelectedItems();
+                    if (!selectedItems.isEmpty()) {
+                        DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
+                        deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
+                            @Override
+                            public void onDialogDismissed() {
+                                // Make grey background invisible when the dialog is dismissed
+                                inventoryAdapter.clearSelection();
+                                greyBack.setVisibility(View.GONE);
+                                exitSelectionMode();
+                            }
+
+                            @Override
+                            public void onDeleteConfirmed() {
+                                // Clear the selection and exit selection mode
+                                inventoryAdapter.clearSelection();
+                                exitSelectionMode();
+
+                                // Remove selected items from the inventory
+                                for (Item item : selectedItems) {
+                                    inventory.removeItem(item);
+                                    FirestoreDB.deleteItemDB(username, inventory, item);
+                                }
+
+                                updateTotals(true);
+                            }
+                        });
+                        deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
+                        greyBack.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     SortItemFragment sortDialog = new SortItemFragment();
@@ -191,39 +179,42 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (state_deletion) {
                     final View greyBack = findViewById(R.id.fadeBackground);
-                    Set<String> current_tags = new HashSet<>();
-                    for (Item item : inventoryAdapter.getSelectedItems()) {
-                        current_tags.addAll(item.getItemTags());
-                    }
-
-                    BulkTagFragment tagDialog = new BulkTagFragment();
-                    Bundle args = new Bundle();
-                    args.putSerializable("inventory", inventory);
-                    args.putSerializable("tags", (Serializable) new ArrayList<>(current_tags));
-                    tagDialog.setArguments(args);
-                    tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
-                        @Override
-                        public void onDialogDismissed() {
-                            greyBack.setVisibility(View.GONE);
+                    List<Item> selectedItems = inventoryAdapter.getSelectedItems();
+                    if (!selectedItems.isEmpty()) {
+                        Set<String> current_tags = new HashSet<>();
+                        for (Item item : inventoryAdapter.getSelectedItems()) {
+                            current_tags.addAll(item.getItemTags());
                         }
 
-                        @Override
-                        public void onTagConfirmed(ArrayList<String> selectedTags) {
-                            for (Item item : inventoryAdapter.getSelectedItems()) {
-                                for (String str : selectedTags) {
-                                    item.addItemTag(str);
-                                }
-                                FirestoreDB.editItemFromFirestore(username, inventory, item);
+                        BulkTagFragment tagDialog = new BulkTagFragment();
+                        Bundle args = new Bundle();
+                        args.putSerializable("inventory", inventory);
+                        args.putSerializable("tags", (Serializable) new ArrayList<>(current_tags));
+                        tagDialog.setArguments(args);
+                        tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
+                            @Override
+                            public void onDialogDismissed() {
+                                greyBack.setVisibility(View.GONE);
                             }
-                            inventory.addTagsToInventory(selectedTags);
-                            inventoryAdapter.clearSelection();
-                            exitSelectionMode();
-                            // Notify the adapter of the data change
-                            inventoryAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
-                    greyBack.setVisibility(View.VISIBLE);
+
+                            @Override
+                            public void onTagConfirmed(ArrayList<String> selectedTags) {
+                                for (Item item : inventoryAdapter.getSelectedItems()) {
+                                    for (String str : selectedTags) {
+                                        item.addItemTag(str);
+                                    }
+                                    FirestoreDB.editItemFromFirestore(username, inventory, item);
+                                }
+                                inventory.addTagsToInventory(selectedTags);
+                                inventoryAdapter.clearSelection();
+                                exitSelectionMode();
+                                // Notify the adapter of the data change
+                                inventoryAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
+                        greyBack.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     FilterFragment filterDialog = new FilterFragment();
@@ -247,6 +238,22 @@ public class InventoryViewActivity extends AppCompatActivity {
             }
         });
 
+        // Handles creating new activity for viewing item
+        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Item selectedItem = inventoryAdapter.getItem(position);
+
+                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
+
+                intent.putExtra("selectedItem", selectedItem);
+                intent.putExtra("pos", position);
+                intent.putExtra("inventory", inventory);
+                intent.putExtra("username", username);
+                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
+            }
+        });
+
         inventoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -263,11 +270,15 @@ public class InventoryViewActivity extends AppCompatActivity {
     private void enterSelectionMode() {
         state_deletion = true;
         filter_tag_button.setBackgroundResource(R.drawable.tag_png);
-        sort_cancel_button.setBackgroundResource(android.R.drawable.ic_delete);
-        addItemButton.setImageResource(android.R.drawable.ic_menu_delete);
+        sort_delete_button.setBackgroundResource(R.drawable.garbage_png);
+        add_back_button.setMaxImageSize((int) (56 * getResources().getDisplayMetrics().density));
+        add_back_button.setImageResource(R.drawable.back_arrow_png);
+        Animation wobbleAnimation = AnimationUtils.loadAnimation(this, R.anim.wobble_effect);
+
         // Show checkboxes
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
+            view.startAnimation(wobbleAnimation);
             CheckBox checkBox = view.findViewById(R.id.item_checkbox);
             ImageView arrow = view.findViewById(R.id.arrow);
             checkBox.setVisibility(View.VISIBLE);
@@ -283,10 +294,12 @@ public class InventoryViewActivity extends AppCompatActivity {
     private void exitSelectionMode() {
         state_deletion = false;
         filter_tag_button.setBackgroundResource(R.drawable.filter_png);
-        sort_cancel_button.setBackgroundResource(R.drawable.sort_png);
-        addItemButton.setImageResource(android.R.drawable.ic_input_add);
+        sort_delete_button.setBackgroundResource(R.drawable.sort_png);
+        add_back_button.setMaxImageSize((int) (24 * getResources().getDisplayMetrics().density));
+        add_back_button.setImageResource(android.R.drawable.ic_input_add);
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
+            view.clearAnimation();
             CheckBox checkBox = view.findViewById(R.id.item_checkbox);
             ImageView arrow = view.findViewById(R.id.arrow);
             checkBox.setVisibility(View.GONE);

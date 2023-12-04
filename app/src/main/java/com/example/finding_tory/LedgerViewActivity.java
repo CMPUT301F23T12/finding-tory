@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,6 +49,7 @@ public class LedgerViewActivity extends AppCompatActivity {
 
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setTitle("Welcome!");
 
         AUTH_USER = loadData();
         if (AUTH_USER.equals("")) {

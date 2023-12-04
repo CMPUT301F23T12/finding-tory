@@ -3,6 +3,8 @@ package com.example.finding_tory;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 
@@ -52,6 +54,9 @@ public class DeleteConfirmationFragment extends DialogFragment {
         View view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_confirmation, null);
         builder.setView(view);
 
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         // Add action buttons
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnDelete).setOnClickListener(v -> {
@@ -62,7 +67,7 @@ public class DeleteConfirmationFragment extends DialogFragment {
             dismiss();
         });
 
-        return builder.create();
+        return dialog;
     }
 
 

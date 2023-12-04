@@ -3,6 +3,8 @@ package com.example.finding_tory;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -57,6 +59,9 @@ public class BulkTagFragment extends DialogFragment {
         View view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_bulk_tags, null);
         builder.setView(view);
 
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         Inventory inventory = null;
         if (getArguments() != null) {
             inventory = (Inventory) getArguments().getSerializable("inventory");
@@ -97,7 +102,7 @@ public class BulkTagFragment extends DialogFragment {
             }
             dismiss();
         });
-        return builder.create();
+        return dialog;
     }
 
     private String capitalizeFirstLetter(String str) {

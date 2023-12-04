@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,9 +18,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -185,14 +188,37 @@ public class ItemViewActivity extends AppCompatActivity {
         TextView item_name = findViewById(R.id.item_description_text);
         item_name.setText(passedItem.getDescription());
 
-        TextView item_comment = findViewById(R.id.item_comment_text);
-        item_comment.setText(passedItem.getComment());
+        if (passedItem.getComment().equals("")) {
+            findViewById(R.id.comment_layout).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.comment_layout).setVisibility(View.VISIBLE);
+            TextView item_comment = findViewById(R.id.item_comment_text);
+            item_comment.setText(passedItem.getComment());
+        }
 
-        TextView item_make = findViewById(R.id.item_make_text);
-        item_make.setText(passedItem.getMake());
+        if (passedItem.getMake().equals("")) {
+            findViewById(R.id.make_layout).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.make_layout).setVisibility(View.VISIBLE);
+            TextView item_make = findViewById(R.id.item_make_text);
+            item_make.setText(passedItem.getMake());
+        }
 
-        TextView item_quantity = findViewById(R.id.item_model_text);
-        item_quantity.setText(passedItem.getModel());
+        if (passedItem.getModel().equals("")) {
+            findViewById(R.id.model_layout).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.model_layout).setVisibility(View.VISIBLE);
+            TextView item_model = findViewById(R.id.item_model_text);
+            item_model.setText(passedItem.getModel());
+        }
+
+        if (passedItem.getSerialNumber().equals("")) {
+            findViewById(R.id.serial_number_layout).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.serial_number_layout).setVisibility(View.VISIBLE);
+            TextView item_serial_number = findViewById(R.id.item_serial_number_text);
+            item_serial_number.setText(passedItem.getSerialNumber());
+        }
 
         TextView item_date = findViewById(R.id.item_date_text);
         item_date.setText(new SimpleDateFormat("yyyy-MM-dd").format(passedItem.getPurchaseDate()));
@@ -200,8 +226,7 @@ public class ItemViewActivity extends AppCompatActivity {
         TextView item_value = findViewById(R.id.item_value_text);
         item_value.setText(String.format(Locale.CANADA, "$%.2f", passedItem.getEstimatedValue()));
 
-        TextView item_serial_number = findViewById(R.id.item_serial_number_text);
-        item_serial_number.setText(passedItem.getSerialNumber());
+
 
         //if the item does not have an empty list of images, set the image view of the item to the first picture of the item
         if (passedItem.getImageLinks() != null && passedItem.getImageLinks().size() > 0) {
@@ -218,21 +243,30 @@ public class ItemViewActivity extends AppCompatActivity {
             }
         } else { // if there's no images, no need to show the image section
             findViewById(R.id.image_slider_placeholder).setVisibility(View.GONE);
+//            findViewById(R.id.item_container).set;
         }
 
-        LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
-        tagsContainer.removeAllViews();
-        LayoutInflater inflater = LayoutInflater.from(this);
-        for (String tag : passedItem.getItemTags()) {
-            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
-            TextView tagTextView = tagView.findViewById(R.id.tag_text);
-            tagTextView.setText(tag);
+        if (passedItem.getItemTags().size() == 0) {
+            findViewById(R.id.tags_layout).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.tags_layout).setVisibility(View.VISIBLE);
+            LinearLayout tagsContainer = findViewById(R.id.item_tags_container);
+            tagsContainer.removeAllViews();
 
-            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
-            removeTagButton.setVisibility(View.GONE);
-            tagsContainer.addView(tagView); // Add the tag view to the container
 
+            for (String tag : passedItem.getItemTags()) {
+
+                LayoutInflater inflater = LayoutInflater.from(this);
+                View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+                ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+                TextView tagTextView = tagView.findViewById(R.id.tag_text);
+                tagTextView.setText(tag);
+                removeTagButton.setVisibility(View.GONE);
+                tagsContainer.addView(tagView);
+
+            }
         }
+
     }
 
     /**

@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -59,7 +61,6 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         Item item = items.get(position);
         TextView descriptionTextView = view.findViewById(R.id.description_text);
         TextView valueTextView = view.findViewById(R.id.value_text);
-        TextView tagsTextView = view.findViewById(R.id.tags_text);
         CheckBox checkBox = view.findViewById(R.id.item_checkbox);
         checkBox.setChecked(selectedItems.get(position, false));
 
@@ -67,9 +68,47 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         descriptionTextView.setText(item.getDescription());
         valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getEstimatedValue()));
 
-        StringBuilder tag_to_display = new StringBuilder();
+        LinearLayout tagsContainer = view.findViewById(R.id.item_tags_container);
+        tagsContainer.removeAllViews();
+
+        int maxContainerWidth = 420;  // Set your desired maximum width for the tag container
+        int currentContainerWidth = 0;
+        boolean limit_approached = false;
+
         for (String tag : item.getItemTags()) {
-            tag_to_display.append(tag).append(" ");
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+
+            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setText(tag);
+            tagTextView.setTextSize(11);
+            removeTagButton.setVisibility(View.GONE);
+
+            // Measure the width of the tag
+            tagView.measure(0, 0);
+            int tagWidth = tagView.getMeasuredWidth();
+
+            // Check if adding the tag will exceed the maximum width
+            if (currentContainerWidth + tagWidth <= maxContainerWidth) {
+                tagsContainer.addView(tagView);
+                currentContainerWidth += tagWidth;
+            } else {
+                // Stop adding more tags if it exceeds the maximum width
+                limit_approached = true;
+                continue;
+            }
+        }
+        if (limit_approached) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+
+            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setTextSize(11);
+            removeTagButton.setVisibility(View.GONE);
+            tagTextView.setText("...");
+            tagsContainer.addView(tagView);
         }
 
         checkBox.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +117,6 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
                 toggleSelection(position);
             }
         });
-        tagsTextView.setText(item.getTagsString());
 
         return view;
     }

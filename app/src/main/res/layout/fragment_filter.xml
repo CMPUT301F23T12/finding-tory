@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/round_rect_listitem"
     android:padding="16dp">
 
     <TextView
@@ -63,7 +64,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:backgroundTint="@android:color/holo_blue_dark"
             android:text="Cancel"
             android:textColor="@android:color/white" />
 
@@ -72,7 +72,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:backgroundTint="@android:color/holo_blue_dark"
             android:text="Reset"
             android:textColor="@android:color/white" />
 
@@ -80,7 +79,6 @@
             android:id="@+id/btnFilter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@android:color/holo_blue_dark"
             android:text="Filter"
             android:textColor="@android:color/white" />
     </LinearLayout>
