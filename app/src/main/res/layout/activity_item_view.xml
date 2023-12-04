@@ -291,19 +291,37 @@
                     android:id="@+id/item_tags_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:text="Tags: "
                     android:gravity="center_vertical"
                     android:textSize="18sp"/>
 
-                <LinearLayout
-                    android:id="@+id/item_tag_container"
-                    android:layout_width="0dp"
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/item_tag_container"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:gravity="fill_vertical"-->
+<!--                    tools:ignore="DuplicateIds">-->
+                <HorizontalScrollView
+                    android:id="@+id/horizontal_scroll_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="fill_vertical"
-                    tools:ignore="DuplicateIds">
-                </LinearLayout>
+                    >
+
+                    <!-- LinearLayout as a container for tag views -->
+                    <LinearLayout
+                        android:id="@+id/item_tags_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <!-- Tags will be dynamically added here -->
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+                <!--            </LinearLayout>-->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

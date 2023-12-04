@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,9 +18,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -246,17 +249,36 @@ public class ItemViewActivity extends AppCompatActivity {
             findViewById(R.id.tags_layout).setVisibility(View.GONE);
         } else {
             findViewById(R.id.tags_layout).setVisibility(View.VISIBLE);
-            LinearLayout tagsContainer = findViewById(R.id.item_tag_container);
-            tagsContainer.removeAllViews();
-            LayoutInflater inflater = LayoutInflater.from(this);
+            LinearLayout tagsContainer = findViewById(R.id.item_tags_container);
+//            FlexboxLayout flexboxLayout = findViewById(R.id.item_tag_container);
+//            flexboxLayout.removeAllViews();
+//            LayoutInflater inflater = LayoutInflater.from(this);
+//            TagAdapter tagAdapter = new TagAdapter(passedItem.getItemTags(), new ArrayList<String>(), false);
+
+
             for (String tag : passedItem.getItemTags()) {
+                LayoutInflater inflater = LayoutInflater.from(this);
                 View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+                ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
                 TextView tagTextView = tagView.findViewById(R.id.tag_text);
                 tagTextView.setText(tag);
-
-                ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
                 removeTagButton.setVisibility(View.GONE);
-                tagsContainer.addView(tagView); // Add the tag view to the container
+                tagsContainer.addView(tagView);
+//                View tagView = inflater.inflate(R.layout.tag_item_layout, flexboxLayout, false);
+//                TextView tagTextView = tagView.findViewById(R.id.tag_text);
+//                FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
+//                        ViewGroup.LayoutParams.WRAP_CONTENT,
+//                        ViewGroup.LayoutParams.WRAP_CONTENT
+//                );
+//
+//                layoutParams.setMargins(5, 5, 5, 5); // Set margins between tags
+//
+//                tagTextView.setLayoutParams(layoutParams);
+////                tagTextView.setText(tag);
+//
+//                ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+//                removeTagButton.setVisibility(View.GONE);
+//                flexboxLayout.addView(tagView); // Add the tag view to the container
 
             }
         }
