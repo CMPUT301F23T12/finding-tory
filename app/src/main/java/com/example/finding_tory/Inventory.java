@@ -20,8 +20,7 @@ public class Inventory implements Serializable {
     private ArrayList<Item> displayItems;
     private double inventoryEstimatedValue;
     private ArrayList<String> allTags;
-    private String sortType = "Description";
-    private String sortOrder = "Ascending";
+    private Sort sort = new Sort();
     private Filter filter;
 
     public Inventory() {
@@ -248,12 +247,10 @@ public class Inventory implements Serializable {
     /**
      * Sets the sorting criteria for the inventory.
      *
-     * @param sortType  The type of sorting to be applied (e.g., name, date).
-     * @param sortOrder The order of sorting (e.g., ascending, descending).
+     * @param sort The Sort object specifying the new sorting criteria.
      */
-    public void setSortData(String sortType, String sortOrder) {
-        this.sortType = sortType;
-        this.sortOrder = sortOrder;
+    public void setSortData(Sort sort) {
+        this.sort = sort;
     }
 
     /**
@@ -339,7 +336,7 @@ public class Inventory implements Serializable {
      */
     public Boolean sortItems() {
         Comparator<Item> comparator;
-        switch (this.sortType) {
+        switch (sort.getSortType()) {
             case "Description":
                 comparator = Comparator.comparing(item -> item.getDescription().toLowerCase());
                 break;
@@ -358,10 +355,10 @@ public class Inventory implements Serializable {
             default:
                 return false;
         }
-        if ("Descending".equals(this.sortOrder)) {
+        if ("Descending".equals(sort.getSortOrder())) {
             comparator = comparator.reversed();
         }
-        Collections.sort(displayItems, comparator);
+        displayItems.sort(comparator);
         return true;
     }
 }
