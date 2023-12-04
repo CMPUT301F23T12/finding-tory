@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 /**
  * RegisterActivity is an AppCompatActivity that provides a user interface for new account registration.
  * It allows users to enter new information to create an account under the system.
@@ -81,12 +83,15 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Username already taken!", Toast.LENGTH_SHORT).show();
                 } else {
                     // Username is available, we can add the user to collection
-                    User user = new User(username, name, password);
+                    // The password is hashed and BCrypt.gensalt() generates a new salt for hashing
+                    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+                    User user = new User(username, name, hashedPassword);
                     FirestoreDB.getUsersRef().document(username).set(user).addOnSuccessListener(documentReference -> {
-                        Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
-                        intent.putExtra("username", user.getUsername());
-                        startActivity(intent);
                         Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
+                        Intent resultIntent = getIntent();
+                        resultIntent.putExtra("username", username);
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
                     }).addOnFailureListener(e -> {
                         // Error occurred while adding user
                         Toast.makeText(RegisterActivity.this, "Registration failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();

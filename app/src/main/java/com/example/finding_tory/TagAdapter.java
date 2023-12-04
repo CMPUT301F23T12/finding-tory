@@ -18,6 +18,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
 
     private List<String> tagList;
     private List<String> selectedTags;
+    private Boolean showDeleteButton;
 
     /**
      * Constructs a TagAdapter with the provided tag list and selected tags.
@@ -25,9 +26,10 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
      * @param tagList      The list of tags to be displayed.
      * @param selectedTags The list of tags that are initially selected.
      */
-    public TagAdapter(List<String> tagList, List<String> selectedTags) {
+    public TagAdapter(List<String> tagList, List<String> selectedTags, boolean showDeleteButton) {
         this.tagList = tagList;
         this.selectedTags = selectedTags;
+        this.showDeleteButton = showDeleteButton;
     }
 
     /**
@@ -92,6 +94,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
         public ViewHolder(View view) {
             super(view);
             tagTextView = view.findViewById(R.id.tag_text);
+            view.findViewById(R.id.remove_tag_button).setVisibility(View.GONE);
         }
     }
 }

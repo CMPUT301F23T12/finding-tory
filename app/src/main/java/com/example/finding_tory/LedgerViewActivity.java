@@ -1,5 +1,6 @@
 package com.example.finding_tory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.example.finding_tory.ui.ledger.LedgerFragment;
 import com.example.finding_tory.ui.profile.ProfileViewModel;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.IOException;
+
 /**
  * LedgerViewActivity is an AppCompatActivity that manages the main user interface for the application.
  * It sets up a DrawerLayout with a NavigationView for navigating between different sections of the app like ledger and profile.
@@ -29,6 +32,9 @@ public class LedgerViewActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityLedgerViewBinding binding;
+    private InternalStorageManager internalStorageManager;
+    private String AUTH_USER = "";
+    private LedgerViewActivity currentViewContext;
 
     /**
      * Initializes the activity, sets up the navigation drawer and navigation components.
@@ -39,15 +45,56 @@ public class LedgerViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Get user and pass to LedgerFragment
-        String username = (String) getIntent().getSerializableExtra("username");
-        LedgerFragment ledgerFragment = LedgerFragment.newInstance(username);
+        currentViewContext = this;
+        internalStorageManager = new InternalStorageManager(this);
 
         ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
         profileViewModel.setUsername(username);
 
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        AUTH_USER = loadData();
+        if (AUTH_USER.equals("")) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
+        }
+        if (!AUTH_USER.equals("")) {
+            setupLedgerView();
+        }
+    }
+
+    /**
+     * Handles the result of activities that were started for a result.
+     *
+     * @param requestCode The request code that was used to start the activity.
+     * @param resultCode  The result code returned by the activity.
+     * @param data        The data returned by the activity.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ActivityCodes.LOGIN_USER.getRequestCode()) {
+            if (resultCode == RESULT_OK && data != null) {
+                AUTH_USER = data.getStringExtra("username");
+                if (!AUTH_USER.equals("")) {
+                    saveData(AUTH_USER);
+                    setupLedgerView();
+                }
+            } else {
+                // Handle when the back is pressed
+                finish();
+            }
+        }
+    }
+
+    /**
+     * Sets up the ledger's UI, navigation, and event listeners.
+     * It also initializes the LedgerFragment with the provided user info.
+     */
+    private void setupLedgerView() {
+        LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
 
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
@@ -67,7 +114,9 @@ public class LedgerViewActivity extends AppCompatActivity {
         logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                saveData("");
+                Intent intent = new Intent(currentViewContext, LoginActivity.class);
+                startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
             }
         });
 
@@ -80,6 +129,33 @@ public class LedgerViewActivity extends AppCompatActivity {
             }
         };
         getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    /**
+     * Saves the user's username to the internal storage for future reference.
+     *
+     * @param usrname The username to be saved.
+     */
+    public void saveData(String usrname) {
+        try {
+            internalStorageManager.saveUsername(usrname);
+        } catch (IOException ignored) {
+
+        }
+    }
+
+    /**
+     * Loads the user's username from the internal storage.
+     *
+     * @return The user's saved username, or an empty string if it couldn't be loaded.
+     */
+    public String loadData() {
+        try {
+            return internalStorageManager.getUsername();
+            // Use the username
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     /**

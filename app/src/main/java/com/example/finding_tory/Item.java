@@ -117,6 +117,15 @@ public class Item implements Serializable {
     }
 
     /**
+     * Gets the date of the item
+     *
+     * @return the item purchase date
+     */
+    public Date getDate() {
+        return purchaseDate;
+    }
+
+    /**
      * Sets the make of the item
      *
      * @param make new make
@@ -278,18 +287,6 @@ public class Item implements Serializable {
 
     public void setImageLinks(ArrayList<String> imageLinks) {
         this.imageLinks = imageLinks;
-    }
-
-    public void addImageLink(String link) {
-        imageLinks.add(link);
-    }
-
-    public void deleteImageLink(int index) {
-        imageLinks.remove(index);
-    }
-
-    public String getLink(int index) {
-        return imageLinks.get(index);
     }
 
     /**

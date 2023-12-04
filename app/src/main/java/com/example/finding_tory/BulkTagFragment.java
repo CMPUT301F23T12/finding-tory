@@ -64,7 +64,6 @@ public class BulkTagFragment extends DialogFragment {
         assert inventory != null;
         allTags = inventory.getAllTags();
         selectedTags = (ArrayList<String>) getArguments().getSerializable("tags");
-
         // Initialize RecyclerView and Adapter
         tagsRecyclerView = (RecyclerView) view.findViewById(R.id.tagsRecyclerView);
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
@@ -72,7 +71,7 @@ public class BulkTagFragment extends DialogFragment {
         layoutManager.setJustifyContent(JustifyContent.SPACE_AROUND);
         tagsRecyclerView.setLayoutManager(layoutManager);
 
-        tagAdapter = new TagAdapter(allTags, selectedTags);
+        tagAdapter = new TagAdapter(allTags, selectedTags, false);
         tagsRecyclerView.setAdapter(tagAdapter);
 
         EditText tags_entered = view.findViewById(R.id.add_tags_edittext);
@@ -82,8 +81,8 @@ public class BulkTagFragment extends DialogFragment {
             String tagText = tags_entered.getText().toString().trim();
             String[] tagParts = tagText.split("\\s+");
             for (String tag : tagParts) {
-                if (!tag.isEmpty() && !allTags.contains(tag)) {
-                    allTags.add(tag);
+                if (!tag.isEmpty() && !allTags.contains(capitalizeFirstLetter(tag))) {
+                    allTags.add(capitalizeFirstLetter(tag));
                 }
             }
             tags_entered.setText("");
@@ -99,6 +98,13 @@ public class BulkTagFragment extends DialogFragment {
             dismiss();
         });
         return builder.create();
+    }
+
+    private String capitalizeFirstLetter(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
 

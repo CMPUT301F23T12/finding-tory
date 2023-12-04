@@ -83,11 +83,11 @@ public class ItemViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Show Delete Confirmation Fragment
-                DeleteItemFragment deleteDialog = new DeleteItemFragment();
+                DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
                 final View greyBack = findViewById(R.id.fadeBackground);
                 greyBack.setVisibility(View.VISIBLE);
                 // Set the listener to know when the dialog is dismissed
-                deleteDialog.setDeleteDialogListener(new DeleteItemFragment.DeleteDialogListener() {
+                deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
                     @Override
                     public void onDialogDismissed() {
                         // Make grey background invisible when the dialog is dismissed
@@ -216,8 +216,7 @@ public class ItemViewActivity extends AppCompatActivity {
                 findViewById(R.id.button_right_picture_item).setVisibility(View.VISIBLE);
                 findViewById(R.id.button_left_picture_item).setVisibility(View.VISIBLE);
             }
-        }
-        else { // if there's no images, no need to show the image section
+        } else { // if there's no images, no need to show the image section
             findViewById(R.id.image_slider_placeholder).setVisibility(View.GONE);
         }
 
@@ -240,16 +239,16 @@ public class ItemViewActivity extends AppCompatActivity {
      * Updates the image displayed for the item, called when the left or right buttons for image are pressed
      *
      * @param direction (int): either -1 to signify left or 1 to signify right
-     *        item (Item): the item that we are currently viewing
+     *                  item (Item): the item that we are currently viewing
      */
     private void updateImage(int direction, Item item) {
-        if (item.getImageLinks() == null || item.getImageLinks().size() == 0 ) { // return if no images exist
+        if (item.getImageLinks() == null || item.getImageLinks().size() == 0) { // return if no images exist
             Toast.makeText(this, "No images to show", Toast.LENGTH_SHORT).show();
             return;
         }
         // load the image and index of the the current image, calculate the next index of image and display
         ImageView image = findViewById(R.id.item_image);
-        picture_index += direction+item.getImageLinks().size(); // ensures that picture_index is always positive; mod will account for it
+        picture_index += direction + item.getImageLinks().size(); // ensures that picture_index is always positive; mod will account for it
         picture_index %= item.getImageLinks().size();
         Glide.with(this).load(item.getImageLinks().get(picture_index)).into(image);
     }

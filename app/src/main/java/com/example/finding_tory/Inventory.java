@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 
 /**
  * Represents an inventory containing a collection of items. This class provides functionalities to manage
@@ -16,10 +17,16 @@ public class Inventory implements Serializable {
     private String id;
     private String inventoryName;
     private ArrayList<Item> items;
+    private ArrayList<Item> displayItems;
     private double inventoryEstimatedValue;
     private ArrayList<String> allTags;
     private String sortType = "Description";
     private String sortOrder = "Ascending";
+    public Date filteredStartDate;
+    public Date filteredEndDate;
+    public String filteredDescription;
+    public String filteredMake;
+    public ArrayList<String> filteredTags;
 
     public Inventory() {
     }
@@ -33,6 +40,7 @@ public class Inventory implements Serializable {
     public Inventory(String name) {
         this.inventoryName = name;
         this.items = new ArrayList<>();
+        this.displayItems = new ArrayList<>();
         this.inventoryEstimatedValue = 0;
         this.allTags = new ArrayList<>();
     }
@@ -73,19 +81,23 @@ public class Inventory implements Serializable {
         return items.size();
     }
 
+    /**
+     * Retrieves the ID of this inventory.
+     *
+     * @return A string representing the unique identifier of this object.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Sets the ID of this inventory.
+     *
+     * @param id The string representing the unique identifier of this object.
+     */
     public void setId(String id) {
         this.id = id;
     }
-
-    /**
-     * Gets the total value of all the Items in the inventory.
-     *
-     * @return sum of all item values
-     */
 
     /**
      * Sets the name of the inventory object.
@@ -115,7 +127,8 @@ public class Inventory implements Serializable {
      * @param items new ArrayList of Items to store
      */
     public void setItems(ArrayList<Item> items) {
-        this.items = items;
+        this.items = new ArrayList<>(items);
+        this.displayItems = new ArrayList<>(items);
         calculateValue();
         this.allTags = new ArrayList<>();
         for (Item item : items) {
@@ -145,7 +158,14 @@ public class Inventory implements Serializable {
      * @param item  The new item to set in the inventory.
      */
     public void set(int index, Item item) {
-        items.set(index, item);
+        items.remove(displayItems.get(index));
+        displayItems.set(index, item);
+        items.add(displayItems.get(index));
+        for (String s : item.getItemTags()) {
+            if (!this.allTags.contains(capitalizeFirstLetter(s))) {
+                this.allTags.add(capitalizeFirstLetter(s));
+            }
+        }
         calculateValue();
     }
 
@@ -156,6 +176,7 @@ public class Inventory implements Serializable {
      */
     public void addItem(Item item) {
         this.items.add(item);
+        this.displayItems.add(item);
         for (String s : item.getItemTags()) {
             if (!this.allTags.contains(capitalizeFirstLetter(s))) {
                 this.allTags.add(capitalizeFirstLetter(s));
@@ -175,6 +196,7 @@ public class Inventory implements Serializable {
             this.allTags.remove(capitalizeFirstLetter(tag));
         }
         this.items.remove(item);
+        this.displayItems.remove(item);
         this.inventoryEstimatedValue -= item.getEstimatedValue();
     }
 
@@ -184,11 +206,12 @@ public class Inventory implements Serializable {
      * @param i The index of the item to remove.
      */
     public void removeItemByIndex(int i) {
-        for (String tag : this.items.get(i).getItemTags()) {
+        for (String tag : this.displayItems.get(i).getItemTags()) {
             this.allTags.remove(capitalizeFirstLetter(tag));
         }
-        this.inventoryEstimatedValue -= this.items.get(i).getEstimatedValue();
-        this.items.remove(i);
+        this.inventoryEstimatedValue -= this.displayItems.get(i).getEstimatedValue();
+        this.items.remove(this.displayItems.get(i));
+        this.displayItems.remove(i);
     }
 
     /**
@@ -237,6 +260,81 @@ public class Inventory implements Serializable {
         this.sortOrder = sortOrder;
     }
 
+    /**
+     * Retrieves the list of currently displayed items.
+     *
+     * @return ArrayList of Item objects that are currently displayed.
+     */
+    public ArrayList<Item> getDisplayedItems() {
+        return displayItems;
+    }
+
+
+    /**
+     * Filters the items based on the stored filter data.
+     */
+    public void filterItems() {
+        ArrayList<Item> filteredItems = new ArrayList<>();
+        for (Item item : items) {
+            Date itemDate = item.getPurchaseDate();
+            if (filteredStartDate == null || (!itemDate.before(filteredStartDate) && !itemDate.after(filteredEndDate))) {
+                if (filteredDescription.equals("") || item.getDescription().contains(filteredDescription)) {
+                    if (filteredMake.equals("") || item.getMake().contains(filteredMake)) {
+                        if (item.getItemTags().containsAll(filteredTags)) {
+                            filteredItems.add(item);
+                        }
+                    }
+                }
+            }
+        }
+        updateDisplayedItems(filteredItems);
+    }
+
+    /**
+     * Sets the Filter conditions of the inventory based on the specified date range, description, and make.
+     *
+     * @param startDate         The start date of the range to filter items. If null, the start date is not considered.
+     * @param endDate           The end date of the range to filter items.
+     * @param filterDescription The description to filter by. If empty, the description is not considered.
+     * @param filterMake        The make to filter by. If empty, the make is not considered.
+     */
+    public void setFilter(Date startDate, Date endDate, String filterDescription, String filterMake, ArrayList<String> filterTags) {
+        this.filteredStartDate = startDate;
+        this.filteredEndDate = endDate;
+        this.filteredDescription = filterDescription;
+        this.filteredMake = filterMake;
+        this.filteredTags = filterTags;
+    }
+
+    /**
+     * Updates the list of displayed items with a new set of items.
+     *
+     * @param newDisplayedItems The new list of items to display.
+     */
+    public void updateDisplayedItems(ArrayList<Item> newDisplayedItems) {
+        this.displayItems.clear();
+        this.displayItems.addAll(newDisplayedItems);
+        this.sortItems();
+    }
+
+    /**
+     * Calculates the total estimated value of all displayed items.
+     *
+     * @return The sum of the estimated values of each item in the displayed items list.
+     */
+    public double getDisplayedEstimatedValue() {
+        double sum = 0;
+        for (Item it : this.displayItems) {
+            sum += it.getEstimatedValue();
+        }
+        return sum;
+    }
+
+    /**
+     * Sorts the displayed items based on the current sort criteria.
+     *
+     * @return A Boolean indicating if the sorting was successful. Returns false if an invalid sort type is specified.
+     */
     public Boolean sortItems() {
         Comparator<Item> comparator;
         switch (this.sortType) {
@@ -261,7 +359,7 @@ public class Inventory implements Serializable {
         if ("Descending".equals(this.sortOrder)) {
             comparator = comparator.reversed();
         }
-        Collections.sort(items, comparator);
+        Collections.sort(displayItems, comparator);
         return true;
     }
 }

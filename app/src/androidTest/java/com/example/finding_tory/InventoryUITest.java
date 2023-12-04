@@ -308,7 +308,7 @@ public class InventoryUITest {
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
         onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
         onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
-        // for Interation with DatePickerDialog
+        // for Interaction with DatePickerDialog
         onView(withId(R.id.date_edittext)).perform(click());
         onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
         onView(withId(android.R.id.button1)).perform(click());
