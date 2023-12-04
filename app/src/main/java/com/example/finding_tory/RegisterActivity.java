@@ -86,10 +86,10 @@ public class RegisterActivity extends AppCompatActivity {
                     // The password is hashed and BCrypt.gensalt() generates a new salt for hashing
                     String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
                     User user = new User(username, name, hashedPassword);
+                    Ledger.getInstance().setUser(user);
                     FirestoreDB.getUsersRef().document(username).set(user).addOnSuccessListener(documentReference -> {
                         Toast.makeText(RegisterActivity.this, "Successfully registered!", Toast.LENGTH_SHORT).show();
                         Intent resultIntent = getIntent();
-                        resultIntent.putExtra("username", username);
                         setResult(RESULT_OK, resultIntent);
                         finish();
                     }).addOnFailureListener(e -> {
@@ -100,6 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
             });
         } else {
             User user = new User(username, name, password);
+            Ledger.getInstance().setUser(user);
             Intent intent = new Intent(RegisterActivity.this, LedgerViewActivity.class);
             intent.putExtra("username", user.getUsername());
             startActivity(intent);

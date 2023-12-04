@@ -36,18 +36,15 @@ public class LedgerFragment extends Fragment {
     private FragmentLedgerBinding binding;
 
     // TODO use a Ledger instead of an ArrayList of Inventories
-    private Ledger ledger = Ledger.getInstance();
-    private String username;
+    private final Ledger ledger = Ledger.getInstance();
     private ListView ledgerListView;
     private LedgerAdapter ledgerAdapter;
     private View root;
     private FloatingActionButton addInvButton;
 
-    public static LedgerFragment newInstance(String usrname) {
+    public static LedgerFragment newInstance() {
         LedgerFragment fragment = new LedgerFragment();
-        Bundle args = new Bundle();
-        args.putSerializable("username", usrname);
-        fragment.setArguments(args);
+        fragment.setArguments(new Bundle());
         return fragment;
     }
 
@@ -74,11 +71,6 @@ public class LedgerFragment extends Fragment {
         ledgerAdapter = new LedgerAdapter(root.getContext(), ledger.getInventories());
         ledgerListView.setAdapter(ledgerAdapter);
 
-        // Retrieve from fragment arguments
-        if (getArguments() != null) {
-            username = getArguments().getString("username");
-        }
-
         // cache the add button
         addInvButton = binding.addInventoryButton;
 
@@ -88,7 +80,7 @@ public class LedgerFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), InventoryViewActivity.class);
                 intent.putExtra("inventory", ledger.getInventories().get(position));
-                intent.putExtra("username", username);
+                intent.putExtra("username", ledger.getUser().getUsername());
                 startActivityForResult(intent, 1);
                 // getActivity().startActivity(intent);  // launch the InventoryViewActivity
             }
@@ -99,7 +91,7 @@ public class LedgerFragment extends Fragment {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
                 intent.putExtra("inventory", ledger.getInventories().get(position));
-                intent.putExtra("username", username);
+                intent.putExtra("username", ledger.getUser().getUsername());
                 startActivityForResult(intent, ActivityCodes.DELETE_INVENTORY.getRequestCode());
                 return true;
             }
@@ -111,7 +103,7 @@ public class LedgerFragment extends Fragment {
             public void onClick(View view) {
                 // TODO allow creation of new, unrelated inventories
                 Intent editItemIntent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
-                editItemIntent.putExtra("username", username);
+                editItemIntent.putExtra("username", ledger.getUser().getUsername());
                 startActivityForResult(editItemIntent, ActivityCodes.ADD_INVENTORY.getRequestCode());
             }
         });
@@ -166,7 +158,7 @@ public class LedgerFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (username != null && !username.equals("")) {
+        if (ledger.getUser().getUsername() != null && !ledger.getUser().getUsername().isEmpty()) {
             fetchUserInventories(); // Refresh data when the fragment becomes visible
         }
     }
@@ -176,7 +168,7 @@ public class LedgerFragment extends Fragment {
      */
     private void fetchUserInventories() {
         ledger.setInventories(new ArrayList<>());
-        FirestoreDB.getInventoriesRef(username).get().addOnCompleteListener(task -> {
+        FirestoreDB.getInventoriesRef(ledger.getUser().getUsername()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     // Add the inventories to the ledger view

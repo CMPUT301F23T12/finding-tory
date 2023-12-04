@@ -9,7 +9,6 @@ public class User implements Serializable {
     private String username;
     private String name;
     private String password;
-    private ArrayList<Inventory> inventories;
 
     public User() {
     }
@@ -17,12 +16,6 @@ public class User implements Serializable {
     public User(String username, String name, String password) {
         this.username = username;
         this.name = name;
-        this.password = password;
-        this.inventories = new ArrayList<>();
-    }
-
-    public void addInventory(Inventory inventory) {
-        inventories.add(inventory);
     }
 
     public String getUsername() {
@@ -47,15 +40,5 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @PropertyName("inventories")
-    public ArrayList<Inventory> getInventories() {
-        return inventories;
-    }
-
-    @PropertyName("inventories")
-    public void setInventories(ArrayList<Inventory> inventories) {
-        this.inventories = inventories;
     }
 }

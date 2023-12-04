@@ -31,7 +31,7 @@ public class LedgerViewActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityLedgerViewBinding binding;
     private InternalStorageManager internalStorageManager;
-    private String AUTH_USER = "";
+    private final Ledger ledger = Ledger.getInstance();
     private LedgerViewActivity currentViewContext;
 
     /**
@@ -49,12 +49,13 @@ public class LedgerViewActivity extends AppCompatActivity {
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        AUTH_USER = loadData();
-        if (AUTH_USER.equals("")) {
+        loadUser();
+        if (ledger.getUser().getUsername() == null || ledger.getUser().getUsername().isEmpty()) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
         }
-        if (!AUTH_USER.equals("")) {
+        // once the login/registration activity is done, we have a chance to launch the ledger fragment
+        if (ledger.getUser().getUsername() != null) {
             setupLedgerView();
         }
     }
@@ -72,9 +73,8 @@ public class LedgerViewActivity extends AppCompatActivity {
 
         if (requestCode == ActivityCodes.LOGIN_USER.getRequestCode()) {
             if (resultCode == RESULT_OK && data != null) {
-                AUTH_USER = data.getStringExtra("username");
-                if (!AUTH_USER.equals("")) {
-                    saveData(AUTH_USER);
+                if (ledger.getUser().getUsername() != null) {
+                    saveData(ledger.getUser());
                     setupLedgerView();
                 }
             } else {
@@ -89,7 +89,7 @@ public class LedgerViewActivity extends AppCompatActivity {
      * It also initializes the LedgerFragment with the provided user info.
      */
     private void setupLedgerView() {
-        LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
+        LedgerFragment ledgerFragment = new LedgerFragment();
 
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
@@ -109,7 +109,7 @@ public class LedgerViewActivity extends AppCompatActivity {
         logoutLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveData("");
+                saveData(null);
                 Intent intent = new Intent(currentViewContext, LoginActivity.class);
                 startActivityForResult(intent, ActivityCodes.LOGIN_USER.getRequestCode());
             }
@@ -127,29 +127,27 @@ public class LedgerViewActivity extends AppCompatActivity {
     }
 
     /**
-     * Saves the user's username to the internal storage for future reference.
+     * Saves the user's info to the internal storage for future reference.
      *
-     * @param usrname The username to be saved.
+     * @param user The user to be saved.
      */
-    public void saveData(String usrname) {
+    public void saveData(User user) {
         try {
-            internalStorageManager.saveUsername(usrname);
+            internalStorageManager.saveUser(user);
         } catch (IOException ignored) {
 
         }
     }
 
     /**
-     * Loads the user's username from the internal storage.
-     *
-     * @return The user's saved username, or an empty string if it couldn't be loaded.
+     * Loads the user's info from the internal storage.
      */
-    public String loadData() {
+    public void loadUser() {
         try {
-            return internalStorageManager.getUsername();
+            ledger.setUser(internalStorageManager.getUser());
             // Use the username
         } catch (IOException e) {
-            return "";
+            ledger.setUser(null);
         }
     }
 

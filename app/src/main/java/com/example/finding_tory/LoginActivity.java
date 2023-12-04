@@ -90,12 +90,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ActivityCodes.REGISTER_USER.getRequestCode()) {
-            if (resultCode == RESULT_OK && data != null) {
-                String LOGGEDIN_USER = data.getStringExtra("username");
-                Intent resultIntent = getIntent();
-                resultIntent.putExtra("username", LOGGEDIN_USER);
-                setResult(RESULT_OK, resultIntent);
-            }
             finish();
         }
     }
@@ -116,7 +110,9 @@ public class LoginActivity extends AppCompatActivity {
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
                     if (BCrypt.checkpw(enteredPassword, storedPassword)) {
                         Intent resultIntent = getIntent();
-                        resultIntent.putExtra("username", username);
+                        String name = queryDocumentSnapshots.getDocuments().get(0).getString("name");
+                        String password = queryDocumentSnapshots.getDocuments().get(0).getString("password");
+                        Ledger.getInstance().setUser(new User(username, name, password));
                         setResult(RESULT_OK, resultIntent);
                         finish();
                     } else {

@@ -23,14 +23,22 @@ public class InternalStorageManager {
     }
 
     /**
-     * Saves a username to the internal storage.
+     * Saves a logged-in user to the internal storage.
      *
-     * @param username The username string to be saved.
-     * @throws IOException If an I/O error occurs while writing the username to the file.
+     * @param user          The user object to be saved.
+     * @throws IOException  If an I/O error occurs while writing the username to the file.
      */
-    public void saveUsername(String username) throws IOException {
+    public void saveUser(User user) throws IOException {
         FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-        fos.write(username.getBytes());
+        System.out.println("THERE");
+        if (user == null || user.getUsername() == null) {
+            user = new User("", "", "");
+            System.out.println("HERE");
+        }
+        System.out.println(user.getUsername());
+        fos.write(user.getUsername().concat("\n").getBytes());
+        fos.write(user.getName().concat("\n").getBytes());
+        fos.write(user.getPassword().concat("\n").getBytes());
         fos.close();
     }
 
@@ -40,16 +48,14 @@ public class InternalStorageManager {
      * @return The username as a string.
      * @throws IOException If an I/O error occurs while reading the username from the file.
      */
-    public String getUsername() throws IOException {
+    public User getUser() throws IOException {
         FileInputStream fis = context.openFileInput(FILENAME);
         InputStreamReader isr = new InputStreamReader(fis);
         BufferedReader bufferedReader = new BufferedReader(isr);
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            sb.append(line);
-        }
+        String username = bufferedReader.readLine();
+        String name = bufferedReader.readLine();
+        String password = bufferedReader.readLine();
         fis.close();
-        return sb.toString();
+        return new User(username, name, password);
     }
 }
