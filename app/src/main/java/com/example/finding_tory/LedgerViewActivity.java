@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +18,13 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.finding_tory.databinding.ActivityLedgerViewBinding;
 import com.example.finding_tory.ui.ledger.LedgerFragment;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 
@@ -92,6 +99,16 @@ public class LedgerViewActivity extends AppCompatActivity {
      */
     private void setupLedgerView() {
         LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
+
+        FirestoreDB.getUsersRef().document(AUTH_USER).get().addOnSuccessListener(documentSnapshot -> {
+            String name = documentSnapshot.getString("name");
+            assert name != null;
+            if (!name.isEmpty()) {
+                Ledger.getInstance().setUserNames(name, AUTH_USER);
+            } else {
+                Ledger.getInstance().setUserNames("", AUTH_USER);
+            }
+        });
 
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;

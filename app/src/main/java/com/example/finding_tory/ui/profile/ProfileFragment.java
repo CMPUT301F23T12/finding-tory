@@ -14,57 +14,36 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.finding_tory.FirestoreDB;
+import com.example.finding_tory.Inventory;
+import com.example.finding_tory.Item;
+import com.example.finding_tory.Ledger;
 import com.example.finding_tory.databinding.FragmentProfileBinding;
-import com.example.finding_tory.ui.profile.ProfileViewModel;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.mindrot.jbcrypt.BCrypt;
 
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
-    private ProfileViewModel profileViewModel;
+    private String username;
+    private String name;
+    private Ledger gloabalLedger;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        // Observe the LiveData from the ViewModel
-        profileViewModel.getUserData().observe(getViewLifecycleOwner(), user -> {
-            if (user != null) {
-                binding.textProfileName.setText(user.getName());
-                binding.textUserid.setText("@" + user.getUsername());
-            }
-        });
+        binding.editProfileButton.setOnClickListener(v -> editProfile());
+        binding.changePasswordButton.setOnClickListener(v -> changePassword());
+        gloabalLedger = Ledger.getInstance();
 
-        profileViewModel.getTotalInventories().observe(getViewLifecycleOwner(), total -> {
-            binding.textNumInventories.setText("Inventories created: " + total);
-        });
-
-        profileViewModel.getTotalItems().observe(getViewLifecycleOwner(), total -> {
-            binding.textNumItems.setText("Total items: " + total);
-        });
-
-        profileViewModel.getTotalValue().observe(getViewLifecycleOwner(), total -> {
-            binding.textTotalValue.setText("Total value: $" + String.format("%.2f", total));
-        });
-
-        profileViewModel.getUserFetchError().observe(getViewLifecycleOwner(), error -> {
-            if (error != null && !error.isEmpty()) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
-            }
-        });
+        updateNames();
+        updateTotals();
 
         binding.editProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle the edit profile action
-                // For example, you could navigate to an EditProfileFragment
-                // or show a dialog to edit the profile
                 editProfile();
             }
         });
@@ -72,9 +51,6 @@ public class ProfileFragment extends Fragment {
         binding.changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle the change password action
-                // For example, you could navigate to a ChangePasswordFragment
-                // or show a dialog to change the password
                 changePassword();
             }
         });
@@ -82,16 +58,27 @@ public class ProfileFragment extends Fragment {
         return root;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        profileViewModel.updateInventoryData();
+    public void updateNames() {
+        username = gloabalLedger.getUsrIDName();
+        name = gloabalLedger.getUsrName();
+        binding.textProfileName.setText(name);
+        binding.textUserid.setText("@" + username);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    public void updateTotals() {
+        int totalInventories = 0;
+        int totalItems = 0;
+        double totalValue = 0;
+        for (Inventory inv : gloabalLedger.getInventories()) {
+            totalInventories++;
+            for (Item it : inv.getItems()) {
+                totalItems++;
+                totalValue += it.getEstimatedValue();
+            }
+        }
+        binding.textNumInventories.setText("Inventories created: " + totalInventories);
+        binding.textNumItems.setText("Total items: " + totalItems);
+        binding.textTotalValue.setText("Total value: $" + String.format("%.2f", totalValue));
     }
 
     private void updateProfileInFirestore(String newName) {
@@ -100,16 +87,13 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
-        String username = profileViewModel.getUsername();
         FirestoreDB.getUsersRef().document(username)
                 .update("name", newName)
                 .addOnSuccessListener(aVoid -> {
-                    profileViewModel.fetchUserData();
                     Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error updating profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
-
 
     private void updatePasswordInFirestore(String username, String oldPassword, String newPassword) {
         FirestoreDB.getUsersRef().document(username).get().addOnSuccessListener(documentSnapshot -> {
@@ -144,6 +128,9 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newName = inputName.getText().toString();
+                Ledger.getInstance().setUserNames(newName,username);
+                updateNames();
+                updateNames();
                 updateProfileInFirestore(newName);
             }
         });
@@ -202,8 +189,6 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
 
-                // Now we check the old password and update to the new password
-                String username = profileViewModel.getUsername();
                 updatePasswordInFirestore(username, oldPassword, newPassword);
             }
         });
@@ -217,4 +202,16 @@ public class ProfileFragment extends Fragment {
 
         builder.show();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
 }

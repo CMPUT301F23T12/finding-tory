@@ -114,9 +114,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 if (!queryDocumentSnapshots.isEmpty()) {
                     String storedPassword = queryDocumentSnapshots.getDocuments().get(0).getString("password");
+                    String name = queryDocumentSnapshots.getDocuments().get(0).getString("name");
                     if (BCrypt.checkpw(enteredPassword, storedPassword)) {
                         Intent resultIntent = getIntent();
                         resultIntent.putExtra("username", username);
+                        Ledger.getInstance().setUserNames(username, name);
                         setResult(RESULT_OK, resultIntent);
                         finish();
                     } else {
