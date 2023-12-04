@@ -19,6 +19,7 @@ import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
 import com.example.finding_tory.Ledger;
 import com.example.finding_tory.LedgerAdapter;
+import com.example.finding_tory.R;
 import com.example.finding_tory.UpsertInventoryViewActivity;
 import com.example.finding_tory.databinding.FragmentLedgerBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -109,10 +110,9 @@ public class LedgerFragment extends Fragment {
         binding.addInventoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO allow creation of new, unrelated inventories
-                Intent editItemIntent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
-                editItemIntent.putExtra("username", username);
-                startActivityForResult(editItemIntent, ActivityCodes.ADD_INVENTORY.getRequestCode());
+                Intent addInventoryIntent = new Intent(getActivity(), UpsertInventoryViewActivity.class);
+                addInventoryIntent.putExtra("username", username);
+                startActivityForResult(addInventoryIntent, ActivityCodes.ADD_INVENTORY.getRequestCode());
             }
         });
 

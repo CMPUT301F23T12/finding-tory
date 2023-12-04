@@ -27,7 +27,6 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
     private EditText inventory_text;
     private String inventory_name;
     private boolean isAdd = false;
-    private ArrayList<String> inventoryNames;
 
     /**
      * Initializes the activity when starting
@@ -90,6 +89,8 @@ public class UpsertInventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Show Delete Confirmation Fragment
                 DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
+                final View greyBack = findViewById(R.id.fadeBackground);
+                greyBack.setVisibility(View.VISIBLE);
 
                 // Set the listener to know when the dialog is dismissed
                 deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
