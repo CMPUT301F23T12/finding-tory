@@ -18,10 +18,12 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.CoreMatchers.anything;
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
@@ -53,23 +55,32 @@ import java.util.List;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class InventoryUITest {
     @Rule
-    public ActivityScenarioRule<LoginActivity> activityRule = new ActivityScenarioRule<>(LoginActivity.class);
+    public ActivityScenarioRule<LedgerViewActivity> activityRule = new ActivityScenarioRule<>(LedgerViewActivity.class);
     private CountingIdlingResource idlingResource;
     private List<String> testItemNames;
 
 
+    @Test
+    public void register(){
+        Intent startIntent = new Intent(ApplicationProvider.getApplicationContext(), RegisterActivity.class);
+        activityRule.getScenario().onActivity(activity -> activity.startActivity(startIntent));
+        onView(withId(R.id.button_register)).perform(click());
+
+        onView(withId(R.id.edit_text_username)).perform(typeText("TestUser"));
+        onView(withId(R.id.edit_text_name)).perform(typeText("TestUser"));
+        onView(withId(R.id.edit_text_password)).perform(typeText("password123"));
+        onView(withId(R.id.edit_text_confirm_password)).perform(typeText("password123"));
+        closeSoftKeyboard();
+
+        onView(withId(R.id.button_register)).perform(click());
+
+    }
 
     @Test
     public void login() {
         onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("test"));
         onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("test"));
-
         onView(withId(R.id.button_login)).perform(click());
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public void navigateToInventory() {
