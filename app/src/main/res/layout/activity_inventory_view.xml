@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg_grey"
     tools:context=".InventoryViewActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,7 +58,8 @@
         android:layout_alignParentStart="true"
         android:layout_marginHorizontal="40dp"
         android:layout_marginVertical="15dp"
-        android:text="Total Items: xx" />
+        android:text="Total Items: xx"
+        android:textColor="@color/black"/>
 
     <TextView
         android:id="@+id/total_value_textview"
@@ -67,15 +69,22 @@
         android:layout_marginHorizontal="40dp"
         android:layout_marginVertical="15dp"
         android:layout_toEndOf="@+id/total_items_textview"
-        android:text="Total Value: $xx.xx" />
+        android:text="Total Value: $xx.xx"
+        android:textColor="@color/black"/>
 
     <ListView
         android:id="@+id/inventory_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/add_delete_item_button"
         android:layout_below="@+id/total_items_textview"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp" />
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp"
+        android:divider="@null"
+        android:dividerHeight="10.0sp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_delete_item_button"

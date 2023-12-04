@@ -54,35 +54,69 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
-        if (view == null) {
+        if (view == null)
             view = LayoutInflater.from(context).inflate(R.layout.item_content, parent, false);
-        }
 
+        // find TextView elements that we wish to update
         Item item = items.get(position);
-
         TextView descriptionTextView = view.findViewById(R.id.description_text);
         TextView valueTextView = view.findViewById(R.id.value_text);
-        LinearLayout tagsContainer = view.findViewById(R.id.item_tag_container); // Your container for tags
         CheckBox checkBox = view.findViewById(R.id.item_checkbox);
-
-        descriptionTextView.setText(item.getDescription());
-        valueTextView.setText(String.format(Locale.CANADA, "Value: $%.2f", item.getEstimatedValue()));
         checkBox.setChecked(selectedItems.get(position, false));
 
-        checkBox.setOnClickListener(v -> toggleSelection(position));
+        // modify TextViews with current item information
+        descriptionTextView.setText(item.getDescription());
+        valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getEstimatedValue()));
 
+        LinearLayout tagsContainer = view.findViewById(R.id.item_tags_container);
         tagsContainer.removeAllViews();
-        LayoutInflater inflater = LayoutInflater.from(context);
+
+        int maxContainerWidth = 420;  // Set your desired maximum width for the tag container
+        int currentContainerWidth = 0;
+        boolean limit_approached = false;
+
         for (String tag : item.getItemTags()) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
-            TextView tagTextView = tagView.findViewById(R.id.tag_text);
-            tagTextView.setText(tag);
 
             ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setText(tag);
+            tagTextView.setTextSize(11);
             removeTagButton.setVisibility(View.GONE);
 
+            // Measure the width of the tag
+            tagView.measure(0, 0);
+            int tagWidth = tagView.getMeasuredWidth();
+
+            // Check if adding the tag will exceed the maximum width
+            if (currentContainerWidth + tagWidth <= maxContainerWidth) {
+                tagsContainer.addView(tagView);
+                currentContainerWidth += tagWidth;
+            } else {
+                // Stop adding more tags if it exceeds the maximum width
+                limit_approached = true;
+                continue;
+            }
+        }
+        if (limit_approached) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+
+            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setTextSize(11);
+            removeTagButton.setVisibility(View.GONE);
+            tagTextView.setText("...");
             tagsContainer.addView(tagView);
         }
+
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleSelection(position);
+            }
+        });
 
         return view;
     }

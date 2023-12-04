@@ -3,6 +3,8 @@ package com.example.finding_tory;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -56,6 +58,9 @@ public class FilterFragment extends DialogFragment {
         View view = requireActivity().getLayoutInflater().inflate(R.layout.fragment_filter, null);
         builder.setView(view);
 
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         selectedDate = view.findViewById(R.id.selectedDate);
         datePicker = view.findViewById(R.id.datePicker);
         filteredMake = view.findViewById(R.id.editTextMake);
@@ -95,7 +100,7 @@ public class FilterFragment extends DialogFragment {
             dismiss();
         });
 
-        return builder.create();
+        return dialog;
     }
 
     /**

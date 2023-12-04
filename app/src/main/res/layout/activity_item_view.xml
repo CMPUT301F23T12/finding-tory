@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/bg_grey"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -22,6 +23,7 @@
         android:id="@+id/image_slider_placeholder"
         android:layout_width="match_parent"
         android:layout_height="230dp"
+        android:padding="10dp"
         android:gravity="center">
 
         <ImageView
@@ -56,9 +58,16 @@
 
     <!-- Details Section -->
     <ScrollView
+        android:id="@+id/item_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/image_slider_placeholder">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/image_slider_placeholder"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="70dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/item_container"
+        android:padding="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -76,10 +85,12 @@
                 android:paddingEnd="10sp"
                 android:paddingBottom="5sp"
                 android:text="item_description"
+                android:textAlignment="center"
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@id/comment_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -93,17 +104,17 @@
                     android:paddingStart="10sp"
                     android:paddingTop="10sp"
                     android:paddingEnd="5sp"
-                    android:text="Comments: "
                     android:paddingBottom="5sp"
-                    android:textSize="18sp"/>
+                    android:text="Comments: "
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/item_comment_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="5"
                     android:layout_marginStart="0dp"
                     android:layout_marginTop="0dp"
+                    android:layout_weight="5"
                     android:paddingTop="10sp"
                     android:paddingEnd="10sp"
                     android:paddingBottom="5sp"
@@ -112,160 +123,166 @@
 
             </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/item_make_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingStart="10sp"
-                android:paddingTop="10sp"
-                android:paddingEnd="5sp"
-                android:text="Make: "
-                android:paddingBottom="5sp"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:id="@+id/item_make_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingTop="10sp"
-                android:paddingEnd="10sp"
-                android:paddingBottom="5sp"
-                android:text="item_make"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/item_model_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingStart="10sp"
-                android:paddingTop="10sp"
-                android:paddingEnd="5sp"
-                android:text="Model: "
-                android:paddingBottom="5sp"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:id="@+id/item_model_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingTop="5sp"
-                android:paddingEnd="10sp"
-                android:paddingBottom="5sp"
-                android:text="item_model"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/item_date_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingStart="10sp"
-                android:paddingTop="10sp"
-                android:paddingEnd="5sp"
-                android:text="Date Purchased: "
-                android:paddingBottom="5sp"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:id="@+id/item_date_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingTop="10sp"
-                android:paddingEnd="10sp"
-                android:paddingBottom="5sp"
-                android:text="item_date"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/item_estimated_value_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingStart="10sp"
-                android:paddingTop="10sp"
-                android:paddingEnd="5sp"
-                android:text="Estimated Value: "
-                android:paddingBottom="5sp"
-                android:textSize="18sp"/>
-
-            <TextView
-                android:id="@+id/item_value_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingTop="5sp"
-                android:paddingEnd="10sp"
-                android:paddingBottom="5sp"
-                android:text="item_value"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/item_serial_number_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingStart="10sp"
-                android:paddingEnd="5sp"
-                android:paddingTop="10sp"
-                android:text="Serial Number: "
-                android:paddingBottom="5sp"
-                android:textSize="18sp"/>
-            <TextView
-                android:id="@+id/item_serial_number_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginTop="0dp"
-                android:paddingTop="5sp"
-                android:paddingEnd="10sp"
-                android:paddingBottom="5sp"
-                android:text="item_SN"
-                android:textSize="18sp" />
-        </LinearLayout>
             <LinearLayout
+                android:id="@+id/make_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/item_make_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingStart="10sp"
+                    android:paddingTop="10sp"
+                    android:paddingEnd="5sp"
+                    android:paddingBottom="5sp"
+                    android:text="Make: "
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/item_make_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingTop="10sp"
+                    android:paddingEnd="10sp"
+                    android:paddingBottom="5sp"
+                    android:text="item_make"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/model_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/item_model_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingStart="10sp"
+                    android:paddingTop="10sp"
+                    android:paddingEnd="5sp"
+                    android:paddingBottom="5sp"
+                    android:text="Model: "
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/item_model_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingTop="5sp"
+                    android:paddingEnd="10sp"
+                    android:paddingBottom="5sp"
+                    android:text="item_model"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/item_date_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingStart="10sp"
+                    android:paddingTop="10sp"
+                    android:paddingEnd="5sp"
+                    android:paddingBottom="5sp"
+                    android:text="Date Purchased: "
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/item_date_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingTop="10sp"
+                    android:paddingEnd="10sp"
+                    android:paddingBottom="5sp"
+                    android:text="item_date"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/item_estimated_value_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingStart="10sp"
+                    android:paddingTop="10sp"
+                    android:paddingEnd="5sp"
+                    android:paddingBottom="5sp"
+                    android:text="Estimated Value: "
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/item_value_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingTop="5sp"
+                    android:paddingEnd="10sp"
+                    android:paddingBottom="5sp"
+                    android:text="item_value"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/serial_number_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/item_serial_number_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingStart="10sp"
+                    android:paddingTop="10sp"
+                    android:paddingEnd="5sp"
+                    android:paddingBottom="5sp"
+                    android:text="Serial Number: "
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/item_serial_number_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:paddingTop="5sp"
+                    android:paddingEnd="10sp"
+                    android:paddingBottom="5sp"
+                    android:text="item_SN"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tags_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -278,29 +295,48 @@
                     android:id="@+id/item_tags_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tags: "
+                    android:layout_marginTop="5dp"
                     android:gravity="center_vertical"
-                    android:textSize="18sp"/>
+                    android:text="Tags: "
+                    android:textSize="18sp" />
 
-                <LinearLayout
-                    android:id="@+id/item_tag_container"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="horizontal"
-                    android:gravity="fill_vertical"
-                    tools:ignore="DuplicateIds">
-                </LinearLayout>
+                <!--                <LinearLayout-->
+                <!--                    android:id="@+id/item_tag_container"-->
+                <!--                    android:layout_width="0dp"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_weight="1"-->
+                <!--                    android:orientation="horizontal"-->
+                <!--                    android:gravity="fill_vertical"-->
+                <!--                    tools:ignore="DuplicateIds">-->
+                <HorizontalScrollView
+                    android:id="@+id/horizontal_scroll_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- LinearLayout as a container for tag views -->
+                    <LinearLayout
+                        android:id="@+id/item_tags_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <!-- Tags will be dynamically added here -->
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+                <!--            </LinearLayout>-->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
     <!-- Delete and Edit Buttons -->
     <LinearLayout
+        android:id="@+id/buttons_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
         android:orientation="horizontal"
         android:paddingLeft="16dp"
         android:paddingTop="8dp"
