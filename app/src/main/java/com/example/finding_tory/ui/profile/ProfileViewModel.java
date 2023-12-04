@@ -31,8 +31,22 @@ public class ProfileViewModel extends ViewModel {
 
     public void setUsername(String username) {
         this.username = username;
+        fetchUserData();
         updateInventoryData();
     }
+
+    private void fetchUserData() {
+        FirebaseFirestore db = FirestoreDB.getDb();
+        db.collection("users").document(username)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    User user = documentSnapshot.toObject(User.class);
+                    userData.setValue(user);
+                    Log.d("ProfileViewModel", "User Data Updated: " + user);
+                })
+                .addOnFailureListener(e -> userFetchError.setValue("Error fetching user data: " + e.getMessage()));
+    }
+
 
     private void updateInventoryData() {
         if (username == null || username.isEmpty()) {

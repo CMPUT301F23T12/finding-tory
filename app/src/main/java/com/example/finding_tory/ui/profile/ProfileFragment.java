@@ -35,7 +35,7 @@ public class ProfileFragment extends Fragment {
         profileViewModel.getUserData().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
                 binding.textProfileName.setText(user.getName());
-                binding.textUserid.setText(user.getUsername());
+                binding.textUserid.setText("@" + user.getUsername());
             }
         });
 

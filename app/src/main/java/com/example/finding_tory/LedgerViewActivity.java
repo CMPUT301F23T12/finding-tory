@@ -48,9 +48,6 @@ public class LedgerViewActivity extends AppCompatActivity {
         currentViewContext = this;
         internalStorageManager = new InternalStorageManager(this);
 
-        ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        profileViewModel.setUsername(username);
-
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -61,6 +58,8 @@ public class LedgerViewActivity extends AppCompatActivity {
         }
         if (!AUTH_USER.equals("")) {
             setupLedgerView();
+            ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+            profileViewModel.setUsername(AUTH_USER);
         }
     }
 
