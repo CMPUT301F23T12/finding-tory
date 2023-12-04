@@ -16,8 +16,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static org.hamcrest.Matchers.allOf;
 
 import static org.hamcrest.CoreMatchers.anything;
-
-<<<<<<< HEAD
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.util.Log;
@@ -30,9 +28,7 @@ import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import static androidx.test.espresso.action.ViewActions.*;
-=======
 import androidx.test.espresso.IdlingRegistry;
->>>>>>> main
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.idling.CountingIdlingResource;
 import androidx.test.espresso.matcher.ViewMatchers;

@@ -79,7 +79,10 @@ public class LedgerViewActivity extends AppCompatActivity {
                 AUTH_USER = data.getStringExtra("username");
                 if (!AUTH_USER.equals("")) {
                     saveData(AUTH_USER);
+                    ProfileViewModel profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+                    profileViewModel.setUsername(AUTH_USER);
                     setupLedgerView();
+
                 }
             } else {
                 // Handle when the back is pressed
@@ -93,8 +96,6 @@ public class LedgerViewActivity extends AppCompatActivity {
      * It also initializes the LedgerFragment with the provided user info.
      */
     private void setupLedgerView() {
-        LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
-
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -105,7 +106,11 @@ public class LedgerViewActivity extends AppCompatActivity {
         // Use the NavController to navigate to the LedgerFragment
         // initialize the navigation bar functionality
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        navController.navigate(R.id.nav_ledger, ledgerFragment.getArguments());
+        boolean ledgerFragmentPopped = navController.popBackStack(R.id.nav_ledger, false);
+        if (!ledgerFragmentPopped) {
+            LedgerFragment ledgerFragment = LedgerFragment.newInstance(AUTH_USER);
+            navController.navigate(R.id.nav_ledger, ledgerFragment.getArguments());
+        }
         NavigationUI.setupWithNavController(navigationView, navController);
 
         // bind the logout "button" to end this activity
