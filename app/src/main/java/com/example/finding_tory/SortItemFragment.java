@@ -22,17 +22,20 @@ import java.util.Date;
  * choice back to the parent context through the SortDialogListener interface.
  */
 public class SortItemFragment extends DialogFragment {
+    private SortItemFragment.SortDialogListener listener;
+    private RadioGroup sortTypeRadioGroup;
+    private RadioGroup sortOrderRadioGroup;
+    private int typeID = -1, orderID = -1;
+    private Sort sort;
+
     /**
      * The interface for event handling from the SortItemFragment.
      */
     public interface SortDialogListener {
         void onDialogDismissed();
 
-        void onSortConfirmed(String sort_type, String sort_order);
+        void onSortConfirmed(Sort sort);
     }
-
-    private SortItemFragment.SortDialogListener listener;
-    private int i1 = -1, i2 = -1;
 
     /**
      * Sets the listener that will handle events from this dialog.
@@ -60,21 +63,49 @@ public class SortItemFragment extends DialogFragment {
 
         AlertDialog dialog = builder.create();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        // initialize the RadioGroups in the fragment
+        sortTypeRadioGroup = view.findViewById(R.id.radioGroup1);
+        sortOrderRadioGroup = view.findViewById(R.id.radioGroup2);
+
+        // prefill the radio buttons based on the existing sort
+        RadioButton selectedType, selectedOrder;
+        switch (sort.getSortType()) {
+            case "Date":
+                selectedType = view.findViewById(R.id.radio_Date);
+                break;
+            case "Make":
+                selectedType = view.findViewById(R.id.radio_Make);
+                break;
+            case "Value":
+                selectedType = view.findViewById(R.id.radio_Value);
+                break;
+            case "Tags":
+                selectedType = view.findViewById(R.id.radio_Tags);
+                break;
+            default:
+                selectedType = view.findViewById(R.id.radio_Description);
+        }
+        if (sort.getSortOrder().equals("Ascending")) {
+            selectedOrder = view.findViewById(R.id.radio_ascending);
+        } else {
+            selectedOrder = view.findViewById(R.id.radio_descending);
+        }
+        selectedType.setChecked(true);
+        selectedOrder.setChecked(true);
 
         // Add action buttons
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnSort).setOnClickListener(v -> {
-            RadioGroup radioGroup1 = view.findViewById(R.id.radioGroup1);
-            RadioGroup radioGroup2 = view.findViewById(R.id.radioGroup2);
-            i1 = radioGroup1.getCheckedRadioButtonId();
-            i2 = radioGroup2.getCheckedRadioButtonId();
+            typeID = sortTypeRadioGroup.getCheckedRadioButtonId();
+            orderID = sortOrderRadioGroup.getCheckedRadioButtonId();
 
             if (listener != null) {
-                if (i1 != -1 && i2 != -1) {
-                    RadioButton selectedButton1 = view.findViewById(i1);
-                    RadioButton selectedButton2 = view.findViewById(i2);
+                if (typeID != -1 && orderID != -1) {
+                    RadioButton selectedButton1 = view.findViewById(typeID);
+                    RadioButton selectedButton2 = view.findViewById(orderID);
 
-                    listener.onSortConfirmed(selectedButton1.getText().toString(), selectedButton2.getText().toString());
+                    listener.onSortConfirmed(new Sort(selectedButton1.getText().toString(),
+                            selectedButton2.getText().toString()));
                     dismiss();
                 }
             } else {
@@ -83,6 +114,15 @@ public class SortItemFragment extends DialogFragment {
         });
 
         return dialog;
+    }
+
+    /**
+     * Sets the existing sorting parameters for this dialog, which are passed from the parent inventory.
+     *
+     * @param sort The Sort object containing the existing parameters.
+     */
+    public void setSortParams(Sort sort) {
+        this.sort = sort;
     }
 
     /**

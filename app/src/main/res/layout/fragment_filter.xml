@@ -37,17 +37,10 @@
     </LinearLayout>
 
     <EditText
-        android:id="@+id/editTextDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/selectedDateContainer"
-        android:hint="Description" />
-
-    <EditText
         android:id="@+id/editTextMake"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editTextDescription"
+        android:layout_below="@+id/selectedDateContainer"
         android:hint="Make" />
 
     <androidx.recyclerview.widget.RecyclerView

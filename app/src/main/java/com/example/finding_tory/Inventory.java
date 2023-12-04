@@ -20,13 +20,8 @@ public class Inventory implements Serializable {
     private ArrayList<Item> displayItems;
     private double inventoryEstimatedValue;
     private ArrayList<String> allTags;
-    private String sortType = "Description";
-    private String sortOrder = "Ascending";
-    public Date filteredStartDate;
-    public Date filteredEndDate;
-    public String filteredDescription;
-    public String filteredMake;
-    public ArrayList<String> filteredTags;
+    private Sort sort;
+    private Filter filter;
 
     public Inventory() {
     }
@@ -43,6 +38,8 @@ public class Inventory implements Serializable {
         this.displayItems = new ArrayList<>();
         this.inventoryEstimatedValue = 0;
         this.allTags = new ArrayList<>();
+        this.sort = new Sort();
+        this.filter = new Filter();
     }
 
     /**
@@ -250,14 +247,21 @@ public class Inventory implements Serializable {
     }
 
     /**
+     * Retrieves the sort object currently being applied to this inventory.
+     *
+     * @return Sort object containing current sort criteria.
+     */
+    public Sort getSort() {
+        return sort;
+    }
+
+    /**
      * Sets the sorting criteria for the inventory.
      *
-     * @param sortType  The type of sorting to be applied (e.g., name, date).
-     * @param sortOrder The order of sorting (e.g., ascending, descending).
+     * @param sort The Sort object specifying the new sorting criteria.
      */
-    public void setSortData(String sortType, String sortOrder) {
-        this.sortType = sortType;
-        this.sortOrder = sortOrder;
+    public void setSort(Sort sort) {
+        this.sort = sort;
     }
 
     /**
@@ -274,13 +278,17 @@ public class Inventory implements Serializable {
      * Filters the items based on the stored filter data.
      */
     public void filterItems() {
+        if (filter.isEmpty()) {
+            updateDisplayedItems(items);
+            return;
+        }
         ArrayList<Item> filteredItems = new ArrayList<>();
         for (Item item : items) {
             Date itemDate = item.getPurchaseDate();
-            if (filteredStartDate == null || (!itemDate.before(filteredStartDate) && !itemDate.after(filteredEndDate))) {
-                if (filteredDescription.equals("") || item.getDescription().contains(filteredDescription)) {
-                    if (filteredMake.equals("") || item.getMake().contains(filteredMake)) {
-                        if (item.getItemTags().containsAll(filteredTags)) {
+            if (filter.getStartDate() == null || (!itemDate.before(filter.getStartDate()) && !itemDate.after(filter.getEndDate()))) {
+                if (filter.getDescription().isEmpty() || item.getDescription().contains(filter.getDescription())) {
+                    if (filter.getMake().isEmpty() || item.getMake().contains(filter.getMake())) {
+                        if (filter.getTags().isEmpty() || !Collections.disjoint(item.getItemTags(), filter.getTags())) {
                             filteredItems.add(item);
                         }
                     }
@@ -291,19 +299,21 @@ public class Inventory implements Serializable {
     }
 
     /**
-     * Sets the Filter conditions of the inventory based on the specified date range, description, and make.
+     * Retrieves the filter object currently being applied to this inventory.
      *
-     * @param startDate         The start date of the range to filter items. If null, the start date is not considered.
-     * @param endDate           The end date of the range to filter items.
-     * @param filterDescription The description to filter by. If empty, the description is not considered.
-     * @param filterMake        The make to filter by. If empty, the make is not considered.
+     * @return Filter object containing current filter criteria.
      */
-    public void setFilter(Date startDate, Date endDate, String filterDescription, String filterMake, ArrayList<String> filterTags) {
-        this.filteredStartDate = startDate;
-        this.filteredEndDate = endDate;
-        this.filteredDescription = filterDescription;
-        this.filteredMake = filterMake;
-        this.filteredTags = filterTags;
+    public Filter getFilter() {
+        return this.filter;
+    }
+
+    /**
+     * Sets the Filter conditions of the inventory.
+     *
+     * @param filter The new filter to apply to this inventory.
+     */
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 
     /**
@@ -337,7 +347,7 @@ public class Inventory implements Serializable {
      */
     public Boolean sortItems() {
         Comparator<Item> comparator;
-        switch (this.sortType) {
+        switch (sort.getSortType()) {
             case "Description":
                 comparator = Comparator.comparing(item -> item.getDescription().toLowerCase());
                 break;
@@ -356,10 +366,10 @@ public class Inventory implements Serializable {
             default:
                 return false;
         }
-        if ("Descending".equals(this.sortOrder)) {
+        if ("Descending".equals(sort.getSortOrder())) {
             comparator = comparator.reversed();
         }
-        Collections.sort(displayItems, comparator);
+        displayItems.sort(comparator);
         return true;
     }
 }
