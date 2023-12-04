@@ -14,6 +14,9 @@
     <string name="add_item_btn_description">Add Item</string>
     <string name="upsert_title_text">Title</string>
     <string name="remove_tag">Remove tag</string>
+    <string name="profile_statistics_title">Profile Statistics</string>
+    <string name="edit_profile_btn_text">Edit Profile</string>
+    <string name="change_password_btn_text">Change Password</string>
     <string name="ledger_view_header_msg">Your inventories:</string>
     <string name="no_inventories_msg">Create your first inventory!</string>
 

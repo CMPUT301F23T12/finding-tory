@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 public class Ledger {
     private static final Ledger instance = new Ledger(new ArrayList<Inventory>(), new User());
-
+    private static String GLOBAL_NAME;
+    private static String GLOBAL_USERNAME;
     private ArrayList<Inventory> inventories;
     private User user;
 
@@ -31,6 +32,19 @@ public class Ledger {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setUserNames(String name, String usrname) {
+        GLOBAL_NAME = name;
+        GLOBAL_USERNAME = usrname;
+    }
+
+    public String getUsrIDName() {
+        return GLOBAL_USERNAME;
+    }
+
+    public String getUsrName() {
+        return GLOBAL_NAME;
     }
 
     public void deleteInventory(Inventory inventory) {
