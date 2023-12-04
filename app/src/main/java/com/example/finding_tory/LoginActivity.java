@@ -67,12 +67,10 @@ public class LoginActivity extends AppCompatActivity {
                 String password = String.valueOf(passwordEditText.getText());
                 passwordEditText.setText("");
 
-                // TODO remove mock credentials
-                if (username.equals("") && password.equals("")) {
-                    loginUser("cq4", "123");
+                if (username.equals("") || password.equals("")) {
+                    Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
                 } else {
                     loginUser(username, password);
-                    //Snackbar.make(v, "Invalid user credentials. Please try again.", Snackbar.LENGTH_LONG).show();
                 }
             }
         });

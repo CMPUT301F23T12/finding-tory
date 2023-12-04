@@ -236,7 +236,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
          * view item if user wants to edit item
          */
         submit_button.setOnClickListener(new View.OnClickListener() {
-            //TODO: refactor
             @Override
             public void onClick(View view) {
                 // checks for error and makes sure required input is filled
@@ -248,7 +247,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 }
 
                 if (!error.equals("")) {
-                    // TODO: display error message on screen
                     Toast toast = Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG);
                     toast.show();
                 } else {

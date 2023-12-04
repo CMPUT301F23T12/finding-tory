@@ -60,7 +60,6 @@ public class DeleteConfirmationFragment extends DialogFragment {
         // Add action buttons
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnDelete).setOnClickListener(v -> {
-            // TODO: Implement delete logic
             if (listener != null) {
                 listener.onDeleteConfirmed(); // Notify the listener
             }
