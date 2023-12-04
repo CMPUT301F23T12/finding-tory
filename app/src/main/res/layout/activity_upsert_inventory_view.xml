@@ -2,7 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <!-- Label for Inventory Name -->
     <TextView
@@ -11,7 +12,9 @@
         android:text="Inventory Name"
         android:textSize="18sp"
         android:id="@+id/inventoryNameLabel"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginTop="16sp"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginRight="16dp"/>
 
     <!-- Inventory Name Input Field -->
     <EditText
@@ -19,7 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Inventory Name"
-        android:layout_below="@id/inventoryNameLabel"/>
+        android:layout_below="@id/inventoryNameLabel"
+        android:layout_marginHorizontal="16sp"/>
 
     <!-- Container for Buttons -->
     <LinearLayout
