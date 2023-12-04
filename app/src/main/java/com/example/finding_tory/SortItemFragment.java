@@ -29,7 +29,7 @@ public class SortItemFragment extends DialogFragment {
     public interface SortDialogListener {
         void onDialogDismissed();
 
-        void onSortConfirmed(String sort_type, String sort_order);
+        void onSortConfirmed(Sort sort);
     }
 
     /**
@@ -97,7 +97,8 @@ public class SortItemFragment extends DialogFragment {
                     RadioButton selectedButton1 = view.findViewById(typeID);
                     RadioButton selectedButton2 = view.findViewById(orderID);
 
-                    listener.onSortConfirmed(selectedButton1.getText().toString(), selectedButton2.getText().toString());
+                    listener.onSortConfirmed(new Sort(selectedButton1.getText().toString(),
+                            selectedButton2.getText().toString()));
                     dismiss();
                 }
             } else {

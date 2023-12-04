@@ -171,8 +171,8 @@ public class InventoryViewActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onSortConfirmed(String sort_type, String sort_order) {
-                            inventory.setSort(new Sort(sort_type, sort_order));
+                        public void onSortConfirmed(Sort sort) {
+                            inventory.setSort(sort);
                             if (inventory.sortItems()) {
                                 inventoryAdapter.notifyDataSetChanged();
                             }
