@@ -35,7 +35,6 @@ import java.util.Locale;
  */
 public class FilterFragment extends DialogFragment {
     TextView selectedDate;
-    EditText filteredDescription;
     EditText filteredMake;
     Button datePicker;
     Date dateStart;
@@ -64,7 +63,6 @@ public class FilterFragment extends DialogFragment {
         selectedDate = view.findViewById(R.id.selectedDate);
         datePicker = view.findViewById(R.id.datePicker);
         filteredMake = view.findViewById(R.id.editTextMake);
-        filteredDescription = view.findViewById(R.id.editTextDescription);
 
         tagsRecyclerView = (RecyclerView) view.findViewById(R.id.tagsRecyclerView);
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager(getContext());
@@ -78,9 +76,6 @@ public class FilterFragment extends DialogFragment {
         if (dateStart != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
             selectedDate.setText(sdf.format(dateStart) + " - " + sdf.format(dateEnd));
-        }
-        if (filteredDescriptionTxt != null) {
-            filteredDescription.setText(filteredDescriptionTxt);
         }
         if (filteredMakeTxt != null) {
             filteredMake.setText(filteredMakeTxt);
@@ -98,7 +93,7 @@ public class FilterFragment extends DialogFragment {
 
         view.findViewById(R.id.btnFilter).setOnClickListener(v -> {
             if (listener != null) {
-                listener.onFilterConfirmed(dateStart, dateEnd, filteredDescription.getText().toString(), filteredMake.getText().toString(), selectedTags);
+                listener.onFilterConfirmed(dateStart, dateEnd, filteredDescriptionTxt, filteredMake.getText().toString(), selectedTags);
             }
             dismiss();
         });
