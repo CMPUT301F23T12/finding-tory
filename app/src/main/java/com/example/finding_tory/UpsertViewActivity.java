@@ -56,7 +56,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
     private Button cancel_button;
     private ImageButton scan_barcode_button;
     private ImageButton scan_serial_button;
-    private TextView view_title;
     private LinearLayout tags_container;
     private EditText description_text;
     private EditText make_text;
@@ -92,7 +91,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         cancel_button = findViewById(R.id.cancel_button);
         scan_barcode_button = findViewById(R.id.scan_barcode_button);
         scan_serial_button = findViewById(R.id.serial_number_scanner);
-        view_title = findViewById(R.id.upsert_title);
         tags_container = findViewById(R.id.tags_container);
         description_text = findViewById(R.id.description_edittext);
         make_text = findViewById(R.id.make_edittext);
@@ -126,11 +124,11 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
         }
         //initializes UI based on if user wants to add or edit item
         if (isAdd) {
-            view_title.setText("Add Item Information");
+            setTitle("Add Item Information");
             submit_button.setText("Add");
             date_purchased_text.setText(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
         } else {
-            view_title.setText("Edit Item Information");
+            setTitle("Edit Item Information");
             description_text.setText(item.getDescription());
             make_text.setText(item.getMake());
             model_text.setText(item.getModel());
@@ -158,8 +156,6 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                 });
                 tags_container.addView(tagView);
             }
-//            imageAdapter.notifyDataSetChanged();
-//            justifyListViewHeightBasedOnChildren();
         }
 
         /**

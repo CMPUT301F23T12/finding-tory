@@ -1,7 +1,6 @@
 package com.example.finding_tory;
 
 import android.content.Context;
-import android.icu.util.Measure;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,7 +61,6 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         Item item = items.get(position);
         TextView descriptionTextView = view.findViewById(R.id.description_text);
         TextView valueTextView = view.findViewById(R.id.value_text);
-//        TextView tagsTextView = view.findViewById(R.id.tags_text);
         CheckBox checkBox = view.findViewById(R.id.item_checkbox);
         checkBox.setChecked(selectedItems.get(position, false));
 
@@ -119,7 +117,6 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
                 toggleSelection(position);
             }
         });
-//        tagsTextView.setText(item.getTagsString());
 
         return view;
     }

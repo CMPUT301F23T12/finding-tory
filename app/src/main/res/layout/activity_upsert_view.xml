@@ -20,15 +20,6 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/upsert_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:text="Title"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -261,7 +252,7 @@
                         android:layout_weight="1"
                         android:autofillHints=""
                         android:ems="10"
-                        android:hint="Add tags"
+                        android:hint="Add tags space seperated"
                         android:inputType="text"
                         android:minHeight="48dp" />
 
