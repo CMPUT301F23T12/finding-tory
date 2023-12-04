@@ -9,9 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.ArrayList;
 
 public class ItemTest extends TestCase {
     private Item item;
@@ -34,12 +34,12 @@ public class ItemTest extends TestCase {
         estimatedValue = 1799.99f;
         comment = "This is a comment";
         itemTags = new ArrayList<>(Arrays.asList("Home", "School"));
-        item = new Item(purchaseDate, description, make, model, estimatedValue, serialNumber, comment, itemTags);
+        item = new Item(purchaseDate, description, make, model, estimatedValue, serialNumber, comment, itemTags, new ArrayList<>());
     }
 
     @Test
     public void testUpdateItem() {
-        Item newItem = new Item(new Date(), "New Description", "New Make", "New Model", 1f, "NewSerial", "New Comment", new ArrayList<>());
+        Item newItem = new Item(new Date(), "New Description", "New Make", "New Model", 1f, "NewSerial", "New Comment", new ArrayList<>(), new ArrayList<>());
         item.updateItem(newItem);
         assertEquals(newItem.getPurchaseDate(), item.getPurchaseDate());
         assertEquals(newItem.getDescription(), item.getDescription());
@@ -143,7 +143,7 @@ public class ItemTest extends TestCase {
     @Test
     public void testGetTagsString() {
         StringBuilder expectedTagsString = new StringBuilder();
-        for (String tag: itemTags) {
+        for (String tag : itemTags) {
             expectedTagsString.append(tag).append(" ");
         }
         assertEquals(expectedTagsString.toString().trim(), item.getTagsString().toString().trim());
@@ -152,8 +152,9 @@ public class ItemTest extends TestCase {
     @Test
     public void testTestSetItemTags() {
         ArrayList<String> newItemTags = new ArrayList<>(Arrays.asList("tag1", "tag2"));
+        ArrayList<String> resultTags = new ArrayList<>(Arrays.asList("Tag1", "Tag2"));
         item.setItemTags(newItemTags);
-        assertIterableEquals(newItemTags, item.getItemTags());
+        assertIterableEquals(resultTags, item.getItemTags());
     }
 
     @Test
