@@ -212,4 +212,3 @@ public class ProfileFragment extends Fragment {
         builder.show();
     }
 }
-
