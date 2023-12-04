@@ -21,6 +21,8 @@ import com.example.finding_tory.databinding.FragmentProfileBinding;
 import com.example.finding_tory.ui.profile.ProfileViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
     private ProfileViewModel profileViewModel;
@@ -95,24 +97,22 @@ public class ProfileFragment extends Fragment {
         String username = profileViewModel.getUsername();
         FirestoreDB.getUsersRef().document(username)
                 .update("name", newName)
-                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show())
+                .addOnSuccessListener(aVoid -> {
+                    profileViewModel.fetchUserData();
+                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Error updating profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
 
-    private void updatePasswordInFirestore(String oldPassword, String newPassword, String confirmNewPassword) {
-        if (!newPassword.equals(confirmNewPassword)) {
-            Toast.makeText(getContext(), "New Password and Confirm New Password do not match", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String username = profileViewModel.getUsername();
+    private void updatePasswordInFirestore(String username, String oldPassword, String newPassword) {
         FirestoreDB.getUsersRef().document(username).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                String storedPassword = documentSnapshot.getString("password");
-                if (storedPassword != null && storedPassword.equals(oldPassword)) {
+                String storedHashedPassword = documentSnapshot.getString("password");
+                if (storedHashedPassword != null && BCrypt.checkpw(oldPassword, storedHashedPassword)) {
+                    String newHashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
                     FirestoreDB.getUsersRef().document(username)
-                            .update("password", newPassword)
+                            .update("password", newHashedPassword)
                             .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Password updated successfully", Toast.LENGTH_SHORT).show())
                             .addOnFailureListener(e -> Toast.makeText(getContext(), "Error updating password: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                 } else {
@@ -183,9 +183,25 @@ public class ProfileFragment extends Fragment {
                 String newPassword = inputNewPassword.getText().toString();
                 String confirmNewPassword = inputConfirmNewPassword.getText().toString();
 
-                updatePasswordInFirestore(oldPassword, newPassword, confirmNewPassword);
+                // Check if new password is different from the old password
+                if (newPassword.equals(oldPassword)) {
+
+                    Toast.makeText(getContext(), "New password must be different from the old password", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Make sure the new passwords match
+                if (!newPassword.equals(confirmNewPassword)) {
+                    Toast.makeText(getContext(), "New Password and Confirm New Password do not match", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Now we check the old password and update to the new password
+                String username = profileViewModel.getUsername();
+                updatePasswordInFirestore(username, oldPassword, newPassword);
             }
         });
+
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

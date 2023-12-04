@@ -35,7 +35,7 @@ public class ProfileViewModel extends ViewModel {
         updateInventoryData();
     }
 
-    private void fetchUserData() {
+    public void fetchUserData() {
         FirebaseFirestore db = FirestoreDB.getDb();
         db.collection("users").document(username)
                 .get()
