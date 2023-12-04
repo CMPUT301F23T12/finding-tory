@@ -21,7 +21,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -164,6 +163,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     SortItemFragment sortDialog = new SortItemFragment();
+                    sortDialog.setSortParams(inventory.getSort());
                     sortDialog.setSortDialogListener(new SortItemFragment.SortDialogListener() {
                         @Override
                         public void onDialogDismissed() {
@@ -172,7 +172,7 @@ public class InventoryViewActivity extends AppCompatActivity {
 
                         @Override
                         public void onSortConfirmed(String sort_type, String sort_order) {
-                            inventory.setSortData(new Sort(sort_type, sort_order));
+                            inventory.setSort(new Sort(sort_type, sort_order));
                             if (inventory.sortItems()) {
                                 inventoryAdapter.notifyDataSetChanged();
                             }

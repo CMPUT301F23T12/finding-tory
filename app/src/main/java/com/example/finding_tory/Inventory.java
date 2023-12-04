@@ -244,12 +244,17 @@ public class Inventory implements Serializable {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
+    // TODO create javadoc
+    public Sort getSort() {
+        return sort;
+    }
+
     /**
      * Sets the sorting criteria for the inventory.
      *
      * @param sort The Sort object specifying the new sorting criteria.
      */
-    public void setSortData(Sort sort) {
+    public void setSort(Sort sort) {
         this.sort = sort;
     }
 
