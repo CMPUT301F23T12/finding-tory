@@ -41,6 +41,7 @@ public class LedgerViewActivity extends AppCompatActivity {
     private InternalStorageManager internalStorageManager;
     private String AUTH_USER = "";
     private LedgerViewActivity currentViewContext;
+    TextView nav_username;
 
     /**
      * Initializes the activity, sets up the navigation drawer and navigation components.
@@ -57,6 +58,10 @@ public class LedgerViewActivity extends AppCompatActivity {
         binding = ActivityLedgerViewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setTitle("Welcome!");
+
+        NavigationView navigationView = binding.navView;
+        View headerView = navigationView.getHeaderView(0);
+        nav_username = headerView.findViewById(R.id.headerUsername);
 
         AUTH_USER = loadData();
         if (AUTH_USER.equals("")) {
@@ -108,6 +113,7 @@ public class LedgerViewActivity extends AppCompatActivity {
             } else {
                 Ledger.getInstance().setUserNames("", AUTH_USER);
             }
+            nav_username.setText(name);
         });
 
         setSupportActionBar(binding.appBarMain.toolbar);

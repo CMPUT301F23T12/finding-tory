@@ -128,7 +128,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String newName = inputName.getText().toString();
-                Ledger.getInstance().setUserNames(newName,username);
+                Ledger.getInstance().setUserNames(newName, username);
                 updateNames();
                 updateNames();
                 updateProfileInFirestore(newName);
