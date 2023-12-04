@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <!-- Label for Inventory Name -->
     <TextView
-        android:id="@+id/inventoryNameLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:text="Inventory Name"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:id="@+id/inventoryNameLabel"
+        android:layout_marginBottom="8dp"/>
 
     <!-- Inventory Name Input Field -->
     <EditText
         android:id="@+id/inventoryNameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/inventoryNameLabel"
-        android:hint="Enter Inventory Name" />
+        android:hint="Enter Inventory Name"
+        android:layout_below="@id/inventoryNameLabel"/>
 
     <!-- Container for Buttons -->
     <LinearLayout
+        android:layout_below="@id/inventoryNameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/inventoryNameText"
-        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
         android:gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:layout_marginTop="20dp">
 
         <!-- Cancel Button -->
         <Button
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:text="Cancel" />
+            android:text="Cancel"
+            android:layout_marginEnd="10dp"/>
 
         <!-- Delete Button -->
 
@@ -51,7 +52,7 @@
             android:id="@+id/submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit" />
+            android:text="Submit"/>
     </LinearLayout>
 
     <View
@@ -61,6 +62,7 @@
         android:alpha="0.5"
         android:background="@android:color/black"
         android:layerType="hardware"
-        android:visibility="gone"></View>
+        android:visibility="gone">
+    </View>
 
 </RelativeLayout>
