@@ -11,6 +11,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static org.hamcrest.Matchers.allOf;
 
 import static org.hamcrest.CoreMatchers.anything;
 
@@ -25,6 +28,7 @@ import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
+import static androidx.test.espresso.action.ViewActions.*;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.idling.CountingIdlingResource;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -42,6 +46,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
+import java.util.List;
+
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -49,21 +55,33 @@ public class InventoryUITest {
     @Rule
     public ActivityScenarioRule<LoginActivity> activityRule = new ActivityScenarioRule<>(LoginActivity.class);
     private CountingIdlingResource idlingResource;
+    private List<String> testItemNames;
 
+
+
+    @Test
+    public void login() {
+        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("test"));
+        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("test"));
+
+        onView(withId(R.id.button_login)).perform(click());
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void navigateToInventory() {
         login();
 
         try {
-            Thread.sleep(2000); // Waiting for 2 seconds
+            Thread.sleep(6000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        onData(anything())
-                .inAdapterView(withId(R.id.ledger_listview))
-                .atPosition(0)
-                .perform(click());
+        onView(withId(R.id.add_delete_item_button)).perform(click());
 
         try {
             Thread.sleep(2000);
@@ -71,7 +89,53 @@ public class InventoryUITest {
             e.printStackTrace();
         }
 
-        onView(withId(R.id.add_delete_item_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.inventoryNameText)).perform(ViewActions.typeText("Home"));
+        onView(withId(R.id.submit_button)).perform(click());
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.search_inventory_edittext)).perform(typeText("Home"), ViewActions.closeSoftKeyboard());
+
+        onData(anything())
+                .inAdapterView(withId(R.id.inventory_listview))
+                .atPosition(0)
+                .perform(click());
+    }
+
+    private void navigateToMainScreen() {
+        login();
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.ledger_listview)).check(matches(isDisplayed()));
+    }
+
+
+    private void deleteInventory(String inventoryName) {
+        navigateToMainScreen();
+
+        onView(withId(R.id.search_inventory_edittext)).perform(typeText(inventoryName), ViewActions.closeSoftKeyboard());
+
+        try {
+            Thread.sleep(2000); // This is not a best practice. Consider using Idling Resources.
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onData(anything())
+                .inAdapterView(withId(R.id.ledger_listview))
+                .atPosition(0)
+                .onChildView(withText(inventoryName))
+                .perform(longClick());
+
+        onView(withId(R.id.delete_button)).perform(click());
     }
 
     public void navigateToFirstItem() {
@@ -238,20 +302,55 @@ public class InventoryUITest {
         onView(withId(R.id.add_delete_item_button)).perform(click());
         onView(withId(R.id.btnDelete)).perform(click());
 
-        // Reset the app to it's original state since the DB is affected
+        // Reset the app to it's original state since the other tests might still need to run
         resetAppState();
     }
 
-    @Test
-    public void login() {
-        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("abc"));
-        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("123"));
 
-        onView(withId(R.id.button_login)).perform(click());
+    @Before
+    public void setUp() {
+        // Initialize your IdlingResource that monitors your DB operations
+        idlingResource = new CountingIdlingResource("DataLoader");
+        // Register the IdlingResource with Espresso
+        IdlingRegistry.getInstance().register(idlingResource);
+    }
+
+    @After
+    public void tearDown() {
+        // Unregister your IdlingResource
+        IdlingRegistry.getInstance().unregister(idlingResource);
+        deleteInventory("Home");
     }
 
     public void resetAppState() {
-        // Add all the stuff we deleted since DB is affected permanently
+        navigateToInventory();
+
+        onView(withId(R.id.add_delete_item_button)).perform(click());
+        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
+        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
+        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
+        // for Interaction with DatePickerDialog
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
+        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Kitchen Home"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_button)).perform(click());
+        onView(withId(R.id.add_button)).perform(scrollTo());
+        onView(withId(R.id.add_button)).perform(click());
+
+        onView(withId(R.id.add_delete_item_button)).perform(click());
+        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Dining Table"));
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("800"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Oak Wood Dining Table"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_button)).perform(scrollTo());
+        onView(withId(R.id.add_button)).perform(click());
+
         onView(withId(R.id.add_delete_item_button)).perform(click());
         onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Sony PS5"));
         onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Sony"));
@@ -266,38 +365,7 @@ public class InventoryUITest {
         onView(withId(R.id.add_tags_button)).perform(click());
         onView(withId(R.id.add_button)).perform(scrollTo());
         onView(withId(R.id.add_button)).perform(click());
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
-        // for Interation with DatePickerDialog
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
-        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Kitchen Home"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_button)).perform(click());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
     }
-
-    @Before
-    public void setUp() {
-        // Initialize your IdlingResource that monitors your DB operations
-        idlingResource = new CountingIdlingResource("DataLoader");
-        // Register the IdlingResource with Espresso
-        IdlingRegistry.getInstance().register(idlingResource);
-    }
-
-    @After
-    public void tearDown() {
-        // Unregister your IdlingResource
-        IdlingRegistry.getInstance().unregister(idlingResource);
-    }
-
 
     @Test
     public void addTestData2() throws InterruptedException {
