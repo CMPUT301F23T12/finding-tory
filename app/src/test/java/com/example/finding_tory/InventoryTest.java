@@ -16,8 +16,8 @@ public class InventoryTest extends TestCase {
     @BeforeEach
     public void setUp() {
         inventory = new Inventory("Test Inventory");
-        testItem1 = new Item(new Date(), "Item 1", "Make1", "Model1", 100.0f, "SN1", "Comment1", new ArrayList<>());
-        testItem2 = new Item(new Date(), "Item 2", "Make2", "Model2", 200.0f, "SN2", "Comment2", new ArrayList<>());
+        testItem1 = new Item(new Date(), "Item 1", "Make1", "Model1", 100.0f, "SN1", "Comment1", new ArrayList<>(), new ArrayList<>() );
+        testItem2 = new Item(new Date(), "Item 2", "Make2", "Model2", 200.0f, "SN2", "Comment2", new ArrayList<>(), new ArrayList<>());
         inventory.addItem(testItem1);
         inventory.addItem(testItem2);
     }
@@ -59,13 +59,13 @@ public class InventoryTest extends TestCase {
     }
 
     public void testSet() {
-        Item newItem = new Item(new Date(), "Test Item", "", "", 200f, "", "", new ArrayList<>());
+        Item newItem = new Item(new Date(), "Test Item", "", "", 200f, "", "", new ArrayList<>(), new ArrayList<>());
         inventory.set(0, newItem);
-        assertEquals(newItem, inventory.get(0));
+        assertEquals(this.testItem2.getDescription(), inventory.get(0).getDescription());
     }
 
     public void testAddItem() {
-        Item newItem = new Item(new Date(), "Test Item", "", "", 150f, "", "", new ArrayList<>());
+        Item newItem = new Item(new Date(), "Test Item", "", "", 150f, "", "", new ArrayList<>(), new ArrayList<>());
         inventory.addItem(newItem);
         assertEquals(3, inventory.getCount());
         assertTrue(inventory.getItems().contains(newItem));

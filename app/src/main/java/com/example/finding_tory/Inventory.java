@@ -286,8 +286,8 @@ public class Inventory implements Serializable {
         for (Item item : items) {
             Date itemDate = item.getPurchaseDate();
             if (filter.getStartDate() == null || (!itemDate.before(filter.getStartDate()) && !itemDate.after(filter.getEndDate()))) {
-                if (filter.getDescription().isEmpty() || item.getDescription().contains(filter.getDescription())) {
-                    if (filter.getMake().isEmpty() || item.getMake().contains(filter.getMake())) {
+                if (filter.getDescription().isEmpty() || item.getDescription().toLowerCase().contains(filter.getDescription().toLowerCase())) {
+                    if (filter.getMake().isEmpty() || item.getMake().toLowerCase().contains(filter.getMake().toLowerCase())) {
                         if (filter.getTags().isEmpty() || !Collections.disjoint(item.getItemTags(), filter.getTags())) {
                             filteredItems.add(item);
                         }
