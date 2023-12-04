@@ -109,7 +109,11 @@ public class SortItemFragment extends DialogFragment {
         return builder.create();
     }
 
-    // TODO create javadoc
+    /**
+     * Sets the existing sorting parameters for this dialog, which are passed from the parent inventory.
+     *
+     * @param sort The Sort object containing the existing parameters.
+     */
     public void setSortParams(Sort sort) {
         this.sort = sort;
     }

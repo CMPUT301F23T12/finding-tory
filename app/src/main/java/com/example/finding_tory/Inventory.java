@@ -244,7 +244,11 @@ public class Inventory implements Serializable {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
-    // TODO create javadoc
+    /**
+     * Retrieves the sort object currently being applied to this inventory.
+     *
+     * @return Sort object containing current sort criteria.
+     */
     public Sort getSort() {
         return sort;
     }
@@ -295,7 +299,7 @@ public class Inventory implements Serializable {
     /**
      * Retrieves the filter object currently being applied to this inventory.
      *
-     * @return Filter object containing current filter criteria
+     * @return Filter object containing current filter criteria.
      */
     public Filter getFilter() {
         return this.filter;
