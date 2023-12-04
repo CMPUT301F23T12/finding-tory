@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -41,8 +43,8 @@ public class InventoryViewActivity extends AppCompatActivity {
     private boolean state_filter = false;
     private TextView totalItemsTextView;
     private TextView totalValueTextView;
-    private FloatingActionButton addItemButton;
-    private ImageButton filter_tag_button, sort_cancel_button;
+    private FloatingActionButton add_back_button;
+    private ImageButton filter_tag_button, sort_delete_button;
 
     /**
      * Initializes the instance variables and bindings associated with this activity on creation.
@@ -74,7 +76,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         // initialize and cache the TextViews for the totals
         totalItemsTextView = findViewById(R.id.total_items_textview);
         totalValueTextView = findViewById(R.id.total_value_textview);
-        addItemButton = findViewById(R.id.add_delete_item_button);
+        add_back_button = findViewById(R.id.add_delete_item_button);
         updateTotals(false);
 
         EditText findItemDesc = findViewById(R.id.search_inventory_edittext);
@@ -98,7 +100,23 @@ public class InventoryViewActivity extends AppCompatActivity {
         });
 
         // allows new items to be added
-        addItemButton.setOnClickListener(new View.OnClickListener() {
+        add_back_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (state_deletion) {
+                    inventoryAdapter.clearSelection();
+                    exitSelectionMode();
+                } else {
+                    Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
+                    editItemIntent.putExtra("username", username);
+                    editItemIntent.putExtra("inventory", inventory);
+                    startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
+                }
+            }
+        });
+
+        sort_delete_button = findViewById(R.id.sort_cancel_button);
+        sort_delete_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (state_deletion) {
@@ -131,38 +149,6 @@ public class InventoryViewActivity extends AppCompatActivity {
                     });
                     deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
                     greyBack.setVisibility(View.VISIBLE); // move to the bottom after filter is implemented
-                } else {
-                    Intent editItemIntent = new Intent(InventoryViewActivity.this, UpsertViewActivity.class);
-                    editItemIntent.putExtra("username", username);
-                    editItemIntent.putExtra("inventory", inventory);
-                    startActivityForResult(editItemIntent, ActivityCodes.ADD_ITEM.getRequestCode());
-                }
-            }
-        });
-
-        // Handles creating new activity for viewing item
-        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Item selectedItem = inventoryAdapter.getItem(position);
-
-                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
-
-                intent.putExtra("selectedItem", selectedItem);
-                intent.putExtra("pos", position);
-                intent.putExtra("inventory", inventory);
-                intent.putExtra("username", username);
-                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
-            }
-        });
-
-        sort_cancel_button = findViewById(R.id.sort_cancel_button);
-        sort_cancel_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (state_deletion) {
-                    inventoryAdapter.clearSelection();
-                    exitSelectionMode();
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     SortItemFragment sortDialog = new SortItemFragment();
@@ -249,6 +235,22 @@ public class InventoryViewActivity extends AppCompatActivity {
             }
         });
 
+        // Handles creating new activity for viewing item
+        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Item selectedItem = inventoryAdapter.getItem(position);
+
+                Intent intent = new Intent(InventoryViewActivity.this, ItemViewActivity.class);
+
+                intent.putExtra("selectedItem", selectedItem);
+                intent.putExtra("pos", position);
+                intent.putExtra("inventory", inventory);
+                intent.putExtra("username", username);
+                startActivityForResult(intent, ActivityCodes.VIEW_ITEM.getRequestCode());
+            }
+        });
+
         inventoryListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -265,11 +267,15 @@ public class InventoryViewActivity extends AppCompatActivity {
     private void enterSelectionMode() {
         state_deletion = true;
         filter_tag_button.setBackgroundResource(R.drawable.tag_png);
-        sort_cancel_button.setBackgroundResource(android.R.drawable.ic_delete);
-        addItemButton.setImageResource(android.R.drawable.ic_menu_delete);
+        sort_delete_button.setBackgroundResource(R.drawable.garbage_png);
+        add_back_button.setMaxImageSize((int) (56 * getResources().getDisplayMetrics().density));
+        add_back_button.setImageResource(R.drawable.back_arrow_png);
+        Animation wobbleAnimation = AnimationUtils.loadAnimation(this, R.anim.wobble_effect);
+
         // Show checkboxes
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
+            view.startAnimation(wobbleAnimation);
             CheckBox checkBox = view.findViewById(R.id.item_checkbox);
             ImageView arrow = view.findViewById(R.id.arrow);
             checkBox.setVisibility(View.VISIBLE);
@@ -285,10 +291,12 @@ public class InventoryViewActivity extends AppCompatActivity {
     private void exitSelectionMode() {
         state_deletion = false;
         filter_tag_button.setBackgroundResource(R.drawable.filter_png);
-        sort_cancel_button.setBackgroundResource(R.drawable.sort_png);
-        addItemButton.setImageResource(android.R.drawable.ic_input_add);
+        sort_delete_button.setBackgroundResource(R.drawable.sort_png);
+        add_back_button.setMaxImageSize((int) (24 * getResources().getDisplayMetrics().density));
+        add_back_button.setImageResource(android.R.drawable.ic_input_add);
         for (int i = 0; i < inventoryAdapter.getCount(); i++) {
             View view = inventoryListView.getChildAt(i);
+            view.clearAnimation();
             CheckBox checkBox = view.findViewById(R.id.item_checkbox);
             ImageView arrow = view.findViewById(R.id.arrow);
             checkBox.setVisibility(View.GONE);

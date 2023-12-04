@@ -77,10 +77,10 @@
         android:layout_below="@+id/total_items_textview"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:dividerHeight="10.0sp"
-        android:divider="@null"/>
+        android:layout_marginRight="20dp"
+        android:divider="@null"
+        android:dividerHeight="10.0sp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_delete_item_button"
