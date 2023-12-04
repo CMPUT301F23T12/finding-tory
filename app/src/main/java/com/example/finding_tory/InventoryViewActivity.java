@@ -58,6 +58,7 @@ public class InventoryViewActivity extends AppCompatActivity {
         inventory = (Inventory) intent.getSerializableExtra("inventory");
         username = (String) intent.getSerializableExtra("username");
         inventory.setItems(new ArrayList<>());
+        inventory.setSort(new Sort());
         inventory.setFilter(new Filter());
 
         populateInventoryItems();

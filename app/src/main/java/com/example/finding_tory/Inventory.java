@@ -20,7 +20,7 @@ public class Inventory implements Serializable {
     private ArrayList<Item> displayItems;
     private double inventoryEstimatedValue;
     private ArrayList<String> allTags;
-    private Sort sort = new Sort();
+    private Sort sort;
     private Filter filter;
 
     public Inventory() {
@@ -38,6 +38,8 @@ public class Inventory implements Serializable {
         this.displayItems = new ArrayList<>();
         this.inventoryEstimatedValue = 0;
         this.allTags = new ArrayList<>();
+        this.sort = new Sort();
+        this.filter = new Filter();
     }
 
     /**
@@ -286,7 +288,7 @@ public class Inventory implements Serializable {
             if (filter.getStartDate() == null || (!itemDate.before(filter.getStartDate()) && !itemDate.after(filter.getEndDate()))) {
                 if (filter.getDescription().isEmpty() || item.getDescription().contains(filter.getDescription())) {
                     if (filter.getMake().isEmpty() || item.getMake().contains(filter.getMake())) {
-                        if (!Collections.disjoint(item.getItemTags(), filter.getTags())) {
+                        if (filter.getTags().isEmpty() || !Collections.disjoint(item.getItemTags(), filter.getTags())) {
                             filteredItems.add(item);
                         }
                     }
