@@ -121,34 +121,36 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (state_deletion) {
                     final View greyBack = findViewById(R.id.fadeBackground);
-                    DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
-                    deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
-                        @Override
-                        public void onDialogDismissed() {
-                            // Make grey background invisible when the dialog is dismissed
-                            inventoryAdapter.clearSelection();
-                            greyBack.setVisibility(View.GONE);
-                            exitSelectionMode();
-                        }
-
-                        @Override
-                        public void onDeleteConfirmed() {
-                            List<Item> selectedItems = inventoryAdapter.getSelectedItems();
-                            // Clear the selection and exit selection mode
-                            inventoryAdapter.clearSelection();
-                            exitSelectionMode();
-
-                            // Remove selected items from the inventory
-                            for (Item item : selectedItems) {
-                                inventory.removeItem(item);
-                                FirestoreDB.deleteItemDB(username, inventory, item);
+                    List<Item> selectedItems = inventoryAdapter.getSelectedItems();
+                    if (!selectedItems.isEmpty()) {
+                        DeleteConfirmationFragment deleteDialog = new DeleteConfirmationFragment();
+                        deleteDialog.setDeleteDialogListener(new DeleteConfirmationFragment.DeleteDialogListener() {
+                            @Override
+                            public void onDialogDismissed() {
+                                // Make grey background invisible when the dialog is dismissed
+                                inventoryAdapter.clearSelection();
+                                greyBack.setVisibility(View.GONE);
+                                exitSelectionMode();
                             }
 
-                            updateTotals(true);
-                        }
-                    });
-                    deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
-                    greyBack.setVisibility(View.VISIBLE); // move to the bottom after filter is implemented
+                            @Override
+                            public void onDeleteConfirmed() {
+                                // Clear the selection and exit selection mode
+                                inventoryAdapter.clearSelection();
+                                exitSelectionMode();
+
+                                // Remove selected items from the inventory
+                                for (Item item : selectedItems) {
+                                    inventory.removeItem(item);
+                                    FirestoreDB.deleteItemDB(username, inventory, item);
+                                }
+
+                                updateTotals(true);
+                            }
+                        });
+                        deleteDialog.show(getSupportFragmentManager(), "DELETE_ITEM");
+                        greyBack.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     SortItemFragment sortDialog = new SortItemFragment();
@@ -178,39 +180,42 @@ public class InventoryViewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (state_deletion) {
                     final View greyBack = findViewById(R.id.fadeBackground);
-                    Set<String> current_tags = new HashSet<>();
-                    for (Item item : inventoryAdapter.getSelectedItems()) {
-                        current_tags.addAll(item.getItemTags());
-                    }
-
-                    BulkTagFragment tagDialog = new BulkTagFragment();
-                    Bundle args = new Bundle();
-                    args.putSerializable("inventory", inventory);
-                    args.putSerializable("tags", (Serializable) new ArrayList<>(current_tags));
-                    tagDialog.setArguments(args);
-                    tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
-                        @Override
-                        public void onDialogDismissed() {
-                            greyBack.setVisibility(View.GONE);
+                    List<Item> selectedItems = inventoryAdapter.getSelectedItems();
+                    if (!selectedItems.isEmpty()) {
+                        Set<String> current_tags = new HashSet<>();
+                        for (Item item : inventoryAdapter.getSelectedItems()) {
+                            current_tags.addAll(item.getItemTags());
                         }
 
-                        @Override
-                        public void onTagConfirmed(ArrayList<String> selectedTags) {
-                            for (Item item : inventoryAdapter.getSelectedItems()) {
-                                for (String str : selectedTags) {
-                                    item.addItemTag(str);
-                                }
-                                FirestoreDB.editItemFromFirestore(username, inventory, item);
+                        BulkTagFragment tagDialog = new BulkTagFragment();
+                        Bundle args = new Bundle();
+                        args.putSerializable("inventory", inventory);
+                        args.putSerializable("tags", (Serializable) new ArrayList<>(current_tags));
+                        tagDialog.setArguments(args);
+                        tagDialog.setTagDialogListener(new BulkTagFragment.TagDialogListener() {
+                            @Override
+                            public void onDialogDismissed() {
+                                greyBack.setVisibility(View.GONE);
                             }
-                            inventory.addTagsToInventory(selectedTags);
-                            inventoryAdapter.clearSelection();
-                            exitSelectionMode();
-                            // Notify the adapter of the data change
-                            inventoryAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
-                    greyBack.setVisibility(View.VISIBLE);
+
+                            @Override
+                            public void onTagConfirmed(ArrayList<String> selectedTags) {
+                                for (Item item : inventoryAdapter.getSelectedItems()) {
+                                    for (String str : selectedTags) {
+                                        item.addItemTag(str);
+                                    }
+                                    FirestoreDB.editItemFromFirestore(username, inventory, item);
+                                }
+                                inventory.addTagsToInventory(selectedTags);
+                                inventoryAdapter.clearSelection();
+                                exitSelectionMode();
+                                // Notify the adapter of the data change
+                                inventoryAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        tagDialog.show(getSupportFragmentManager(), "TAG_ITEMS");
+                        greyBack.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     FilterFragment filterDialog = new FilterFragment();
