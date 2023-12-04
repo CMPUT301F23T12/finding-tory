@@ -44,12 +44,13 @@
 
     <ImageView
         android:id="@+id/arrow"
-        android:layout_width="24dp"
-        android:layout_height="20dp"
-        android:layout_margin="20dp"
-        android:rotationY="180"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_margin="15dp"
+        android:src="@drawable/arrow_png"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="?attr/homeAsUpIndicator" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

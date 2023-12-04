@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:background="@drawable/round_rect_listitem"
+    android:orientation="horizontal"
     android:paddingHorizontal="20dp"
     android:paddingVertical="10dp">
 
@@ -42,21 +42,23 @@
 
     <ImageView
         android:id="@+id/arrow"
-        android:layout_width="24dp"
-        android:layout_height="20dp"
-        android:layout_margin="20dp"
-        android:rotationY="180"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_margin="15dp"
+        android:src="@drawable/arrow_png"
         android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="?attr/homeAsUpIndicator" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <CheckBox
         android:id="@+id/item_checkbox"
-        android:layout_width="24dp"
-        android:layout_height="20dp"
-        android:layout_margin="20dp"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_margin="15dp"
         android:visibility="gone"
+        android:background="@color/bg_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
