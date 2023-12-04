@@ -303,6 +303,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                         }
                     }
 
+                    Date finalDateFormatted = dateFormatted;
                     new Thread(() -> {
                         try {
                             latch.await(); // Wait for all uploads to complete
@@ -313,6 +314,7 @@ public class UpsertViewActivity extends AppCompatActivity implements DatePickerD
                             } else {
                                 item.setImageLinks(imageLinks);
                                 item.setDescription(description);
+                                item.setPurchaseDate(finalDateFormatted);
                                 item.setMake(make);
                                 item.setModel(model);
                                 item.setEstimatedValue(estimated_cost);

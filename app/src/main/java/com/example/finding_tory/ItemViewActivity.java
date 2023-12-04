@@ -250,13 +250,11 @@ public class ItemViewActivity extends AppCompatActivity {
         } else {
             findViewById(R.id.tags_layout).setVisibility(View.VISIBLE);
             LinearLayout tagsContainer = findViewById(R.id.item_tags_container);
-//            FlexboxLayout flexboxLayout = findViewById(R.id.item_tag_container);
-//            flexboxLayout.removeAllViews();
-//            LayoutInflater inflater = LayoutInflater.from(this);
-//            TagAdapter tagAdapter = new TagAdapter(passedItem.getItemTags(), new ArrayList<String>(), false);
+            tagsContainer.removeAllViews();
 
 
             for (String tag : passedItem.getItemTags()) {
+
                 LayoutInflater inflater = LayoutInflater.from(this);
                 View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
                 ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
@@ -264,21 +262,6 @@ public class ItemViewActivity extends AppCompatActivity {
                 tagTextView.setText(tag);
                 removeTagButton.setVisibility(View.GONE);
                 tagsContainer.addView(tagView);
-//                View tagView = inflater.inflate(R.layout.tag_item_layout, flexboxLayout, false);
-//                TextView tagTextView = tagView.findViewById(R.id.tag_text);
-//                FlexboxLayout.LayoutParams layoutParams = new FlexboxLayout.LayoutParams(
-//                        ViewGroup.LayoutParams.WRAP_CONTENT,
-//                        ViewGroup.LayoutParams.WRAP_CONTENT
-//                );
-//
-//                layoutParams.setMargins(5, 5, 5, 5); // Set margins between tags
-//
-//                tagTextView.setLayoutParams(layoutParams);
-////                tagTextView.setText(tag);
-//
-//                ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
-//                removeTagButton.setVisibility(View.GONE);
-//                flexboxLayout.addView(tagView); // Add the tag view to the container
 
             }
         }
