@@ -5,15 +5,30 @@ import com.google.firebase.firestore.PropertyName;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Represents a user with a username, name, password, and a list of inventories.
+ * This class is serializable to support easy storage and retrieval.
+ */
 public class User implements Serializable {
     private String username;
     private String name;
     private String password;
     private ArrayList<Inventory> inventories;
 
+    /**
+     * Default constructor for creating an empty User instance.
+     */
     public User() {
     }
 
+    /**
+     * Constructs a new User with specified username, name, and password.
+     * Initializes an empty list of inventories.
+     *
+     * @param username the username of the user
+     * @param name     the real name of the user
+     * @param password the password of the user
+     */
     public User(String username, String name, String password) {
         this.username = username;
         this.name = name;

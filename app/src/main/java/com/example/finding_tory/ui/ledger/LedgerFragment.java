@@ -33,8 +33,6 @@ import java.util.ArrayList;
 public class LedgerFragment extends Fragment {
 
     private FragmentLedgerBinding binding;
-
-    // TODO use a Ledger instead of an ArrayList of Inventories
     private Ledger ledger = Ledger.getInstance();
     private String username;
     private ListView ledgerListView;
@@ -43,6 +41,12 @@ public class LedgerFragment extends Fragment {
     private TextView noInventoriesMsg;
     private FloatingActionButton addInvButton;
 
+    /**
+     * Creates a new instance of LedgerFragment with the provided username.
+     *
+     * @param usrname The username of the user whose inventories will be displayed.
+     * @return A new instance of LedgerFragment.
+     */
     public static LedgerFragment newInstance(String usrname) {
         LedgerFragment fragment = new LedgerFragment();
         Bundle args = new Bundle();

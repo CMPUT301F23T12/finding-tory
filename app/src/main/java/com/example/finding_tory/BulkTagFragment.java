@@ -105,6 +105,10 @@ public class BulkTagFragment extends DialogFragment {
         return dialog;
     }
 
+    /**
+     * Capitalizes the first letter of the tag
+     * @param str the string to capitalize the first letter
+     */
     private String capitalizeFirstLetter(String str) {
         if (str == null || str.isEmpty()) {
             return str;

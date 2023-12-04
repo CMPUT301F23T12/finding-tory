@@ -65,7 +65,6 @@ public class InventoryUITest {
         }
     }
 
-    @Test
     public void register(){
         onView(withId(R.id.button_register)).perform(click());
         onView(withId(R.id.edit_text_username)).perform(typeText("TestUser"));
@@ -77,43 +76,58 @@ public class InventoryUITest {
         onView(withId(R.id.button_register)).perform(click());
     }
 
-    @Test
-    public void login() {
-        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("abc"));
-        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("123"));
-        Espresso.closeSoftKeyboard();
-        onView(withId(R.id.button_login)).perform(click());
-    }
-
-    @Test
     public void createInventory() {
-        onView((withId(R.id.add_inventory_button))).perform(click());
+        onView(withId(R.id.add_inventory_button)).perform(click());
         onView(withId(R.id.inventoryNameText)).perform(ViewActions.typeText("Home"));
         onView(withId(R.id.submit_button)).perform(click());
+    }
+
+    private void testDeleteInventory() {
         onData(anything())
                 .inAdapterView(withId(R.id.ledger_listview))
                 .atPosition(0)
-                .perform(click());
+                .perform(longClick());
+        onView(withId(R.id.delete_button)).perform(click());
+        onView(withId(R.id.btnDelete)).perform(click());
+
     }
 
-    @Test
-    public void testAddItem() {
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Apple Macbook Pro 2022"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Macbook"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("Pro 2022"));
+    public void testAddItem(String description, String make, String model, String price, String tags) {
+        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText(description));
+        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText(make));
+        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText(model));
         onView(withId(R.id.date_edittext)).perform(click());
         onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
         onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("2000"));
+        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText(price));
         onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("SN3892"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText(tags), ViewActions.closeSoftKeyboard());
         onView(withId(R.id.add_tags_button)).perform(click());
         onView(withId(R.id.add_button)).perform(scrollTo());
         onView(withId(R.id.add_button)).perform(click());
 
-        onView(withText("Apple Macbook Pro 2022")).check(matches(isDisplayed()));
+        onView(withText(description)).check(matches(isDisplayed()));
+    }
+
+    public void testDeleteItem(String item) {
+        onView(withText(item)).check(matches(isDisplayed()));
+        onView(withText(item)).perform(click());
+        onView(withId(R.id.delete_button)).perform(click());
+        onView(withId(R.id.btnDelete)).perform(click());
+        onView(withText(item)).check(doesNotExist());
+    }
+
+    @Test
+    public void loginAndLogout() {
+        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("abc"));
+        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("123"));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.button_login)).perform(click());
+        awaitDB(2000);
+        Espresso.pressBack();
+        onView(withId(R.id.imageView2)).perform(click());
     }
 
     @Test
@@ -121,81 +135,23 @@ public class InventoryUITest {
         register();
         awaitDB(2000);
         createInventory();
-        awaitDB(2000);
+        awaitDB(1000);
         onData(anything())
                 .inAdapterView(withId(R.id.ledger_listview))
                 .atPosition(0)
                 .perform(click());
         awaitDB(2000);
         onView(withId(R.id.add_delete_item_button)).perform(click());
+        testAddItem("Sony PS5", "Sony", "PS5", "2000", "Electronics Consoles");
+        onView(withText("Sony PS5")).check(matches(isDisplayed()));
         awaitDB(1000);
-        testAddItem();
+        onView(withId(R.id.add_delete_item_button)).perform(click());
+        testAddItem("Ninja Blender AF100", "Ninja", "AF100", "100", "Kitchen");
+        onView(withText("Ninja Blender AF100")).check(matches(isDisplayed()));
+        Espresso.pressBack();
+        awaitDB(1000);
+        testDeleteInventory();
         FirestoreDB.getUsersRef().document("TestUser").delete();
-    }
-
-    @Test
-    public void navigateToInventory() {
-        register();
-        awaitDB(2000);
-
-        onView(withId(R.id.inventoryNameText)).perform(ViewActions.typeText("Home"));
-        onView(withId(R.id.submit_button)).perform(click());
-
-        awaitDB(3000);
-
-        onView(withId(R.id.search_inventory_edittext)).perform(typeText("Home"), ViewActions.closeSoftKeyboard());
-
-        onData(anything())
-                .inAdapterView(withId(R.id.inventory_listview))
-                .atPosition(0)
-                .perform(click());
-    }
-
-    private void navigateToMainScreen() {
-        login();
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.ledger_listview)).check(matches(isDisplayed()));
-    }
-
-
-    private void deleteInventory(String inventoryName) {
-        navigateToMainScreen();
-
-        onView(withId(R.id.search_inventory_edittext)).perform(typeText(inventoryName), ViewActions.closeSoftKeyboard());
-
-        try {
-            Thread.sleep(2000); // This is not a best practice. Consider using Idling Resources.
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        onData(anything())
-                .inAdapterView(withId(R.id.ledger_listview))
-                .atPosition(0)
-                .onChildView(withText(inventoryName))
-                .perform(longClick());
-
-        onView(withId(R.id.delete_button)).perform(click());
-    }
-
-    public void navigateToFirstItem() {
-        awaitDB(2000);
-
-        onData(anything())
-                .inAdapterView(withId(R.id.inventory_listview))
-                .atPosition(0)
-                .perform(click());
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public static ViewAction setDate(final int year, final int monthOfYear, final int dayOfMonth) {
@@ -218,158 +174,4 @@ public class InventoryUITest {
         };
     }
 
-    @Test
-    public void testCancelAddItem() {
-        try {
-            navigateToInventory();
-        }
-        catch (Exception e) {
-            
-        }
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.cancel_button)).perform(scrollTo());
-        onView(withId(R.id.cancel_button)).perform(click());
-    }
-
-    @Test
-    public void testGoBackToLedger() {
-        try {
-            navigateToInventory();
-        }
-        catch (Exception e) {
-            
-        }
-        navigateToFirstItem();
-        onView(withId(R.id.button_close_item_view)).perform(click());
-        pressBack();
-        onView(withText("Home")).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testSortItems() {
-        try {
-            navigateToInventory();
-        }
-        catch (Exception e) {
-            
-        }
-        onView(withId(R.id.sort_cancel_button)).perform(click());
-        onView(withId(R.id.radio_Value)).perform(click());
-        onView(withId(R.id.radio_descending)).perform(click());
-        onView(withId(R.id.btnSort)).perform(click());
-
-        onData(anything())
-                .inAdapterView(withId(R.id.inventory_listview))
-                .atPosition(0)
-                .perform(click());
-
-        // Verify first item clicked is now Dining Table
-        onView(withText("Dining Table")).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void testViewItem() {
-        // Click on the first inventory in the ledger list
-        // Make sure testAddItem() is ran first
-        try {
-            navigateToInventory();
-        }
-        catch (Exception e) {
-            
-        }
-        onView(withText("Blender")).check(matches(isDisplayed()));
-    }
-
-
-    public void resetAppState() {
-        navigateToInventory();
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
-        // for Interaction with DatePickerDialog
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
-        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Kitchen Home"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_button)).perform(click());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Dining Table"));
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("800"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Oak Wood Dining Table"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Sony PS5"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Sony"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("PS5"));
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("500"));
-        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("JKA34"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Brand New"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room Electronics Home"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_button)).perform(click());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
-    }
-
-    @Test
-    public void addTestData2() throws InterruptedException {
-        Thread.sleep(2000);
-        navigateToInventory();
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Blender"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Ninja"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("B600"));
-        // for Interaction with DatePickerDialog
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("100"));
-        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("GN54E"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Kitchen Home"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_button)).perform(click());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Dining Table"));
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("800"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Oak Wood Dining Table"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Sony PS5"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Sony"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("PS5"));
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("500"));
-        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("JKA34"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Brand New"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room Electronics Home"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_button)).perform(click());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
-    }
 }

@@ -54,7 +54,6 @@ public class InventoryViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_view);
 
-        // TODO get an actual inventory from the db
         // get the inventory that's been passed by the ledger view parent activity
         Intent intent = getIntent();
         inventory = (Inventory) intent.getSerializableExtra("inventory");
@@ -379,8 +378,6 @@ public class InventoryViewActivity extends AppCompatActivity {
             }
             inventory.sortItems();
             updateTotals(false);
-        }).addOnFailureListener(e -> {
-            // TODO
         });
     }
 }
