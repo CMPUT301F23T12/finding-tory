@@ -83,6 +83,12 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        profileViewModel.updateInventoryData();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
