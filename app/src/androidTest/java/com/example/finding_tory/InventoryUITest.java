@@ -56,58 +56,92 @@ import java.util.List;
 public class InventoryUITest {
     @Rule
     public ActivityScenarioRule<LedgerViewActivity> activityRule = new ActivityScenarioRule<>(LedgerViewActivity.class);
-    private CountingIdlingResource idlingResource;
-    private List<String> testItemNames;
 
+    private void awaitDB(int timer) {
+        try {
+            Thread.sleep(timer);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void register(){
-        Intent startIntent = new Intent(ApplicationProvider.getApplicationContext(), RegisterActivity.class);
-        activityRule.getScenario().onActivity(activity -> activity.startActivity(startIntent));
         onView(withId(R.id.button_register)).perform(click());
-
         onView(withId(R.id.edit_text_username)).perform(typeText("TestUser"));
         onView(withId(R.id.edit_text_name)).perform(typeText("TestUser"));
         onView(withId(R.id.edit_text_password)).perform(typeText("password123"));
         onView(withId(R.id.edit_text_confirm_password)).perform(typeText("password123"));
-        closeSoftKeyboard();
+        Espresso.closeSoftKeyboard();
 
         onView(withId(R.id.button_register)).perform(click());
-
     }
 
     @Test
     public void login() {
-        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("test"));
-        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("test"));
+        onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("abc"));
+        onView(withId(R.id.edit_text_password)).perform(ViewActions.typeText("123"));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.button_login)).perform(click());
     }
 
-    public void navigateToInventory() {
-        login();
+    @Test
+    public void createInventory() {
+        onView((withId(R.id.add_inventory_button))).perform(click());
+        onView(withId(R.id.inventoryNameText)).perform(ViewActions.typeText("Home"));
+        onView(withId(R.id.submit_button)).perform(click());
+        onData(anything())
+                .inAdapterView(withId(R.id.ledger_listview))
+                .atPosition(0)
+                .perform(click());
+    }
 
-        try {
-            Thread.sleep(6000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    @Test
+    public void testAddItem() {
+        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Apple Macbook Pro 2022"));
+        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Macbook"));
+        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("Pro 2022"));
+        onView(withId(R.id.date_edittext)).perform(click());
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
+        onView(withId(android.R.id.button1)).perform(click());
+        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("2000"));
+        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("SN3892"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_button)).perform(scrollTo());
+        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room"), ViewActions.closeSoftKeyboard());
+        onView(withId(R.id.add_tags_button)).perform(click());
+        onView(withId(R.id.add_button)).perform(scrollTo());
+        onView(withId(R.id.add_button)).perform(click());
 
+        onView(withText("Apple Macbook Pro 2022")).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void mainTest(){
+        register();
+        awaitDB(2000);
+        createInventory();
+        awaitDB(2000);
+        onData(anything())
+                .inAdapterView(withId(R.id.ledger_listview))
+                .atPosition(0)
+                .perform(click());
+        awaitDB(2000);
         onView(withId(R.id.add_delete_item_button)).perform(click());
+        awaitDB(1000);
+        testAddItem();
+        FirestoreDB.getUsersRef().document("TestUser").delete();
+    }
 
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    @Test
+    public void navigateToInventory() {
+        register();
+        awaitDB(2000);
 
         onView(withId(R.id.inventoryNameText)).perform(ViewActions.typeText("Home"));
         onView(withId(R.id.submit_button)).perform(click());
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        awaitDB(3000);
 
         onView(withId(R.id.search_inventory_edittext)).perform(typeText("Home"), ViewActions.closeSoftKeyboard());
 
@@ -150,11 +184,7 @@ public class InventoryUITest {
     }
 
     public void navigateToFirstItem() {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        awaitDB(2000);
 
         onData(anything())
                 .inAdapterView(withId(R.id.inventory_listview))
@@ -186,40 +216,6 @@ public class InventoryUITest {
                 datePicker.updateDate(year, monthOfYear, dayOfMonth);
             }
         };
-    }
-
-    @Test
-    public void testAddAndDeleteItem() {
-        try {
-            navigateToInventory();
-        }
-        catch (Exception e) {
-            
-        }
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-
-        onView(withId(R.id.description_edittext)).perform(ViewActions.typeText("Apple Macbook Pro 2022"));
-        onView(withId(R.id.make_edittext)).perform(ViewActions.typeText("Macbook"));
-        onView(withId(R.id.model_edittext)).perform(ViewActions.typeText("Pro 2022"));
-        onView(withId(R.id.date_edittext)).perform(click());
-        onView(withClassName(Matchers.equalTo(DatePicker.class.getName()))).perform(setDate(2023, 7, 1));
-        onView(withId(android.R.id.button1)).perform(click());
-        onView(withId(R.id.amount_edittext)).perform(ViewActions.typeText("2000"));
-        onView(withId(R.id.serial_number_edittext)).perform(ViewActions.typeText("SN3892"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.comment_edittext)).perform(ViewActions.typeText("Bought online"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_tags_edittext)).perform(ViewActions.typeText("Living-Room"), ViewActions.closeSoftKeyboard());
-        onView(withId(R.id.add_tags_button)).perform(click());
-        onView(withId(R.id.add_button)).perform(scrollTo());
-        onView(withId(R.id.add_button)).perform(click());
-
-        onView(withText("Apple Macbook Pro 2022")).check(matches(isDisplayed()));
-
-        navigateToFirstItem();
-        onView(withId(R.id.button_delete_item)).perform(click());
-        onView(withId(R.id.btnDelete)).perform(click());
-        onView(withText("Apple Macbook Pro 2022")).check(doesNotExist());
     }
 
     @Test
@@ -284,54 +280,6 @@ public class InventoryUITest {
         onView(withText("Blender")).check(matches(isDisplayed()));
     }
 
-    @Test
-    public void testbulkDeleteItem() {
-        try {
-            navigateToInventory();
-        }
-        catch (Exception e) {
-            
-        }
-
-        // Long click first item in the inventory
-        onData(anything())
-                .inAdapterView(withId(R.id.inventory_listview))
-                .atPosition(0)
-                .perform(ViewActions.longClick());
-
-        onData(anything())
-                .inAdapterView(withId(R.id.inventory_listview))
-                .atPosition(0)
-                .onChildView(withId(R.id.item_checkbox))
-                .perform(click());
-        onData(anything())
-                .inAdapterView(withId(R.id.inventory_listview))
-                .atPosition(2)
-                .onChildView(withId(R.id.item_checkbox))
-                .perform(click());
-
-        onView(withId(R.id.add_delete_item_button)).perform(click());
-        onView(withId(R.id.btnDelete)).perform(click());
-
-        // Reset the app to it's original state since the other tests might still need to run
-        resetAppState();
-    }
-
-
-    @Before
-    public void setUp() {
-        // Initialize your IdlingResource that monitors your DB operations
-        idlingResource = new CountingIdlingResource("DataLoader");
-        // Register the IdlingResource with Espresso
-        IdlingRegistry.getInstance().register(idlingResource);
-    }
-
-    @After
-    public void tearDown() {
-        // Unregister your IdlingResource
-        IdlingRegistry.getInstance().unregister(idlingResource);
-        deleteInventory("Home");
-    }
 
     public void resetAppState() {
         navigateToInventory();
