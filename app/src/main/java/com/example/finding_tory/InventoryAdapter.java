@@ -1,6 +1,7 @@
 package com.example.finding_tory;
 
 import android.content.Context;
+import android.icu.util.Measure;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,23 +70,46 @@ public class InventoryAdapter extends ArrayAdapter<Item> {
         descriptionTextView.setText(item.getDescription());
         valueTextView.setText(String.format(Locale.CANADA, "Value : $%.2f", item.getEstimatedValue()));
 
-//        StringBuilder tag_to_display = new StringBuilder();
-//        for (String tag : item.getItemTags()) {
-//            tag_to_display.append(tag).append(" ");
-//        }
         LinearLayout tagsContainer = view.findViewById(R.id.item_tags_container);
         tagsContainer.removeAllViews();
 
-        for (String tag : item.getItemTags()) {
+        int maxContainerWidth = 420;  // Set your desired maximum width for the tag container
+        int currentContainerWidth = 0;
+        boolean limit_approached = false;
 
+        for (String tag : item.getItemTags()) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
             View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
-//            tagView.setMargins();
+
             ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
             TextView tagTextView = tagView.findViewById(R.id.tag_text);
             tagTextView.setText(tag);
             tagTextView.setTextSize(11);
             removeTagButton.setVisibility(View.GONE);
+
+            // Measure the width of the tag
+            tagView.measure(0, 0);
+            int tagWidth = tagView.getMeasuredWidth();
+
+            // Check if adding the tag will exceed the maximum width
+            if (currentContainerWidth + tagWidth <= maxContainerWidth) {
+                tagsContainer.addView(tagView);
+                currentContainerWidth += tagWidth;
+            } else {
+                // Stop adding more tags if it exceeds the maximum width
+                limit_approached = true;
+                continue;
+            }
+        }
+        if (limit_approached) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View tagView = inflater.inflate(R.layout.tag_item_layout, tagsContainer, false);
+
+            ImageButton removeTagButton = tagView.findViewById(R.id.remove_tag_button);
+            TextView tagTextView = tagView.findViewById(R.id.tag_text);
+            tagTextView.setTextSize(11);
+            removeTagButton.setVisibility(View.GONE);
+            tagTextView.setText("...");
             tagsContainer.addView(tagView);
         }
 
