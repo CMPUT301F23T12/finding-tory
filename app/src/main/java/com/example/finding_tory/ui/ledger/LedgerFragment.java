@@ -130,37 +130,6 @@ public class LedgerFragment extends Fragment {
         binding = null;
     }
 
-//    /**
-//     * Called when an activity launched by this fragment returns a result.
-//     *
-//     * @param requestCode The integer request code originally supplied to startActivityForResult().
-//     * @param resultCode  The integer result code returned by the child activity.
-//     * @param data        An Intent that carries the result data.
-//     */
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        // adding new item to list once user submits new item
-//        if (requestCode == ActivityCodes.ADD_INVENTORY.getRequestCode()) {
-//            if (resultCode == RESULT_OK) {
-//                assert data != null;
-//                Inventory selectedInventory = (Inventory) data.getSerializableExtra("inventory_to_add");
-//
-//                assert selectedInventory != null;
-//                ledger.getInventories().add(selectedInventory);
-//            }
-//        } else if (requestCode == ActivityCodes.DELETE_INVENTORY.getRequestCode()) {
-//            if (resultCode == RESULT_OK) {
-//                assert data != null;
-//                Inventory deleteInventory = (Inventory) data.getSerializableExtra("inventory_to_delete");
-//                if (deleteInventory != null) {
-//                    ledger.deleteInventory(deleteInventory);
-//                }
-//            }
-//        }
-//        ledgerAdapter.notifyDataSetChanged();
-//    }
-
     /**
      * When this fragment is first launched or resumed after going back from
      * InventoryViewActivity it updates the inventories for any changes
