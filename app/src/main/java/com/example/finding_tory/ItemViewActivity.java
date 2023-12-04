@@ -243,6 +243,7 @@ public class ItemViewActivity extends AppCompatActivity {
             }
         } else { // if there's no images, no need to show the image section
             findViewById(R.id.image_slider_placeholder).setVisibility(View.GONE);
+//            findViewById(R.id.item_container).set;
         }
 
         if (passedItem.getItemTags().size() == 0) {
