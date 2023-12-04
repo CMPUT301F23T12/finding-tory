@@ -111,6 +111,14 @@ public class InventoryUITest {
         onView(withText(description)).check(matches(isDisplayed()));
     }
 
+    public void testDeleteItem(String item) {
+        onView(withText(item)).check(matches(isDisplayed()));
+        onView(withText(item)).perform(click());
+        onView(withId(R.id.delete_button)).perform(click());
+        onView(withId(R.id.btnDelete)).perform(click());
+        onView(withText(item)).check(doesNotExist());
+    }
+
     @Test
     public void loginAndLogout() {
         onView(withId(R.id.edit_text_username)).perform(ViewActions.typeText("abc"));
@@ -135,9 +143,11 @@ public class InventoryUITest {
         awaitDB(2000);
         onView(withId(R.id.add_delete_item_button)).perform(click());
         testAddItem("Sony PS5", "Sony", "PS5", "2000", "Electronics Consoles");
+        onView(withText("Sony PS5")).check(matches(isDisplayed()));
         awaitDB(1000);
         onView(withId(R.id.add_delete_item_button)).perform(click());
         testAddItem("Ninja Blender AF100", "Ninja", "AF100", "100", "Kitchen");
+        onView(withText("Ninja Blender AF100")).check(matches(isDisplayed()));
         Espresso.pressBack();
         awaitDB(1000);
         testDeleteInventory();
