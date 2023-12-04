@@ -7,15 +7,28 @@
     tools:context=".ui.ledger.LedgerFragment">
 
     <TextView
+        android:id="@+id/empty_ledger_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/no_inventories_msg"
+        android:textSize="28sp"
+        android:textAlignment="center"
+        android:textColor="@color/grey"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+
+    <TextView
         android:id="@+id/inventory_text"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:text="Your inventories:"
+        android:text="@string/ledger_view_header_msg"
         android:textStyle="bold"
-        android:textSize="20dp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

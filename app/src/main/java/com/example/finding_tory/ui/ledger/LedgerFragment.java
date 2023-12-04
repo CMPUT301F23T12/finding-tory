@@ -1,7 +1,5 @@
 package com.example.finding_tory.ui.ledger;
 
-import static android.app.Activity.RESULT_OK;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,7 +18,6 @@ import com.example.finding_tory.Inventory;
 import com.example.finding_tory.InventoryViewActivity;
 import com.example.finding_tory.Ledger;
 import com.example.finding_tory.LedgerAdapter;
-import com.example.finding_tory.R;
 import com.example.finding_tory.UpsertInventoryViewActivity;
 import com.example.finding_tory.databinding.FragmentLedgerBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -42,6 +40,7 @@ public class LedgerFragment extends Fragment {
     private ListView ledgerListView;
     private LedgerAdapter ledgerAdapter;
     private View root;
+    private TextView noInventoriesMsg;
     private FloatingActionButton addInvButton;
 
     public static LedgerFragment newInstance(String usrname) {
@@ -79,6 +78,9 @@ public class LedgerFragment extends Fragment {
         if (getArguments() != null) {
             username = getArguments().getString("username");
         }
+
+        // cache the no inventories textview
+        noInventoriesMsg = binding.emptyLedgerMsg;
 
         // cache the add button
         addInvButton = binding.addInventoryButton;
@@ -185,6 +187,12 @@ public class LedgerFragment extends Fragment {
                 }
                 ledgerAdapter = new LedgerAdapter(root.getContext(), ledger.getInventories());
                 ledgerListView.setAdapter(ledgerAdapter);
+
+                // display message if user has no inventories
+                if (ledger.getInventories().isEmpty())
+                    noInventoriesMsg.setVisibility(View.VISIBLE);
+                else
+                    noInventoriesMsg.setVisibility(View.GONE);
             } else {
                 // TODO Handle the error
             }
