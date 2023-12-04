@@ -48,7 +48,7 @@ public class ProfileViewModel extends ViewModel {
     }
 
 
-    private void updateInventoryData() {
+    public void updateInventoryData() {
         if (username == null || username.isEmpty()) {
             userFetchError.setValue("Username not set.");
             return;

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    >
 
     <!-- Label for Inventory Name -->
     <TextView
@@ -12,17 +11,23 @@
         android:layout_height="wrap_content"
         android:text="Inventory Name"
         android:textSize="18sp"
-        android:layout_marginBottom="8dp"/>
+        android:id="@+id/inventoryNameLabel"
+        android:layout_marginTop="16sp"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginRight="16dp"/>
 
     <!-- Inventory Name Input Field -->
     <EditText
         android:id="@+id/inventoryNameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Inventory Name"/>
+        android:hint="Enter Inventory Name"
+        android:layout_below="@id/inventoryNameLabel"
+        android:layout_marginHorizontal="16sp"/>
 
     <!-- Container for Buttons -->
     <LinearLayout
+        android:layout_below="@id/inventoryNameText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -38,18 +43,30 @@
             android:layout_marginEnd="10dp"/>
 
         <!-- Delete Button -->
+
+        <!-- Submit Button -->
         <Button
             android:id="@+id/delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:text="Delete"/>
+            android:text="Delete" />
 
-        <!-- Submit Button -->
         <Button
             android:id="@+id/submit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Submit"/>
     </LinearLayout>
-</LinearLayout>
+
+    <View
+        android:id="@+id/fadeBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:background="@android:color/black"
+        android:layerType="hardware"
+        android:visibility="gone">
+    </View>
+
+</RelativeLayout>
