@@ -226,8 +226,7 @@ public class InventoryViewActivity extends AppCompatActivity {
                 } else {
                     final View greyBack = findViewById(R.id.fadeBackground);
                     FilterFragment filterDialog = new FilterFragment();
-                    filterDialog.populateFilterParams(inventory.getFilter().getStartDate(), inventory.getFilter().getEndDate(),
-                            inventory.getFilter().getDescription(), inventory.getFilter().getMake(), inventory.getAllTags(), inventory.getFilter().getTags());
+                    filterDialog.populateFilterParams(inventory.getFilter(), inventory.getAllTags());
                     filterDialog.setFilterDialogListener(new FilterFragment.FilterDialogListener() {
                         @Override
                         public void onFilterDismissed() {
@@ -235,9 +234,8 @@ public class InventoryViewActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> filterTags) {
-                            // TODO change FilterFragment to have a Filter object instead of all these attributes
-                            inventory.setFilter(new Filter(filterStartDate, filterEndDate, filterDescription, filterMake, filterTags));
+                        public void onFilterConfirmed(Filter filter) {
+                            inventory.setFilter(filter);
                             inventory.filterItems();
                             updateTotals(false);
                         }

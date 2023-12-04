@@ -37,20 +37,16 @@ public class FilterFragment extends DialogFragment {
     TextView selectedDate;
     EditText filteredMake;
     Button datePicker;
-    Date dateStart;
-    Date dateEnd;
-    String filteredMakeTxt;
-    String filteredDescriptionTxt;
     private FilterFragment.FilterDialogListener listener;
     private RecyclerView tagsRecyclerView;
     private TagAdapter tagAdapter;
     private ArrayList<String> allTags;
-    private ArrayList<String> selectedTags = new ArrayList<>();
+    private Filter filter;
 
     public interface FilterDialogListener {
         void onFilterDismissed();
 
-        void onFilterConfirmed(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> filterTags);
+        void onFilterConfirmed(Filter filter);
     }
 
     @NonNull
@@ -70,15 +66,15 @@ public class FilterFragment extends DialogFragment {
         layoutManager.setJustifyContent(JustifyContent.SPACE_AROUND);
         tagsRecyclerView.setLayoutManager(layoutManager);
 
-        tagAdapter = new TagAdapter(allTags, selectedTags, false);
+        tagAdapter = new TagAdapter(allTags, filter.getTags(), false);
         tagsRecyclerView.setAdapter(tagAdapter);
 
-        if (dateStart != null) {
+        if (filter.getStartDate() != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-            selectedDate.setText(sdf.format(dateStart) + " - " + sdf.format(dateEnd));
+            selectedDate.setText(sdf.format(filter.getStartDate()) + " - " + sdf.format(filter.getEndDate()));
         }
-        if (filteredMakeTxt != null) {
-            filteredMake.setText(filteredMakeTxt);
+        if (filter.getMake() != null) {
+            filteredMake.setText(filter.getMake());
         }
 
         datePicker.setOnClickListener(v -> DatePickerDialog());
@@ -86,14 +82,15 @@ public class FilterFragment extends DialogFragment {
         view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
         view.findViewById(R.id.btnResetFilter).setOnClickListener(v -> {
             if (listener != null) {
-                listener.onFilterConfirmed(null, null, "", "", new ArrayList<String>());
+                listener.onFilterConfirmed(new Filter());
             }
             dismiss();
         });
 
         view.findViewById(R.id.btnFilter).setOnClickListener(v -> {
             if (listener != null) {
-                listener.onFilterConfirmed(dateStart, dateEnd, filteredDescriptionTxt, filteredMake.getText().toString(), selectedTags);
+                listener.onFilterConfirmed(new Filter(filter.getStartDate(), filter.getEndDate(),
+                        filter.getDescription(), filteredMake.getText().toString(), filter.getTags()));
             }
             dismiss();
         });
@@ -105,20 +102,12 @@ public class FilterFragment extends DialogFragment {
      * Sets the parameters for a filter based on various attributes. It assigns the start and end dates for filtering,
      * along with specific attributes such as make and description.
      *
-     * @param filterStartDate   The start date for the filter, used to determine the beginning of the filtering period.
-     * @param filterEndDate     The end date for the filter, used to determine the end of the filtering period.
-     * @param filterDescription A String representing the description to be used as part of the filter criteria.
-     * @param filterMake        A String representing the make (or brand) to be used as part of the filter criteria.
-     * @param allPassedInTags   An ArrayList of Strings representing all available tags.
-     * @param selectTags        An ArrayList of Strings representing the selected tags to be used in the filter.
+     * @param filter    Any previously-existing filter object, which will be use to pre-fill the dialog.
+     * @param allTags   An ArrayList of Strings representing all available tags.
      */
-    public void populateFilterParams(Date filterStartDate, Date filterEndDate, String filterDescription, String filterMake, ArrayList<String> allPassedInTags, ArrayList<String> selectTags) {
-        this.dateStart = filterStartDate;
-        this.dateEnd = filterEndDate;
-        this.filteredMakeTxt = filterMake;
-        this.filteredDescriptionTxt = filterDescription;
-        this.allTags = allPassedInTags;
-        this.selectedTags = selectTags;
+    public void populateFilterParams(Filter filter, ArrayList<String> allTags) {
+        this.filter = filter;
+        this.allTags = allTags;
     }
 
     /**
@@ -147,29 +136,29 @@ public class FilterFragment extends DialogFragment {
             Calendar calendar = Calendar.getInstance();
 
             // Setting the start date to 00:00:00
-            dateStart = new Date(selection.first);
-            calendar.setTime(dateStart);
+            filter.setStartDate(new Date(selection.first));
+            calendar.setTime(filter.getStartDate());
             calendar.add(Calendar.DAY_OF_MONTH, 1);
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
-            dateStart = calendar.getTime();
+            filter.setStartDate(calendar.getTime());
 
             // Setting the end date to 00:00:00
-            dateEnd = new Date(selection.second);
-            calendar.setTime(dateEnd);
+            filter.setEndDate(new Date(selection.second));
+            calendar.setTime(filter.getEndDate());
             calendar.add(Calendar.DAY_OF_MONTH, 1);
             calendar.set(Calendar.HOUR_OF_DAY, 23);
             calendar.set(Calendar.MINUTE, 59);
             calendar.set(Calendar.SECOND, 59);
             calendar.set(Calendar.MILLISECOND, 0);
-            dateEnd = calendar.getTime();
+            filter.setEndDate(calendar.getTime());
 
             // Formatting the selected dates as strings
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
-            String startDateString = sdf.format(dateStart);
-            String endDateString = sdf.format(dateEnd);
+            String startDateString = sdf.format(filter.getStartDate());
+            String endDateString = sdf.format(filter.getEndDate());
 
             // Creating the date range string
             String selectedDateRange = startDateString + " - " + endDateString;
