@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">finding-tory</string>
+    <string name="app_name">Finding \'Tory</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Test User</string>
@@ -17,5 +17,7 @@
     <string name="profile_statistics_title">Profile Statistics</string>
     <string name="edit_profile_btn_text">Edit Profile</string>
     <string name="change_password_btn_text">Change Password</string>
+    <string name="ledger_view_header_msg">Your inventories:</string>
+    <string name="no_inventories_msg">Create your first inventory!</string>
 
 </resources>
